@@ -14,9 +14,16 @@ from collections import defaultdict
 import threading
 import time
 
+try:
+    import yfinance as yf # type: ignore
+    YFINANCE_AVAILABLE = True
+except ImportError:
+    YFINANCE_AVAILABLE = False
+    print("⚠️  yfinance n'est pas installé. Installez-le avec: pip install yfinance")
 
-class IBDataProvider(EWrapper, EClient):
-    """Provider utilisant Interactive Brokers API."""
+
+class MarketDataProvider(EWrapper, EClient):
+    """Provider utilisant Interactive Brokers API pour récupérer les stocks et yfinance pour les historiques."""
     
     def __init__(self, host: str = "127.0.0.1", port: int = 4001, client_id: int = 1):
         EWrapper.__init__(self)
@@ -148,24 +155,6 @@ class IBDataProvider(EWrapper, EClient):
             print(f"❌ Erreur scanner: {e}")
             return []
     
-    def scannerData(self, reqId, rank, contractDetails, distance, benchmark, projection, legsStr):
-        """Callback IB pour chaque résultat du scanner."""
-        symbol = contractDetails.contract.symbol
-        exchange = getattr(contractDetails.contract, "exchange", "SMART") or "SMART"
-        
-        self.scanner_results.append({
-            "symbol": symbol,
-            "exchange": exchange,
-            "rank": rank,
-            "distance": distance,
-            "benchmark": benchmark,
-            "projection": projection
-        })
-    
-    def scannerDataEnd(self, reqId):
-        """Callback IB quand le scanner est terminé."""
-        self.scanner_done = True
-    
     def get_historical_data(
         self,
         symbol: str,
@@ -174,78 +163,60 @@ class IBDataProvider(EWrapper, EClient):
         interval: str = "1d"
     ) -> Optional[pd.DataFrame]:
         """
-        Récupère les données historiques via IB.
+        Récupère les données historiques via yfinance.
         
-        Note: IB utilise une duration relative, pas des dates absolues.
+        Args:
+            symbol: Symbole (ex: "AAPL")
+            start_date: Date de début
+            end_date: Date de fin
+            interval: "1d", "1h", "5m", etc.
+            
+        Returns:
+            DataFrame avec colonnes standardisées: date, open, high, low, close, volume
         """
         if not self.is_connected():
-            print("❌ Non connecté à IB")
+            print("❌ Provider non connecté")
             return None
         
-        # Calculer la duration
-        delta = end_date - start_date
-        days = delta.days
-        
-        if days <= 30:
-            duration = f"{days} D"
-        elif days <= 365:
-            duration = f"{days // 30} M"
-        else:
-            duration = f"{days // 365} Y"
-        
-        # Mapper l'intervalle
-        bar_size_map = {
-            "1d": "1 day",
-            "1h": "1 hour",
-            "5m": "5 mins",
-            "1m": "1 min"
-        }
-        bar_size = bar_size_map.get(interval, "1 day")
-        
-        contract = Contract()
-        contract.symbol = symbol
-        contract.secType = "STK"
-        contract.exchange = "SMART"
-        contract.currency = "USD"
-        
-        req_id = self._next_req_id
-        self._next_req_id += 1
-        
-        self.history_buf[req_id] = []
-        self.history_done[req_id] = False
-        self.req_map[req_id] = symbol
-        
         try:
-            self.reqHistoricalData(
-                req_id, contract, "", duration, bar_size, "TRADES", 1, 1, False, []
+            ticker = yf.Ticker(symbol)
+            df = ticker.history(
+                start=start_date,
+                end=end_date,
+                interval=interval,
+                auto_adjust=False  # Garder les prix non ajustés
             )
             
-            # Attendre la réponse
-            timeout = 30
-            start = time.time()
-            while not self.history_done.get(req_id) and (time.time() - start) < timeout:
-                time.sleep(0.1)
-            
-            bars = self.history_buf.get(req_id, [])
-            
-            if not bars:
+            if df.empty:
                 print(f"⚠️  Aucune donnée pour {symbol}")
                 return None
             
-            df = pd.DataFrame(bars)
-            df['date'] = pd.to_datetime(df['date'])
+            # Standardiser les colonnes
+            df = df.reset_index()
+            df.columns = [col.lower() for col in df.columns]
+            
+            # Renommer pour uniformiser
+            column_mapping = {
+                'date': 'date',
+                'open': 'open',
+                'high': 'high',
+                'low': 'low',
+                'close': 'close',
+                'volume': 'volume'
+            }
+            
+            df = df.rename(columns=column_mapping)
+            
+            # Ne garder que les colonnes nécessaires
+            required_cols = ['date', 'open', 'high', 'low', 'close', 'volume']
+            df = df[required_cols]
             
             print(f"✅ {symbol}: {len(df)} barres récupérées")
             return df
             
         except Exception as e:
-            print(f"❌ Erreur historique {symbol}: {e}")
+            print(f"❌ Erreur lors de la récupération de {symbol}: {e}")
             return None
-        finally:
-            # Cleanup
-            self.history_buf.pop(req_id, None)
-            self.history_done.pop(req_id, None)
-            self.req_map.pop(req_id, None)
     
     def historicalData(self, reqId, bar):
         """Callback IB pour chaque barre historique."""
