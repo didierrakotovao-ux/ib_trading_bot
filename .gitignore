@@ -1,0 +1,9 @@
+# Ignore Python virtual environment
+.venv/
+
+# Ignore CSV and database files
+*.csv
+*.db
+
+# Ignore Python cache directories
+__pycache__/
