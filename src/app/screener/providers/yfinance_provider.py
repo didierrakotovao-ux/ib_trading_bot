@@ -4,7 +4,6 @@ Provider de données utilisant yfinance (gratuit, pas de compte requis).
 from typing import List, Dict, Optional
 import pandas as pd
 from datetime import datetime, timedelta
-from .base_provider import DataProvider
 
 try:
     import yfinance as yf # type: ignore
@@ -14,7 +13,7 @@ except ImportError:
     print("⚠️  yfinance n'est pas installé. Installez-le avec: pip install yfinance")
 
 
-class YFinanceDataProvider(DataProvider):
+class YFinanceDataProvider():
     """Provider utilisant yfinance pour récupérer les données gratuitement."""
     
     def __init__(self):
@@ -35,21 +34,6 @@ class YFinanceDataProvider(DataProvider):
     
     def is_connected(self) -> bool:
         return self._connected and YFINANCE_AVAILABLE
-    
-    def get_scanner_results(
-        self, 
-        scan_type: str,
-        filters: Optional[Dict] = None,
-        max_results: int = 50
-    ) -> List[Dict]:
-        """
-        yfinance n'a pas de scanner intégré.
-        On pourrait implémenter un scanner basique avec une liste de symboles populaires.
-        Pour l'instant, retourne une liste vide.
-        """
-        print("⚠️  YFinance ne supporte pas les scanners de marché")
-        print("💡 Utilisez IBDataProvider pour le scanner, puis YFinance pour les données historiques")
-        return []
     
     def get_historical_data(
         self,

@@ -5,7 +5,6 @@ Wrapper autour de votre code existant pour l'adapter à l'interface DataProvider
 from typing import List, Dict, Optional
 import pandas as pd
 from datetime import datetime, timedelta
-from .base_provider import DataProvider
 
 from ibapi.client import EClient
 from ibapi.wrapper import EWrapper
@@ -16,7 +15,7 @@ import threading
 import time
 
 
-class IBDataProvider(EWrapper, EClient, DataProvider):
+class IBDataProvider(EWrapper, EClient):
     """Provider utilisant Interactive Brokers API."""
     
     def __init__(self, host: str = "127.0.0.1", port: int = 4001, client_id: int = 1):
