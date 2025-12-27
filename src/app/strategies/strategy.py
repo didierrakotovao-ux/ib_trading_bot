@@ -1,7 +1,9 @@
+from ibapi.scanner import ScannerSubscription
+
 class Strategy:
     name: str
 
-    def scanner_filters(self):
+    def scanner_filters(self) -> ScannerSubscription:
         pass
 
     def entry_signal(self, data, i) -> bool:

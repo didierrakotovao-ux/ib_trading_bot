@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from ibapi.client import EClient
 from ibapi.wrapper import EWrapper
 from ibapi.contract import Contract
+from ibapi.order import Order, OrderId
 from ibapi.scanner import ScannerSubscription
 from collections import defaultdict
 import threading
@@ -24,6 +25,7 @@ except ImportError:
 
 class MarketDataProvider(EWrapper, EClient):
     """Provider utilisant Interactive Brokers API pour récupérer les stocks et yfinance pour les historiques."""
+    scan_sub: Optional[ScannerSubscription] = None
     
     def __init__(self, host: str = "127.0.0.1", port: int = 4001, client_id: int = 1):
         EWrapper.__init__(self)
@@ -90,8 +92,6 @@ class MarketDataProvider(EWrapper, EClient):
     
     def get_scanner_results(
         self, 
-        scan_type: str,
-        filters: Optional[Dict] = None,
         max_results: int = 50
     ) -> List[Dict]:
         """
@@ -110,19 +110,6 @@ class MarketDataProvider(EWrapper, EClient):
             print("❌ Non connecté à IB")
             return []
         
-        # Configuration par défaut
-        filters = filters or {}
-        
-        scan_sub = ScannerSubscription()
-        scan_sub.instrument = "STK"
-        scan_sub.locationCode = filters.get('location', 'STK.NASDAQ')
-        scan_sub.scanCode = scan_type
-        scan_sub.abovePrice = filters.get('price_min', 2.0)
-        scan_sub.belowPrice = filters.get('price_max', 10000.0)
-        scan_sub.aboveVolume = filters.get('volume_min', 500_000)
-        
-        if 'market_cap_min' in filters:
-            scan_sub.marketCapAbove = filters['market_cap_min']
         
         # Reset
         self.scanner_results = []
@@ -131,10 +118,10 @@ class MarketDataProvider(EWrapper, EClient):
         req_id = self._next_req_id
         self._next_req_id += 1
         
-        print(f"🔍 Lancement scanner IB: {scan_type} sur {scan_sub.locationCode}")
+        print(f"🔍 Lancement scanner IB: {self.scan_sub.scanCode } sur {self.scan_sub.locationCode}")
         
         try:
-            self.reqScannerSubscription(req_id, scan_sub, [], [])
+            self.reqScannerSubscription(req_id, self.scan_sub, [], [])
             
             # Attendre les résultats
             timeout = 30
@@ -218,39 +205,6 @@ class MarketDataProvider(EWrapper, EClient):
             print(f"❌ Erreur lors de la récupération de {symbol}: {e}")
             return None
     
-    def historicalData(self, reqId, bar):
-        """Callback IB pour chaque barre historique."""
-        self.history_buf[reqId].append({
-            'date': bar.date,
-            'open': bar.open,
-            'high': bar.high,
-            'low': bar.low,
-            'close': bar.close,
-            'volume': bar.volume
-        })
-    
-    def historicalDataEnd(self, reqId, start, end):
-        """Callback IB quand les données historiques sont complètes."""
-        self.history_done[reqId] = True
-    
-    def get_current_price(self, symbol: str) -> Optional[float]:
-        """
-        Récupère le prix actuel via IB (snapshot).
-        Note: Nécessite un abonnement aux données temps réel.
-        """
-        # Pour simplifier, on prend la dernière clôture des données historiques
-        df = self.get_historical_data(
-            symbol,
-            datetime.now() - timedelta(days=2),
-            datetime.now(),
-            "1d"
-        )
-        
-        if df is not None and not df.empty:
-            return float(df['close'].iloc[-1])
-        
-        return None
-    
     def error(self, reqId, errorTime, errorCode, errorString, advancedOrderRejectJson=""):
         """Callback IB pour les erreurs."""
         # Filtrer les messages informatifs
@@ -258,3 +212,10 @@ class MarketDataProvider(EWrapper, EClient):
             return
         
         print(f"[IB ERROR] reqId={reqId} code={errorCode} msg={errorString}")
+
+    def placeOrder(self, contract:Contract, order:Order):
+        """Override pour loguer les ordres placés."""
+        self._next_req_id += 1
+        print(f"[IB ORDER] Placing orderId={self._next_req_id} for {contract.symbol} {order.action} {order.totalQuantity} @ {order.orderType}")
+        self.placeOrder(self._next_req_id, contract, order)    
+
