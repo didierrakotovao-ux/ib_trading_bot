@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from ibapi.client import EClient
 from ibapi.wrapper import EWrapper
 from ibapi.contract import Contract
-from ibapi.order import Order, OrderId
+from ibapi.order import Order
 from ibapi.scanner import ScannerSubscription
 from collections import defaultdict
 import threading
@@ -91,7 +91,8 @@ class MarketDataProvider(EWrapper, EClient):
         print(f"IB connecté, nextValidId = {orderId}")
     
     def get_scanner_results(
-        self, 
+        self,
+        scan_sub: ScannerSubscription, 
         max_results: int = 50
     ) -> List[Dict]:
         """
@@ -110,7 +111,7 @@ class MarketDataProvider(EWrapper, EClient):
             print("❌ Non connecté à IB")
             return []
         
-        
+        self.scan_sub = scan_sub
         # Reset
         self.scanner_results = []
         self.scanner_done = False
@@ -205,7 +206,7 @@ class MarketDataProvider(EWrapper, EClient):
             print(f"❌ Erreur lors de la récupération de {symbol}: {e}")
             return None
     
-    def error(self, reqId, errorTime, errorCode, errorString, advancedOrderRejectJson=""):
+    def error(self, reqId, errorCode, errorString):
         """Callback IB pour les erreurs."""
         # Filtrer les messages informatifs
         if errorCode in (2104, 2106, 2158):

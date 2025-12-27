@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from app.ml.scoring import Scoring
+from ml.scoring import Scoring
 import yfinance as yf # type: ignore
 from scipy.signal import argrelextrema # type: ignore
 
@@ -9,10 +9,10 @@ class AdDivergenceScoring(Scoring):
     df: pd.DataFrame
     name = "AdDivergenceScoring"
 
-    def __init__(self, dataframe: pd.DataFrame):
-        self.df = dataframe
+    def __init__(self):
+        self.df = None
         
-    def score(self):
+    def score(self, df: pd.DataFrame):
         """
         Implemente un score basé sur la détection de divergences haussières entre le prix et l'indicateur A/D.
         prend en compte aussi la confirmation par le RSI.
@@ -20,6 +20,7 @@ class AdDivergenceScoring(Scoring):
         Retourne un score entier (0–100).
         """
         # Placeholder for actual scoring logic
+        self.df = df
         score = 0
         if(self.detect_ad_bullish_divergence()):
             score += 40
