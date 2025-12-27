@@ -20,11 +20,30 @@ class AdDivergenceScoring(Scoring):
         Retourne un score entier (0–100).
         """
         # Placeholder for actual scoring logic
+        try:
+            df["EMA50"] = df["close"].ewm(span=50, adjust=False).mean()
+            df["EMA200"] = df["close"].ewm(span=200, adjust=False).mean()
+            delta = df["close"].diff()
+            up = delta.clip(lower=0)
+            down = -1 * delta.clip(upper=0)
+            avg_gain = up.rolling(window=14).mean()
+            avg_loss = down.rolling(window=14).mean()
+            rs = avg_gain / avg_loss
+            df["RSI"] = 100 - (100 / (1 + rs))
+            mfv = ((df["close"] - df["low"]) - (df["high"] - df["close"])) / (df["high"] - df["low"])
+            mfv = mfv.fillna(0)
+            mfv_volume = mfv * df["volume"]
+            df["AD"] = mfv_volume.cumsum()
+
+        except Exception as e:
+            print(f"❌ Erreur lors du calcul des indicateurs: {e}")
+            return 0
+        
         self.df = df
         score = 0
         if(self.detect_ad_bullish_divergence()):
             score += 40
-        if self.df["Close"].iloc[-1] > self.df["EMA50"].iloc[-1] > self.df["EMA200"].iloc[-1]:
+        if self.df["close"].iloc[-1] > self.df["EMA50"].iloc[-1] > self.df["EMA200"].iloc[-1]:
             score += 30
         if self.df["EMA50"].iloc[-1] > self.df["EMA200"].iloc[-1]:
             score += 10
@@ -37,10 +56,10 @@ class AdDivergenceScoring(Scoring):
         self.df["price_low"] = np.nan
         self.df["ad_low"] = np.nan
 
-        price_idx = argrelextrema(self.df["Low"].values, np.less, order=order)[0]
+        price_idx = argrelextrema(self.df["low"].values, np.less, order=order)[0]
         ad_idx = argrelextrema(self.df["AD"].values, np.less, order=order)[0]
 
-        self.df.loc[self.df.index[price_idx], "price_low"] = self.df["Low"].iloc[price_idx]
+        self.df.loc[self.df.index[price_idx], "price_low"] = self.df["low"].iloc[price_idx]
         self.df.loc[self.df.index[ad_idx], "ad_low"] = self.df["AD"].iloc[ad_idx]
 
         price_lows = self.df.dropna(subset=["price_low"])

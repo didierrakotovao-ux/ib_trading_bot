@@ -57,13 +57,11 @@ class Trading:
             for strategy in self.strategies:
                 print(f"  Strategie: {strategy.name}...")
                 scan_sub = strategy.scanner_filters()
-                # symbols = self.market_data_provider.get_scanner_results(scan_sub, max_results=200)
-                symbols = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA']  # Mocked for testing
+                symbols = self.market_data_provider.get_scanner_results(scan_sub, max_results=200)
                 strategy.set_symbols_to_analyse(symbols)
                 for symbol in strategy.get_symbols():
                     symbolToTrade.append(symbol)
                 symbolList.append(symbols)
-
             
             for symbol in symbolList:
                 print(f"  Stocks trouvés: {symbol}")
