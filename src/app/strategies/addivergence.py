@@ -25,9 +25,9 @@ class AdDivergenceStrategy(Strategy):
         la création du contrat d'ordre (entrée et sortie) 
         et la fourniture des données à scorer seront implémentées ici.
     """
-    def __init__(self, capital=10000, max_stocks=5, client_id=1):
+    def __init__(self, capital=10000, max_stocks=5):
         self.scoring = AdDivergenceScoring()
-        self.market_data = MarketDataProvider(port=7497, client_id=client_id)
+        self.market_data = MarketDataProvider(port=7497)
         self.lookback_days = 350
         self.score_threshold = 60
         self.capital = capital  # Montant total dédié à la stratégie
