@@ -16,7 +16,7 @@ class Trading:
     """
     def __init__(self):
         self.market_data_provider = MarketDataProvider(port=7497, client_id=1)
-        self.strategies = [AdDivergenceStrategy(client_id=2)]
+        self.strategies = [AdDivergenceStrategy(self.market_data_provider)]
         self.orders = []
         self.position_manager = PositionManager()
         self.order_callbacks = []  # Liste de callbacks à appeler sur exécution d'ordre
