@@ -16,6 +16,10 @@ class Strategy:
     def get_symbols(self) -> list:
         """Retourne la liste des symboles à trader"""
         pass
+    def get_order_params(self):
+        """Retourne les paramètres d’ordre pour entrée/sortie"""
+        pass
+    
     def set_symbols_to_analyse(self, symbols: list):
         """Définit la liste des symboles analysés"""
         pass

@@ -36,7 +36,7 @@ class MarketDataProvider(EWrapper, EClient):
         self.client_id = client_id
         
         self._connected = False
-        self._next_req_id = 10000
+        self._next_req_id = 1
         self._thread = None
         
         # Pour le scanner
@@ -87,7 +87,8 @@ class MarketDataProvider(EWrapper, EClient):
     
     def nextValidId(self, orderId: int):
         """Callback IB après connexion."""
-        self._next_req_id = max(self._next_req_id, orderId)
+        super().nextValidId(orderId)
+        self._next_req_id = orderId
         print(f"IB connecté, nextValidId = {orderId}")
     
     def get_scanner_results(
@@ -216,7 +217,46 @@ class MarketDataProvider(EWrapper, EClient):
 
     def placeOrder(self, contract:Contract, order:Order):
         """Override pour loguer les ordres placés."""
+        print(f"[IB ORDER] Placing order for {contract.symbol} {order.action} {order.totalQuantity} @ {order.orderType}")
+        super().placeOrder(order.orderId if hasattr(order, 'orderId') else self._next_req_id, contract, order)
         self._next_req_id += 1
-        print(f"[IB ORDER] Placing orderId={self._next_req_id} for {contract.symbol} {order.action} {order.totalQuantity} @ {order.orderType}")
-        self.placeOrder(self._next_req_id, contract, order)    
+
+    def create_contract(self, ticker: str, sec_type: str = 'STK', exchange: str = 'SMART', currency: str = 'USD') -> Contract:
+        """Crée un contrat IB pour un ETF"""
+        contract = Contract()
+        contract.symbol = ticker
+        contract.secType = sec_type
+        contract.exchange = exchange
+        contract.currency = currency
+        return contract
+    
+    def create_trailing_stop_order(self, quantity, trailing_percent, parent_order_id=0):
+        """Créer un ordre trailing stop"""
+        order = Order()
+        order.action = "SELL"  # Trailing stop est toujours une vente
+        order.orderType = "TRAIL"
+        order.totalQuantity = quantity
+        order.trailingPercent = trailing_percent  # Pourcentage de trailing
+        order.transmit = True
+        order.eTradeOnly = False
+        order.firmQuoteOnly = False
+        
+        # Lier au parent order si spécifié
+        if parent_order_id > 0:
+            order.parentId = parent_order_id
+            order.transmit = False
+        
+        return order
+    
+    def create_limit_order(self, action: str, quantity: int, limit_price: float, parent_order_id=0):
+        """Créer un ordre limite"""
+        order = Order()
+        order.action = action  # "BUY" ou "SELL"
+        order.orderType = "LMT"
+        order.totalQuantity = quantity
+        order.lmtPrice = limit_price    
+        order.transmit = True
+        order.eTradeOnly = False            
+
+
 
