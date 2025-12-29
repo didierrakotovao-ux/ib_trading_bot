@@ -42,21 +42,19 @@ class AdDivergenceStrategy(Strategy):
         scan_sub = ScannerSubscription()
         scan_sub.instrument = "STK"
         scan_sub.locationCode = "STK.NASDAQ"
-        scan_sub.scanCode = "TOP_PERC_LOS_GAIN"
+        scan_sub.scanCode = "MOST_ACTIVE"
         scan_sub.abovePrice = 5.0
         scan_sub.belowPrice = 500.0
         scan_sub.aboveVolume = 500_000
         # scan_sub.marketCapAbove = 10_000_000_000
         return scan_sub
     
-    def get_symbols(self) -> list: # type: ignore
-        """Retourne la liste des symboles à trader (max_stocks)"""
+    def get_symbols(self, trade_date) -> list: # type: ignore
+        """Retourne la liste des symboles à trader (max_stocks), en excluant les ETFs à effet de levier."""
         scored_symbols = []
         for symbol in self.symbolsToAnalyse:
-
-            end_date = datetime.now()
-            start_date = end_date - timedelta(days=self.lookback_days)
-            data = self.market_data.get_historical_data(symbol, start_date, end_date, interval="1d")
+            start_date = trade_date - timedelta(days=self.lookback_days)
+            data = self.market_data.get_historical_data(symbol, start_date, trade_date, interval="1d")
             if data is not None:
                 score = self.scoring.score(data)
                 if score >= self.score_threshold:
@@ -75,17 +73,6 @@ class AdDivergenceStrategy(Strategy):
         Retourne une liste de dicts {symbol, entry_order, stop_order, take_profit_order}.
         Ne place les ordres que pendant les heures d'ouverture du marché US (9h30-16h00 US/Eastern, jours ouvrés).
         """
-        import pytz
-        from datetime import datetime, time as dtime
-        us_eastern = pytz.timezone('US/Eastern')
-        now_et = datetime.now(us_eastern)
-        is_weekday = now_et.weekday() < 5
-        market_open = dtime(9, 30)
-        market_close = dtime(16, 0)
-        # if not (is_weekday and market_open <= now_et.time() <= market_close):
-        #     print("⏳ Marché fermé : les ordres ne seront pas générés/envoyés.")
-        #     return []
-
         if not hasattr(self, 'symbolsToTrade') or not hasattr(self, 'symbolsData'):
             raise Exception("Appeler get_symbols() avant get_order_params()")
         n = len(self.symbolsToTrade)
@@ -93,13 +80,20 @@ class AdDivergenceStrategy(Strategy):
             return []
         capital_per_stock = self.capital / n
         order_params = []
-        order_id_gen = iter(range(100000, 200000))
-        self.market_data.nextValidId(next(order_id_gen))
+        # S'assurer que la connexion est prête et récupérer le vrai nextValidId
+        if hasattr(self.market_data, '_next_req_id'):
+            start_id = self.market_data._next_req_id
+        else:
+            # Valeur de secours si jamais _next_req_id n'existe pas
+            start_id = 100000
+        order_id_gen = iter(range(start_id, start_id + 10000))
         for symbol in self.symbolsToTrade:
             df = self.symbolsData[symbol]
             last_close = df['close'].iloc[-1]
             qty = int(capital_per_stock / last_close)
             parent_id = next(order_id_gen)
+            stop_id = next(order_id_gen)
+            tp_id = next(order_id_gen)
 
             # Parent: ordre d'entrée
             entryorder = Order()
@@ -118,13 +112,13 @@ class AdDivergenceStrategy(Strategy):
             slorder = Order()
             slorder.action = "SELL"
             slorder.orderType = "TRAIL"
-            slorder.auxPrice = round(last_close * 0.90, 2)  # Trailing stop à 10% sous le prix
+            # slorder.auxPrice = round(last_close * 0.90, 2)  # Trailing stop à 10% sous le prix
             slorder.totalQuantity = qty
             slorder.parentId = parent_id
             slorder.transmit = False
             slorder.eTradeOnly = False
             slorder.firmQuoteOnly = False
-            slorder.orderId = parent_id + 1
+            slorder.orderId = stop_id
             slorder.trailingPercent = 10.0  # Trailing de 10%
             slorder.tif = "GTC"  # Good Till Cancelled
 
@@ -138,7 +132,7 @@ class AdDivergenceStrategy(Strategy):
             tporder.transmit = True  # Le dernier transmet l'ensemble
             tporder.eTradeOnly = False
             tporder.firmQuoteOnly = False
-            tporder.orderId = parent_id + 2
+            tporder.orderId = tp_id
             tporder.tif = "GTC"  # Good Till Cancelled
                             
             order_params.append({
@@ -147,7 +141,7 @@ class AdDivergenceStrategy(Strategy):
                 'stop_order': slorder,
                 'take_profit_order': tporder
             })
-            parent_id += 10  # Incrément pour éviter collision d'IDs
+            self.market_data._next_req_id += 3  # Incrémente l'ID pour les prochains ordres
         return order_params
 
     def set_symbols_to_analyse(self, symbols: list):

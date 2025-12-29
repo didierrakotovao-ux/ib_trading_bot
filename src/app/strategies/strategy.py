@@ -13,13 +13,13 @@ class Strategy:
     def exit_signal(self, data, i, trade) -> bool:
         """Signal de sortie"""
         pass
-    def get_symbols(self) -> list:
+    def get_symbols(self, trade_date) -> list:
         """Retourne la liste des symboles à trader"""
         pass
     def get_order_params(self):
         """Retourne les paramètres d’ordre pour entrée/sortie"""
         pass
-    
+
     def set_symbols_to_analyse(self, symbols: list):
         """Définit la liste des symboles analysés"""
         pass

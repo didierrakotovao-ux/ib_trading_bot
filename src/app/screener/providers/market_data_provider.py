@@ -215,6 +215,9 @@ class MarketDataProvider(EWrapper, EClient):
         Returns:
             DataFrame avec colonnes standardisées: date, open, high, low, close, volume
         """
+        leverage_keywords = [
+            'leveraged', 'ultra', '2x', '3x', 'bull', 'bear', 'proshares', 'direxion', 'x2', 'x3', 'triple', 'double'
+        ]
         try:
             ticker = yf.Ticker(symbol)
             df = ticker.history(
@@ -226,6 +229,14 @@ class MarketDataProvider(EWrapper, EClient):
             
             if df.empty:
                 print(f"⚠️  Aucune donnée pour {symbol}")
+                return None
+            
+            info = ticker.info
+            name = (info.get('longName') or info.get('shortName') or '').lower()
+            summary = (info.get('summaryDetail') or '').lower() if isinstance(info.get('summaryDetail'), str) else ''
+                # Exclure si mot-clé trouvé dans le nom ou le résumé
+            if any(kw in name for kw in leverage_keywords) or any(kw in summary for kw in leverage_keywords):
+                print(f"[FILTRAGE ETF LEVERAGE] {symbol} exclu: {name}")
                 return None
             
             # Standardiser les colonnes

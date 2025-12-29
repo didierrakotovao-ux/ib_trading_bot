@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from screener.providers.market_data_provider import MarketDataProvider
 from strategies.addivergence import AdDivergenceStrategy
 from position_manager import PositionManager
@@ -84,6 +85,8 @@ class Trading:
         4- Ouvre les positions dans le PositionManager uniquement lors de l'exécution effective de l'ordre d'entrée (voir on_order_executed).
         """
         try:
+            trade_date = datetime.now()
+            
             symbolList: list = []
             symbolToTrade: list = []
             self.market_data_provider.connect()
@@ -92,12 +95,11 @@ class Trading:
                 scan_sub = strategy.scanner_filters()
                 symbols = self.market_data_provider.get_scanner_results(scan_sub, max_results=200)
                 strategy.set_symbols_to_analyse(symbols)
-                for symbol in strategy.get_symbols():
+                
+                for symbol in strategy.get_symbols(trade_date):
                     symbolToTrade.append(symbol)
                 for orders in strategy.get_order_params():
                     contrat = self.market_data_provider.create_contract(orders['symbol'])
-                    if not self.market_data_provider.is_connected():
-                        self.market_data_provider.connect()
                     self.place_order(contrat, orders['entry_order'])
                     self.place_order(contrat, orders['stop_order'])
                     self.place_order(contrat, orders['take_profit_order'])
