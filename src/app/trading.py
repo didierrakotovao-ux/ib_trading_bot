@@ -14,7 +14,7 @@ class Trading:
         6-écrit le journal de performance
     """
     def __init__(self):
-        self.market_data_provider = MarketDataProvider(port=4001, client_id=1)
+        self.market_data_provider = MarketDataProvider(port=7497, client_id=1)
         self.strategies = [AdDivergenceStrategy(self.market_data_provider)]
         self.orders = []
         self.position_manager = PositionManager()
@@ -94,13 +94,13 @@ class Trading:
                 strategy.set_symbols_to_analyse(symbols)
                 for symbol in strategy.get_symbols():
                     symbolToTrade.append(symbol)
-                # for orders in strategy.get_order_params():
-                #     contrat = self.market_data_provider.create_contract(orders['symbol'])
-                #     if not self.market_data_provider.is_connected():
-                #         self.market_data_provider.connect()
-                #     self.place_order(contrat, orders['entry_order'])
-                #     self.place_order(contrat, orders['stop_order'])
-                #     self.place_order(contrat, orders['take_profit_order'])
+                for orders in strategy.get_order_params():
+                    contrat = self.market_data_provider.create_contract(orders['symbol'])
+                    if not self.market_data_provider.is_connected():
+                        self.market_data_provider.connect()
+                    self.place_order(contrat, orders['entry_order'])
+                    self.place_order(contrat, orders['stop_order'])
+                    self.place_order(contrat, orders['take_profit_order'])
             for symbol in symbolToTrade:
                 print(f"  Stocks a trader: {symbol}")
 

@@ -42,7 +42,7 @@ class AdDivergenceStrategy(Strategy):
         scan_sub = ScannerSubscription()
         scan_sub.instrument = "STK"
         scan_sub.locationCode = "STK.NASDAQ"
-        scan_sub.scanCode = "HOT_BY_VOLUME"
+        scan_sub.scanCode = "TOP_PERC_LOS_GAIN"
         scan_sub.abovePrice = 5.0
         scan_sub.belowPrice = 500.0
         scan_sub.aboveVolume = 500_000

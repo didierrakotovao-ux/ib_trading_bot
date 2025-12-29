@@ -14,14 +14,7 @@ from ibapi.scanner import ScannerSubscription
 from collections import defaultdict
 import threading
 import time
-
-try:
-    import yfinance as yf # type: ignore
-    YFINANCE_AVAILABLE = True
-except ImportError:
-    YFINANCE_AVAILABLE = False
-    print("⚠️  yfinance n'est pas installé. Installez-le avec: pip install yfinance")
-
+import yfinance as yf
 
 class MarketDataProvider(EWrapper, EClient):
     """Provider utilisant Interactive Brokers API pour récupérer les stocks et yfinance pour les historiques."""
