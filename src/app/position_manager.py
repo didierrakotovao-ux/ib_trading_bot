@@ -23,6 +23,10 @@ class PositionManager:
     def __init__(self):
         self.positions = []
 
+    def has_open_position(self, symbol):
+        """Retourne True si une position ouverte existe pour ce symbole."""
+        return any(p.symbol == symbol and p.status == "open" for p in self.positions)
+
     def open_position(self, symbol, qty, entry_price, entry_time=None, position_type="long"):
         # Vérifie s'il existe déjà une position ouverte sur ce symbole
         if any(p.symbol == symbol and p.status == "open" for p in self.positions):

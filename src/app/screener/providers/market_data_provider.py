@@ -27,17 +27,16 @@ class MarketDataProvider(EWrapper, EClient):
     """Provider utilisant Interactive Brokers API pour récupérer les stocks et yfinance pour les historiques."""
     scan_sub: Optional[ScannerSubscription] = None
     
-    def __init__(self, host: str = "127.0.0.1", port: int = 4001, client_id: int = 1):
+    def __init__(self, host: str = "127.0.0.1", port: int = 4001, client_id: int = 5):
         EWrapper.__init__(self)
         EClient.__init__(self, self)
-        
         self.host = host
         self.port = port
         self.client_id = client_id
-        
         self._connected = False
-        self._next_req_id = 1
+        self._next_req_id = 10000
         self._thread = None
+        self._ready = False  # Synchronisation sur nextValidId
         
         # Pour le scanner
         self.scanner_results = []
@@ -47,12 +46,63 @@ class MarketDataProvider(EWrapper, EClient):
         self.history_buf = defaultdict(list)
         self.req_map = {}
         self.history_done = {}
+
+    # --- Gestion des positions IB ---
+    def req_ib_positions(self):
+        """Demande les positions en cours à IB, attend que la connexion soit vraiment prête."""
+        self._ib_positions = []
+        self._ib_positions_done = False
+        if not self.wait_until_ready():
+            print("[DEBUG] Impossible de récupérer les positions : IB non prêt.")
+            return []
+        self.reqPositions()
+        # Attendre la fin de la récupération (positionEnd)
+        timeout = 10
+        start = time.time()
+        while not self._ib_positions_done and (time.time() - start) < timeout:
+            time.sleep(0.1)
+        return self._ib_positions
+
+    def position(self, account, contract, position, avgCost):
+        """Callback IB pour chaque position ouverte."""
+        print(f"[DEBUG] position callback: {contract.symbol} qty={position} avgCost={avgCost} account={account}")
+        # On ne garde que les actions US (STK)
+        if contract.secType == 'STK' and position != 0:
+            self._ib_positions.append({
+                'symbol': contract.symbol,
+                'qty': position,
+                'avg_cost': avgCost,
+                'account': account
+            })
+
+    def positionEnd(self):
+        print("[DEBUG] positionEnd callback called")
+        self._ib_positions_done = True
+
+    def get_ib_positions(self):
+        """Récupère la liste des positions ouvertes via l'API IB."""
+        if not self.is_connected():
+            print("[DEBUG] Connexion IB non active, tentative de connexion...")
+            self.connect()
+            # Attendre que la connexion soit bien établie
+            timeout = 10
+            start = time.time()
+            while not self.is_connected() and (time.time() - start) < timeout:
+                time.sleep(0.1)
+            if not self.is_connected():
+                print("[DEBUG] Impossible d'établir la connexion IB pour get_ib_positions")
+                return []
+        # Attendre que l'API soit vraiment prête (nextValidId)
+        if not self.wait_until_ready():
+            return []
+        return self.req_ib_positions()
     
     def connect(self) -> bool:
         """Établit la connexion avec IB Gateway/TWS."""
         try:
-            EClient.connect(self, self.host, self.port, self.client_id)
             
+            EClient.connect(self, self.host, self.port, self._next_req_id)
+            self._next_req_id += 1
             # Lancer le thread de communication
             self._thread = threading.Thread(target=self.run, daemon=True)
             self._thread.start()
@@ -89,8 +139,17 @@ class MarketDataProvider(EWrapper, EClient):
         """Callback IB après connexion."""
         super().nextValidId(orderId)
         self._next_req_id = orderId
+        self._ready = True
         print(f"IB connecté, nextValidId = {orderId}")
     
+    def wait_until_ready(self, timeout=10):
+        start = time.time()
+        while not self._ready and (time.time() - start) < timeout:
+            time.sleep(0.1)
+        if not self._ready:
+            print("[DEBUG] IB API pas prête (nextValidId non reçu)")
+        return self._ready
+
     def get_scanner_results(
         self,
         scan_sub: ScannerSubscription, 
@@ -110,21 +169,22 @@ class MarketDataProvider(EWrapper, EClient):
         """
         if not self.is_connected():
             print("❌ Non connecté à IB")
+            self.connect()
             return []
-        
         self.scan_sub = scan_sub
         # Reset
         self.scanner_results = []
         self.scanner_done = False
-        
         req_id = self._next_req_id
         self._next_req_id += 1
-        
         print(f"🔍 Lancement scanner IB: {self.scan_sub.scanCode } sur {self.scan_sub.locationCode}")
-        
+        # Protection supplémentaire : vérifier la connexion juste avant le scanner
+        if not self.is_connected():
+            print("[DEBUG] Connexion IB perdue juste avant reqScannerSubscription !")
+            return []
         try:
+            print("[DEBUG] Avant reqScannerSubscription, connexion active.")
             self.reqScannerSubscription(req_id, self.scan_sub, [], [])
-            
             # Attendre les résultats
             timeout = 30
             start = time.time()
@@ -132,16 +192,15 @@ class MarketDataProvider(EWrapper, EClient):
                 time.sleep(0.2)
                 if self.scanner_results is not None and len(self.scanner_results) >= max_results:
                     break
-            
             # Annuler la souscription
             self.cancelScannerSubscription(req_id)
-            
             results = self.scanner_results[:max_results]
             print(f"✅ Scanner terminé: {len(results)} résultats")
             return results
-            
         except Exception as e:
             print(f"❌ Erreur scanner: {e}")
+            import traceback
+            traceback.print_exc()
             return []
     
     def get_historical_data(
@@ -163,10 +222,6 @@ class MarketDataProvider(EWrapper, EClient):
         Returns:
             DataFrame avec colonnes standardisées: date, open, high, low, close, volume
         """
-        if not self.is_connected():
-            print("❌ Provider non connecté")
-            return None
-        
         try:
             ticker = yf.Ticker(symbol)
             df = ticker.history(
@@ -209,10 +264,6 @@ class MarketDataProvider(EWrapper, EClient):
     
     def error(self, reqId, errorCode, errorString):
         """Callback IB pour les erreurs."""
-        # Filtrer les messages informatifs
-        if errorCode in (2104, 2106, 2158):
-            return
-        
         print(f"[IB ERROR] reqId={reqId} code={errorCode} msg={errorString}")
 
     def placeOrder(self, contract:Contract, order:Order):
@@ -230,33 +281,41 @@ class MarketDataProvider(EWrapper, EClient):
         contract.currency = currency
         return contract
     
-    def create_trailing_stop_order(self, quantity, trailing_percent, parent_order_id=0):
-        """Créer un ordre trailing stop"""
-        order = Order()
-        order.action = "SELL"  # Trailing stop est toujours une vente
-        order.orderType = "TRAIL"
-        order.totalQuantity = quantity
-        order.trailingPercent = trailing_percent  # Pourcentage de trailing
-        order.transmit = True
-        order.eTradeOnly = False
-        order.firmQuoteOnly = False
-        
-        # Lier au parent order si spécifié
-        if parent_order_id > 0:
-            order.parentId = parent_order_id
-            order.transmit = False
-        
-        return order
-    
-    def create_limit_order(self, action: str, quantity: int, limit_price: float, parent_order_id=0):
-        """Créer un ordre limite"""
-        order = Order()
-        order.action = action  # "BUY" ou "SELL"
-        order.orderType = "LMT"
-        order.totalQuantity = quantity
-        order.lmtPrice = limit_price    
-        order.transmit = True
-        order.eTradeOnly = False            
+    def force_close(self):
+        """
+        Force la fermeture de la connexion IB et du thread associé.
+        """
+        import sys
+        try:
+            self.disconnect()
+            if self._thread and self._thread.is_alive():
+                print("[DEBUG] Attente de l'arrêt du thread IB...")
+                self._thread.join(timeout=2)
+                if self._thread.is_alive():
+                    print("[DEBUG] Le thread IB ne s'arrête pas, forçage de l'arrêt du process.")
+                    sys.exit(0)
+        except Exception as e:
+            print(f"[DEBUG] Erreur lors de force_close: {e}")
+            sys.exit(1)
+
+    def scannerData(self, reqId, rank, contract, distance, benchmark, projection, legsStr):
+        symbol = getattr(contract, "symbol", None)
+        if not symbol or symbol == "N/A":
+            symbol = getattr(contract, "localSymbol", None)
+        if not symbol or symbol == "N/A":
+            # Fallback : parser la chaîne contract si possible
+            contract_str = str(contract)
+            # Format attendu : id,symbol,STK,...
+            parts = contract_str.split(",")
+            if len(parts) > 1:
+                symbol = parts[1]
+            else:
+                symbol = "N/A"
+        self.scanner_results.append(symbol)
+
+    def scannerDataEnd(self, reqId):
+        print(f"[DEBUG] scannerDataEnd: reqId={reqId}, total results={len(self.scanner_results)}")
+        self.scanner_done = True
 
 
 

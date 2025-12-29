@@ -42,19 +42,18 @@ class AdDivergenceStrategy(Strategy):
         scan_sub = ScannerSubscription()
         scan_sub.instrument = "STK"
         scan_sub.locationCode = "STK.NASDAQ"
-        scan_sub.scanCode = "MOST_ACTIVE"
+        scan_sub.scanCode = "HOT_BY_VOLUME"
         scan_sub.abovePrice = 5.0
         scan_sub.belowPrice = 500.0
         scan_sub.aboveVolume = 500_000
-        scan_sub.marketCapAbove = 10_000_000_000
+        # scan_sub.marketCapAbove = 10_000_000_000
         return scan_sub
     
     def get_symbols(self) -> list: # type: ignore
         """Retourne la liste des symboles à trader (max_stocks)"""
-        if not self.market_data.is_connected():
-            self.market_data.connect()
         scored_symbols = []
         for symbol in self.symbolsToAnalyse:
+
             end_date = datetime.now()
             start_date = end_date - timedelta(days=self.lookback_days)
             data = self.market_data.get_historical_data(symbol, start_date, end_date, interval="1d")
@@ -67,7 +66,6 @@ class AdDivergenceStrategy(Strategy):
         selected = scored_symbols[:self.max_stocks]
         self.symbolsToTrade = [s[0] for s in selected]
         self.symbolsData = {s[0]: s[2] for s in selected}  # stocke les dataframes pour chaque symbole
-        self.market_data.disconnect()
         return self.symbolsToTrade
 
     def get_order_params(self):
@@ -84,9 +82,9 @@ class AdDivergenceStrategy(Strategy):
         is_weekday = now_et.weekday() < 5
         market_open = dtime(9, 30)
         market_close = dtime(16, 0)
-        if not (is_weekday and market_open <= now_et.time() <= market_close):
-            print("⏳ Marché fermé : les ordres ne seront pas générés/envoyés.")
-            return []
+        # if not (is_weekday and market_open <= now_et.time() <= market_close):
+        #     print("⏳ Marché fermé : les ordres ne seront pas générés/envoyés.")
+        #     return []
 
         if not hasattr(self, 'symbolsToTrade') or not hasattr(self, 'symbolsData'):
             raise Exception("Appeler get_symbols() avant get_order_params()")

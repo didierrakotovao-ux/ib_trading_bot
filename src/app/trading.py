@@ -1,4 +1,3 @@
-
 from screener.providers.market_data_provider import MarketDataProvider
 from strategies.addivergence import AdDivergenceStrategy
 from position_manager import PositionManager
@@ -15,7 +14,7 @@ class Trading:
         6-écrit le journal de performance
     """
     def __init__(self):
-        self.market_data_provider = MarketDataProvider(port=7497, client_id=1)
+        self.market_data_provider = MarketDataProvider(port=4001, client_id=1)
         self.strategies = [AdDivergenceStrategy(self.market_data_provider)]
         self.orders = []
         self.position_manager = PositionManager()
@@ -49,6 +48,10 @@ class Trading:
         Reçoit un contrat et un ordre généré par la stratégie et les transmet au provider via placeOrder.
         Appelle le callback sur exécution d'ordre (à compléter selon le retour du provider).
         """
+        symbol = getattr(contract, 'symbol', None)
+        if order.action == "BUY" and symbol and self.position_manager.has_open_position(symbol):
+            print(f"[Trading] Position déjà ouverte sur {symbol}, ordre ignoré.")
+            return None
         result = self.market_data_provider.placeOrder(contract, order)
         self.orders.append((contract, order))
         # Exemple d'appel du callback (à adapter selon le retour réel du provider)
@@ -87,20 +90,17 @@ class Trading:
             for strategy in self.strategies:
                 print(f"  Strategie: {strategy.name}...")
                 scan_sub = strategy.scanner_filters()
-                # symbols = self.market_data_provider.get_scanner_results(scan_sub, max_results=200)
-
-                symbols = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA', 'NVDA', 'META', 'INTC', 'AMD', 'NFLX']
-
+                symbols = self.market_data_provider.get_scanner_results(scan_sub, max_results=200)
                 strategy.set_symbols_to_analyse(symbols)
                 for symbol in strategy.get_symbols():
                     symbolToTrade.append(symbol)
-                for orders in strategy.get_order_params():
-                    contrat = self.market_data_provider.create_contract(orders['symbol'])
-                    if not self.market_data_provider.is_connected():
-                        self.market_data_provider.connect()
-                    self.place_order(contrat, orders['entry_order'])
-                    self.place_order(contrat, orders['stop_order'])
-                    self.place_order(contrat, orders['take_profit_order'])
+                # for orders in strategy.get_order_params():
+                #     contrat = self.market_data_provider.create_contract(orders['symbol'])
+                #     if not self.market_data_provider.is_connected():
+                #         self.market_data_provider.connect()
+                #     self.place_order(contrat, orders['entry_order'])
+                #     self.place_order(contrat, orders['stop_order'])
+                #     self.place_order(contrat, orders['take_profit_order'])
             for symbol in symbolToTrade:
                 print(f"  Stocks a trader: {symbol}")
 
@@ -110,7 +110,58 @@ class Trading:
             self.market_data_provider.disconnect()
             print(f"Erreur lors du trading: {e}")
 
+    def sync_positions_with_ib(self):
+        """
+        Synchronise le PositionManager avec les positions réelles récupérées via l'API IB.
+        """
+        # Vérification stricte de la connexion
+        if not self.market_data_provider.is_connected():
+            print("[DEBUG] MarketDataProvider non connecté, tentative de reconnexion...")
+            # Recréation d'une nouvelle instance pour une reconnexion propre
+            from screener.providers.market_data_provider import MarketDataProvider
+            self.market_data_provider = MarketDataProvider(port=self.market_data_provider.port, client_id=self.market_data_provider.client_id)
+            if not self.market_data_provider.connect():
+                print("[DEBUG] Impossible de se connecter à IB, synchronisation annulée.")
+                return
+        ib_positions = self.market_data_provider.get_ib_positions()
+        print(f"Positions IB récupérées: {ib_positions}")
+        for pos in ib_positions:
+            if not self.position_manager.has_open_position(pos['symbol']):
+                self.position_manager.open_position(
+                    symbol=pos['symbol'],
+                    qty=pos['qty'],
+                    entry_price=pos['avg_cost'],
+                    entry_time=None,
+                    position_type="long" if pos['qty'] > 0 else "short"
+                )
+        print(f"Positions synchronisées depuis IB: {[p.symbol for p in self.position_manager.get_open_positions()]}" )
+
+    def close(self):
+        """
+        Déconnecte proprement le MarketDataProvider (IB) et arrête le thread associé.
+        """
+        if self.market_data_provider.is_connected():
+            self.market_data_provider.disconnect()
+        print("Déconnexion propre IB terminée.")
+
+
+
 if __name__ == "__main__":
+    client_id = 11  # À ajuster si besoin
     trading = Trading()
-    trading.init_trade()
-        
+    try:
+        print("[TRADING] Connexion à IB...")
+        connected = trading.market_data_provider.connect()
+        print(f"[TRADING] Connecté: {connected}")
+        if not connected:
+            print("[TRADING] Échec de connexion, arrêt du script.")
+            exit(1)
+        trading.sync_positions_with_ib()
+        trading.init_trade()
+        pass
+    except KeyboardInterrupt:
+        print("Arrêt demandé par l'utilisateur (Ctrl+C)")        
+    finally:
+        print("[TRADING] Déconnexion propre...")
+        trading.market_data_provider.disconnect()
+        print("[TRADING] Déconnecté.")
