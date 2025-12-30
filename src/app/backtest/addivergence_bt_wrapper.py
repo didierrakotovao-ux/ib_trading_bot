@@ -12,7 +12,9 @@ class AdDivergenceBTWrapper(bt.Strategy):
 
     params = dict(
         capital=100000,
-        max_stocks=5
+        max_stocks=5,
+        stop_loss=0.05,   # Trailing stop à 5%
+        take_profit=0.10  # Take profit à 10%
     )
 
     def __init__(self,start_date,end_date):
@@ -42,6 +44,8 @@ class AdDivergenceBTWrapper(bt.Strategy):
         print(f"2️⃣ Sélection + scoring")
         symbols_to_trade = self.strategy.get_symbols(current_date)
 
+        print(f"{current_date} Les symboles selectionnés {symbols_to_trade}")
+
         # 3️⃣ Génération des ordres IBKR
         order_bundles = self.strategy.get_order_params()
 
@@ -56,6 +60,7 @@ class AdDivergenceBTWrapper(bt.Strategy):
             entry = OrderTranslator.entry(self, data, bundle["entry_order"])
             stop = OrderTranslator.stop(self, data, bundle["stop_order"])
             tp = OrderTranslator.take_profit(self, data, bundle["take_profit_order"])
+            print(f"{current_date} Placing orders for {symbol}: Entry at {entry.created.price}, Stop at {stop.created.price}, TP at {tp.created.price}")
 
             self.orders_by_symbol[symbol] = {
                 "entry": entry,
