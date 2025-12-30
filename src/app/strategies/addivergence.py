@@ -89,6 +89,7 @@ class AdDivergenceStrategy(Strategy):
             df = self.symbolsData[symbol]
             last_close = df['close'].iloc[-1]
             qty = int(capital_per_stock / last_close)
+            print(f"[ORDER PARAMS] Préparation des ordres pour {symbol} avec close={last_close} et capital par stock={capital_per_stock} et quantité={qty}  ")
             parent_id = next(order_id_gen)
             stop_id = next(order_id_gen)
             tp_id = next(order_id_gen)
@@ -117,14 +118,14 @@ class AdDivergenceStrategy(Strategy):
             slorder.eTradeOnly = False
             slorder.firmQuoteOnly = False
             slorder.orderId = stop_id
-            slorder.trailingPercent = 10.0  # Trailing de 10%
+            slorder.trailingPercent = 5.0  # Trailing de 10%
             slorder.tif = "GTC"  # Good Till Cancelled
 
             # Child 2: Take profit
             tporder = Order()
             tporder.action = "SELL"
             tporder.orderType = "LMT"
-            tporder.lmtPrice = round(last_close * 1.20, 2)  # Take profit à 20% au-dessus du close
+            tporder.lmtPrice = round(last_close * 1.10, 2)  # Take profit à 20% au-dessus du close
             tporder.totalQuantity = qty
             tporder.parentId = parent_id
             tporder.transmit = True  # Le dernier transmet l'ensemble

@@ -4,49 +4,73 @@ class OrderTranslator:
 
     @staticmethod
     def entry(strategy, data, ib_order):
+        pos = strategy.getposition(data)
+        qty = int(ib_order.totalQuantity)
+        print(f"[OrderTranslator] ENTRY: {data._name} | Avant buy: position size={pos.size} | qty transmis={qty} (type={type(qty)})")
         if ib_order.orderType == "STP LMT":
-            return strategy.buy(
+            order = strategy.buy(
                 data=data,
                 exectype=bt.Order.Stop,
                 price=ib_order.auxPrice,
-                size=ib_order.totalQuantity
+                size=qty
             )
-
-        if ib_order.orderType == "LMT":
-            return strategy.buy(
+        elif ib_order.orderType == "LMT":
+            order = strategy.buy(
                 data=data,
                 exectype=bt.Order.Limit,
                 price=ib_order.lmtPrice,
-                size=ib_order.totalQuantity
+                size=qty
             )
-
-        if ib_order.orderType == "MKT":
-            return strategy.buy(
+        elif ib_order.orderType == "MKT":
+            order = strategy.buy(
                 data=data,
-                size=ib_order.totalQuantity
+                size=qty
             )
+        else:
+            raise NotImplementedError(ib_order.orderType)
+        # Log après soumission (l'état changera au fill, mais on log l'intention)
+        print(f"[OrderTranslator] ENTRY: {data._name} | Demande buy de {qty}")
+        return order
 
-        raise NotImplementedError(ib_order.orderType)
 
     @staticmethod
     def stop(strategy, data, ib_order):
-        if hasattr(ib_order, "trailingPercent"):
-            return strategy.sell(
-                data=data,
-                exectype=bt.Order.StopTrail,
-                trailpercent=ib_order.trailingPercent / 100
-            )
-
-        return strategy.sell(
-            data=data,
-            exectype=bt.Order.Stop,
-            price=ib_order.auxPrice
-        )
+        pos = strategy.getposition(data)
+        print(f"[OrderTranslator] STOP: {data._name} | Avant sell: position size={pos.size}")
+        if pos.size > 0:
+            if hasattr(ib_order, "trailingPercent"):
+                order = strategy.sell(
+                    data=data,
+                    exectype=bt.Order.StopTrail,
+                    trailpercent=ib_order.trailingPercent / 100,
+                    size=pos.size
+                )
+            else:
+                order = strategy.sell(
+                    data=data,
+                    exectype=bt.Order.Stop,
+                    price=ib_order.auxPrice,
+                    size=pos.size
+                )
+            print(f"[OrderTranslator] STOP: {data._name} | Demande sell (stop) de {pos.size}")
+            return order
+        else:
+            print(f"[OrderTranslator] STOP: {data._name} | Aucun sell exécuté (pas de position long)")
+            return None
 
     @staticmethod
     def take_profit(strategy, data, ib_order):
-        return strategy.sell(
-            data=data,
-            exectype=bt.Order.Limit,
-            price=ib_order.lmtPrice
-        )
+        pos = strategy.getposition(data)
+        print(f"[OrderTranslator] TAKE_PROFIT: {data._name} | Avant sell: position size={pos.size}")
+        if pos.size > 0:
+            order = strategy.sell(
+                data=data,
+                exectype=bt.Order.Limit,
+                price=ib_order.lmtPrice,
+                size=pos.size
+            )
+            print(f"[OrderTranslator] TAKE_PROFIT: {data._name} | Demande sell (take profit) de {pos.size}")
+            return order
+        else:
+            print(f"[OrderTranslator] TAKE_PROFIT: {data._name} | Aucun sell exécuté (pas de position long)")
+            return None
