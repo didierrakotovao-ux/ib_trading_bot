@@ -28,21 +28,12 @@ class AdDivergenceBTWrapper(bt.Strategy):
         self.start_date = start_date
         self.end_date = end_date    
         self.stocks_to_trade = [
-            # Mega caps
-            'AAPL', 'MSFT', 'GOOGL', 'GOOG', 'AMZN', 'NVDA', 'META', 'TSLA', 'BRK.B', 'UNH',
-            'XOM', 'JNJ', 'JPM', 'V', 'PG', 'MA', 'HD', 'CVX', 'MRK', 'ABBV',
             # Large caps tech
             'AVGO', 'PEP', 'COST', 'ADBE', 'CRM', 'CSCO', 'ACN', 'NFLX', 'TMO', 'AMD',
             'INTC', 'QCOM', 'TXN', 'INTU', 'AMAT', 'MU', 'ADI', 'LRCX', 'KLAC', 'SNPS',
             # Finance
             'BAC', 'WFC', 'MS', 'GS', 'C', 'SCHW', 'AXP', 'BLK', 'SPGI', 'CB',
             'MMC', 'PGR', 'TFC', 'USB', 'PNC', 'CME', 'MCO', 'AON', 'ICE', 'AFL',
-            # Healthcare
-            'LLY', 'UNH', 'JNJ', 'ABBV', 'MRK', 'PFE', 'TMO', 'ABT', 'DHR', 'AMGN',
-            'BMY', 'GILD', 'VRTX', 'CVS', 'ISRG', 'CI', 'MDT', 'REGN', 'HUM', 'ZTS',
-            # Consumer
-            'WMT', 'HD', 'MCD', 'NKE', 'SBUX', 'TGT', 'LOW', 'CVS', 'BKNG', 'LULU',
-            'CMG', 'MAR', 'ABNB', 'ORLY', 'AZO', 'YUM', 'GM', 'F', 'TSLA', 'ROST',
             # Industrial
             'CAT', 'BA', 'HON', 'UNP', 'RTX', 'GE', 'LMT', 'MMM', 'UPS', 'DE',
             'EMR', 'ETN', 'NOC', 'ITW', 'WM', 'PH', 'GD', 'NSC', 'FDX', 'PCAR',

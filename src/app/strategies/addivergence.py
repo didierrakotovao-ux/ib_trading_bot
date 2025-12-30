@@ -33,11 +33,6 @@ class AdDivergenceStrategy(Strategy):
         self.capital = capital  # Montant total dédié à la stratégie
         self.max_stocks = max_stocks  # Nombre max de stocks à trader
 
-    def entry_signal(self, data, i) -> bool:
-        pass
-    def exit_signal(self, data, i, trade) -> bool:
-        pass
-
     def scanner_filters(self) -> ScannerSubscription:
         scan_sub = ScannerSubscription()
         scan_sub.instrument = "STK"
