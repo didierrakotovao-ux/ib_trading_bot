@@ -1,7 +1,10 @@
 from datetime import datetime, timedelta
-from ml.addivergencescoring import AdDivergenceScoring
-from screener.providers.market_data_provider import MarketDataProvider
-from strategies.strategy import Strategy
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
+from src.app.ml.addivergencescoring import AdDivergenceScoring
+from src.app.screener.providers.market_data_provider import MarketDataProvider
+from src.app.strategies.strategy import Strategy
 from ibapi.scanner import ScannerSubscription
 from ibapi.order import Order
 

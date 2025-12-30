@@ -1,7 +1,10 @@
 
 import pandas as pd
 import numpy as np
-from ml.scoring import Scoring
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
+from src.app.ml.scoring import Scoring
 import yfinance as yf # type: ignore
 from scipy.signal import argrelextrema # type: ignore
 import pandas_ta as ta
