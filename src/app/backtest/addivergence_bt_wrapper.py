@@ -43,20 +43,18 @@ class AdDivergenceBTWrapper(bt.Strategy):
             writer.writerow([dt, symbol, order_type, price, size])
 
     def notify_order(self, order):
-        dt = self.data.datetime.datetime(0)
+        #  dt = self.data.datetime.datetime(0)
         symbol = order.data._name if hasattr(order, 'data') and order.data else 'N/A'
         print(f"[notify_order] status={order.getstatusname()}, symbol={symbol}, isbuy={order.isbuy()}, exectype={order.exectype}, price={getattr(order.executed, 'price', None)}, size={getattr(order.executed, 'size', None)}")
         if order.status in [order.Completed]:
             order_type = 'UNKNOWN'
             if order.isbuy():
                 order_type = 'ENTRY'
-                # Placer les ordres de stop et take profit APRES l'exécution de l'entrée
-                # On retrouve le bundle d'ordres pour ce symbole
                 bundle = getattr(self, 'pending_order_bundles', {}).get(symbol)
                 if bundle:
                     data = self._get_data(symbol)
-                    stop = OrderTranslator.stop(self, data, bundle["stop_order"])
-                    tp = OrderTranslator.take_profit(self, data, bundle["take_profit_order"])
+                    stop = OrderTranslator.stop(self, data, bundle["stop_order"], order)
+                    tp = OrderTranslator.take_profit(self, data, bundle["take_profit_order"], order)
                     if stop is not None:
                         self.broker.submit(stop)
                         print(f"[BT] Stop order submitted for {symbol} (post-entry)")
@@ -65,15 +63,16 @@ class AdDivergenceBTWrapper(bt.Strategy):
                         print(f"[BT] Take profit order submitted for {symbol} (post-entry)")
             elif order.issell():
                 # On distingue TP/SL par le type d'ordre
+                self.orders_by_symbol[symbol] = None
                 if order.exectype == bt.Order.Limit:
                     order_type = 'TP'
                 elif order.exectype in [bt.Order.Stop, bt.Order.StopTrail]:
                     order_type = 'SL'
                 else:
                     order_type = 'EXIT'
-            self.log_trade_to_csv(dt, symbol, order_type, order.executed.price, order.executed.size)
+            self.log_trade_to_csv(order.data.datetime.datetime(0), symbol, order_type, order.executed.price, order.executed.size)
         # Optionnel : log sur la console
-        # print(f"Order executed: {order.info}")
+        print(f"Order executed: {order.info}")
     # -------------------------------------------------
     def next(self):
         current_date = self.datas[0].datetime.date(0)
@@ -108,16 +107,17 @@ class AdDivergenceBTWrapper(bt.Strategy):
                 continue
 
             pos = self.getposition(data)
+            
             print(f"[DIAG] Avant entrée: {symbol} | Position size: {pos.size}")
+            """ Contrôle des positions existantes """
             if pos.size > 0:
                 print(f"[CONTROL] Position déjà ouverte sur {symbol} (size={pos.size}), pas de nouvelle entrée.")
                 continue
             if pos.size < 0:
                 print(f"[ERROR] Position short détectée sur {symbol} (size={pos.size}) : aucune entrée ni sortie autorisée. Intervention manuelle requise.")
                 continue
-
             # Entrée uniquement si flat
-            if pos.size == 0:
+            if pos.size == 0 and self.orders_by_symbol.get(symbol) is None:
                 entry = OrderTranslator.entry(self, data, bundle["entry_order"])
                 if entry is not None:
                     self.broker.submit(entry)

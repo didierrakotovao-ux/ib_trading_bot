@@ -34,7 +34,7 @@ class OrderTranslator:
 
 
     @staticmethod
-    def stop(strategy, data, ib_order):
+    def stop(strategy, data, ib_order,parent_order=None):
         pos = strategy.getposition(data)
         print(f"[OrderTranslator] STOP: {data._name} | Avant sell: position size={pos.size}")
         if pos.size > 0:
@@ -43,14 +43,16 @@ class OrderTranslator:
                     data=data,
                     exectype=bt.Order.StopTrail,
                     trailpercent=ib_order.trailingPercent / 100,
-                    size=pos.size
+                    size=pos.size,
+                    parent_order=parent_order
                 )
             else:
                 order = strategy.sell(
                     data=data,
                     exectype=bt.Order.Stop,
                     price=ib_order.auxPrice,
-                    size=pos.size
+                    size=pos.size,
+                    parent_order=parent_order
                 )
             print(f"[OrderTranslator] STOP: {data._name} | Demande sell (stop) de {pos.size}")
             return order
@@ -59,7 +61,7 @@ class OrderTranslator:
             return None
 
     @staticmethod
-    def take_profit(strategy, data, ib_order):
+    def take_profit(strategy, data, ib_order,parent_order=None):
         pos = strategy.getposition(data)
         print(f"[OrderTranslator] TAKE_PROFIT: {data._name} | Avant sell: position size={pos.size}")
         if pos.size > 0:
