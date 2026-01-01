@@ -30,8 +30,12 @@ class AdDivergenceBTWrapper(bt.Strategy):
         )
 
         self.orders_by_symbol = {}
+        self.pending_order_bundles = {}
+        self.last_entry_prices = {}
+        self.pending_stops = {}
 
-    def log_trade_to_csv(self, dt, symbol, order_type, price, size):
+
+    def log_trade_to_csv(self, dt, symbol, order_type, exec_type, price, size, pnl=None):
         import csv
         import os
         filename = 'trades_log.csv'
@@ -39,22 +43,27 @@ class AdDivergenceBTWrapper(bt.Strategy):
         with open(filename, mode='a', newline='') as csvfile:
             writer = csv.writer(csvfile)
             if not file_exists:
-                writer.writerow(['datetime', 'symbol', 'order_type', 'price', 'size'])
-            writer.writerow([dt, symbol, order_type, price, size])
+                writer.writerow(['datetime', 'symbol', 'order_type', 'exec_type', 'price', 'size', 'pnl'])
+            writer.writerow([dt, symbol, order_type, exec_type, price, size, pnl])
 
     def notify_order(self, order):
         #  dt = self.data.datetime.datetime(0)
         symbol = order.data._name if hasattr(order, 'data') and order.data else 'N/A'
         print(f"[notify_order] status={order.getstatusname()}, symbol={symbol}, isbuy={order.isbuy()}, exectype={order.exectype}, price={getattr(order.executed, 'price', None)}, size={getattr(order.executed, 'size', None)}")
+        bundle = self.pending_order_bundles[symbol]
         if order.status in [order.Completed]:
-            order_type = 'UNKNOWN'
             if order.isbuy():
                 order_type = 'ENTRY'
-                bundle = getattr(self, 'pending_order_bundles', {}).get(symbol)
+                self.last_entry_prices[symbol] = order.executed.price
+                bundle["entry_order"] = None
                 if bundle:
                     data = self._get_data(symbol)
                     stop = OrderTranslator.stop(self, data, bundle["stop_order"], order)
                     tp = OrderTranslator.take_profit(self, data, bundle["take_profit_order"], order)
+                    self.pending_stops[symbol] = {
+                        "stop_order": stop,
+                        "take_profit_order": tp
+                    }
                     if stop is not None:
                         self.broker.submit(stop)
                         print(f"[BT] Stop order submitted for {symbol} (post-entry)")
@@ -64,15 +73,22 @@ class AdDivergenceBTWrapper(bt.Strategy):
             elif order.issell():
                 # On distingue TP/SL par le type d'ordre
                 self.orders_by_symbol[symbol] = None
+                # calcul du P&L
+                last_entry_price = self.last_entry_prices[symbol]
+                pnl = -1 * (order.executed.price - last_entry_price) * order.executed.size
                 if order.exectype == bt.Order.Limit:
                     order_type = 'TP'
-                elif order.exectype in [bt.Order.Stop, bt.Order.StopTrail]:
+                    # annulation de l'ordre SL associé
+                    self.broker.cancel(self.pending_stops[symbol]["stop_order"])
+                elif order.exectype == bt.Order.Stop or order.exectype == bt.Order.StopTrail:
                     order_type = 'SL'
+                    # annulation de l'ordre TP associé
+                    self.broker.cancel(self.pending_stops[symbol]["take_profit_order"])
                 else:
                     order_type = 'EXIT'
-            self.log_trade_to_csv(order.data.datetime.datetime(0), symbol, order_type, order.executed.price, order.executed.size)
-        # Optionnel : log sur la console
-        print(f"Order executed: {order.info}")
+            self.pending_order_bundles[symbol] = None
+            self.log_trade_to_csv(order.data.datetime.datetime(0), symbol, order_type, order.exectype, order.executed.price, order.executed.size, pnl if 'pnl' in locals() else '')
+            print(f"[notify_order] Order {order.getstatusname()} for {symbol}")
     # -------------------------------------------------
     def next(self):
         current_date = self.datas[0].datetime.date(0)
@@ -96,9 +112,6 @@ class AdDivergenceBTWrapper(bt.Strategy):
         order_bundles = self.strategy.get_order_params()
 
         # 4️⃣ Traduction + exécution
-        # On prépare les bundles d'ordres pour usage différé dans notify_order
-        if not hasattr(self, 'pending_order_bundles'):
-            self.pending_order_bundles = {}
         for bundle in order_bundles:
             symbol = bundle["symbol"]
             data = self._get_data(symbol)
