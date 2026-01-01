@@ -99,14 +99,20 @@ class BacktestEngine:
 
 if __name__ == "__main__":
     # Exemple d'utilisation
-    start_date=datetime(2025, 9, 1)
+    start_date=datetime(2024, 10, 1)
     end_date=datetime(2025, 9, 30)
 
     engine = BacktestEngine(
         strategy_cls=AdDivergenceBTWrapper,
         symbols=[
+            'AVGO', 'PEP', 'COST', 'ADBE', 'CRM', 'CSCO', 'ACN', 'NFLX', 'TMO', 'AMD',
             'INTC', 'QCOM', 'TXN', 'INTU', 'AMAT', 'MU', 'ADI', 'LRCX', 'KLAC', 'SNPS',
-            'BAC', 'WFC', 'MS', 'GS', 'C', 'SCHW', 'AXP', 'BLK', 'SPGI', 'CB',        
+            # Finance
+            'BAC', 'WFC', 'MS', 'GS', 'C', 'SCHW', 'AXP', 'BLK', 'SPGI', 'CB',
+            'MMC', 'PGR', 'TFC', 'USB', 'PNC', 'CME', 'MCO', 'AON', 'ICE', 'AFL',
+            # Healthcare
+            'LLY', 'UNH', 'JNJ', 'ABBV', 'MRK', 'PFE', 'TMO', 'ABT', 'DHR', 'AMGN',
+            'BMY', 'GILD', 'VRTX', 'CVS', 'ISRG', 'CI', 'MDT', 'REGN', 'HUM', 'ZTS',        
         ],
         start_date=start_date,
         end_date=end_date,

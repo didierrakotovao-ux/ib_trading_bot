@@ -50,13 +50,13 @@ class AdDivergenceBTWrapper(bt.Strategy):
         #  dt = self.data.datetime.datetime(0)
         symbol = order.data._name if hasattr(order, 'data') and order.data else 'N/A'
         print(f"[notify_order] status={order.getstatusname()}, symbol={symbol}, isbuy={order.isbuy()}, exectype={order.exectype}, price={getattr(order.executed, 'price', None)}, size={getattr(order.executed, 'size', None)}")
-        bundle = self.pending_order_bundles[symbol]
+        bundle = self.pending_order_bundles.get(symbol)
         if order.status in [order.Completed]:
             if order.isbuy():
                 order_type = 'ENTRY'
                 self.last_entry_prices[symbol] = order.executed.price
-                bundle["entry_order"] = None
                 if bundle:
+                    bundle["entry_order"] = None
                     data = self._get_data(symbol)
                     stop = OrderTranslator.stop(self, data, bundle["stop_order"], order)
                     tp = OrderTranslator.take_profit(self, data, bundle["take_profit_order"], order)
@@ -71,21 +71,38 @@ class AdDivergenceBTWrapper(bt.Strategy):
                         self.broker.submit(tp)
                         print(f"[BT] Take profit order submitted for {symbol} (post-entry)")
             elif order.issell():
-                # On distingue TP/SL par le type d'ordre
+                # On distingue TP/SL par le PnL réel, pas juste le type d'ordre
                 self.orders_by_symbol[symbol] = None
+                
+                # Vérifier qu'une entrée existe pour ce symbole
+                if symbol not in self.last_entry_prices:
+                    print(f"[WARNING] SL/TP orphelin pour {symbol} : aucune entrée trouvée. Log ignoré.")
+                    # Nettoyage des ordres orphelins
+                    if symbol in self.pending_stops:
+                        self.pending_stops[symbol] = None
+                    return
+                
                 # calcul du P&L
                 last_entry_price = self.last_entry_prices[symbol]
                 pnl = -1 * (order.executed.price - last_entry_price) * order.executed.size
-                if order.exectype == bt.Order.Limit:
+                
+                # Classification selon le PnL réel
+                if pnl >= 0:
                     order_type = 'TP'
                     # annulation de l'ordre SL associé
-                    self.broker.cancel(self.pending_stops[symbol]["stop_order"])
-                elif order.exectype == bt.Order.Stop or order.exectype == bt.Order.StopTrail:
+                    if symbol in self.pending_stops and self.pending_stops[symbol] is not None and self.pending_stops[symbol].get("stop_order") is not None:
+                        self.broker.cancel(self.pending_stops[symbol]["stop_order"])
+                else:
                     order_type = 'SL'
                     # annulation de l'ordre TP associé
-                    self.broker.cancel(self.pending_stops[symbol]["take_profit_order"])
-                else:
-                    order_type = 'EXIT'
+                    if symbol in self.pending_stops and self.pending_stops[symbol] is not None and self.pending_stops[symbol].get("take_profit_order") is not None:
+                        self.broker.cancel(self.pending_stops[symbol]["take_profit_order"])
+                
+                # Nettoyage complet des ordres de sortie après exécution
+                self.pending_stops[symbol] = None
+                # Nettoyage de last_entry_price après sortie
+                del self.last_entry_prices[symbol]
+                print(f"[CLEANUP] pending_stops et last_entry_price nettoyés pour {symbol} après {order_type}")
             self.pending_order_bundles[symbol] = None
             self.log_trade_to_csv(order.data.datetime.datetime(0), symbol, order_type, order.exectype, order.executed.price, order.executed.size, pnl if 'pnl' in locals() else '')
             print(f"[notify_order] Order {order.getstatusname()} for {symbol}")
@@ -98,20 +115,20 @@ class AdDivergenceBTWrapper(bt.Strategy):
         for d in self.datas:
             pos = self.getposition(d)
             print(f"[DIAG] {d._name} | Position size: {pos.size} | Price: {d.close[0]}")
-        # 1️⃣ Fournir la liste des symboles à analyser
+        # 1. Fournir la liste des symboles à analyser
         symbols = [d._name for d in self.datas]
         self.strategy.set_symbols_to_analyse(symbols)
 
-        # 2️⃣ Sélection + scoring
-        print(f"2️⃣ Sélection + scoring")
+        # 2. Sélection + scoring
+        print(f"2. Sélection + scoring")
         symbols_to_trade = self.strategy.get_symbols(current_date)
 
         print(f"{current_date} Les symboles selectionnés {symbols_to_trade}")
 
-        # 3️⃣ Génération des ordres IBKR
+        # 3. Génération des ordres IBKR
         order_bundles = self.strategy.get_order_params()
 
-        # 4️⃣ Traduction + exécution
+        # 4. Traduction + exécution
         for bundle in order_bundles:
             symbol = bundle["symbol"]
             data = self._get_data(symbol)
@@ -131,6 +148,15 @@ class AdDivergenceBTWrapper(bt.Strategy):
                 continue
             # Entrée uniquement si flat
             if pos.size == 0 and self.orders_by_symbol.get(symbol) is None:
+                # Annuler tous les ordres de sortie en attente avant nouvelle entrée
+                if symbol in self.pending_stops and self.pending_stops[symbol] is not None:
+                    for order_key in ["stop_order", "take_profit_order"]:
+                        pending_order = self.pending_stops[symbol].get(order_key)
+                        if pending_order is not None and pending_order.status not in [pending_order.Completed, pending_order.Canceled]:
+                            self.broker.cancel(pending_order)
+                            print(f"[CANCEL] Annulation {order_key} orphelin pour {symbol} avant nouvelle entrée")
+                    self.pending_stops[symbol] = None
+                
                 entry = OrderTranslator.entry(self, data, bundle["entry_order"])
                 if entry is not None:
                     self.broker.submit(entry)

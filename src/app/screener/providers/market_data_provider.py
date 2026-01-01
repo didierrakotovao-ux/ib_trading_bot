@@ -108,14 +108,14 @@ class MarketDataProvider(EWrapper, EClient):
             
             if self.isConnected():
                 self._connected = True
-                print(f"✅ Connecté à IB ({self.host}:{self.port})")
+                print(f"[OK] Connecté à IB ({self.host}:{self.port})")
                 return True
             else:
-                print(f"❌ Timeout de connexion à IB")
+                print(f"[ERREUR] Timeout de connexion à IB")
                 return False
                 
         except Exception as e:
-            print(f"❌ Erreur de connexion IB: {e}")
+            print(f"[ERREUR] Erreur de connexion IB: {e}")
             return False
     
     def disconnect(self):
@@ -161,7 +161,7 @@ class MarketDataProvider(EWrapper, EClient):
             max_results: Nombre max de résultats
         """
         if not self.is_connected():
-            print("❌ Non connecté à IB")
+            print("[ERREUR] Non connecté à IB")
             self.connect()
             return []
         self.scan_sub = scan_sub
@@ -188,10 +188,10 @@ class MarketDataProvider(EWrapper, EClient):
             # Annuler la souscription
             self.cancelScannerSubscription(req_id)
             results = self.scanner_results[:max_results]
-            print(f"✅ Scanner terminé: {len(results)} résultats")
+            print(f"[OK] Scanner terminé: {len(results)} résultats")
             return results
         except Exception as e:
-            print(f"❌ Erreur scanner: {e}")
+            print(f"[ERREUR] Erreur scanner: {e}")
             import traceback
             traceback.print_exc()
             return []
@@ -259,11 +259,11 @@ class MarketDataProvider(EWrapper, EClient):
             required_cols = ['date', 'open', 'high', 'low', 'close', 'volume']
             df = df[required_cols]
             
-            print(f"✅ {symbol}: {len(df)} barres récupérées")
+            print(f"[OK] {symbol}: {len(df)} barres récupérées")
             return df
             
         except Exception as e:
-            print(f"❌ Erreur lors de la récupération de {symbol}: {e}")
+            print(f"[ERREUR] Erreur lors de la récupération de {symbol}: {e}")
             return None
     
     def error(self, reqId, errorCode, errorString):

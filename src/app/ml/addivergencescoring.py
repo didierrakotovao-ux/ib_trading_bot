@@ -43,7 +43,7 @@ class AdDivergenceScoring(Scoring):
             return score
 
         except Exception as e:
-            print(f"❌ Erreur lors du calcul des indicateurs avec pandas_ta: {e}")
+            print(f"[ERREUR] Erreur lors du calcul des indicateurs avec pandas_ta: {e}")
             return 0
 
     
@@ -99,6 +99,6 @@ class AdDivergenceScoring(Scoring):
             return True
 
         except Exception as e:
-            print(f"❌ Erreur lors de la détection de divergence: {e}")
+            print(f"[ERREUR] Erreur lors de la détection de divergence: {e}")
             return False
 
