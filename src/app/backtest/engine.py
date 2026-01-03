@@ -4,6 +4,7 @@ import yfinance as yf
 from datetime import datetime, timedelta
 from addivergence_bt_wrapper import AdDivergenceBTWrapper
 from market_data_mock import MarketDataMock
+import sqlite3
 
 
 class BacktestEngine:
@@ -34,25 +35,37 @@ class BacktestEngine:
 
     # ------------------------------------------------------------------
     def _load_data(self):
-        print(f"Loading data from {start_date} to {self.end_date}...")
         self.dataframes = {}
-        for symbol in self.symbols:
-            print(f"Loading data for {symbol} from {start_date} to {self.end_date}...")
-            df = self.market_data.get_historical_data(
-                symbol,
-                self.start_date,
-                self.end_date,
-                interval="1d")
-            if df is not None and not df.empty:
-                df['date'] = pd.to_datetime(df['date'])
-                df.set_index('date', inplace=True)
-                self.dataframes[symbol] = df
-                data = bt.feeds.PandasData(
-                    dataname=df,
-                    name=symbol
-                )
-                self.cerebro.adddata(data)
+        conn = sqlite3.connect("trading_data.db")
+        query = """
+            SELECT symbol, date, open, high, low, close, volume, adjusted_close
+            FROM historical_data
+            WHERE date BETWEEN ? AND ?
+            AND close >= 5.0
+            AND close <= 500.0
+            AND volume >= 500000
+            ORDER BY symbol, date ASC
+        """
+        df = pd.read_sql_query(
+            query,
+            conn,
+            params=(self.start_date.strftime('%Y-%m-%d'), self.end_date.strftime('%Y-%m-%d'))
+        )
+        conn.close()
+        if df.empty:
+            print("[INFO] Aucun symbole ne passe le screener.")
+            return
 
+        # On groupe par symbole et on injecte chaque DataFrame dans Backtrader
+        for symbol, group in df.groupby("symbol"):
+            group['date'] = pd.to_datetime(group['date'])
+            group.set_index('date', inplace=True)
+            self.dataframes[symbol] = group
+            data = bt.feeds.PandasData(
+                dataname=group,
+                name=symbol
+            )
+            self.cerebro.adddata(data)
     # ------------------------------------------------------------------
     def _configure_broker(self):
         self.cerebro.broker.setcash(self.initial_cash)
@@ -99,7 +112,7 @@ class BacktestEngine:
 
 if __name__ == "__main__":
     # Exemple d'utilisation
-    start_date=datetime(2024, 10, 1)
+    start_date=datetime(2025, 8, 1)
     end_date=datetime(2025, 9, 30)
 
     engine = BacktestEngine(

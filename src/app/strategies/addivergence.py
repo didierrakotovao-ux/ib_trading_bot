@@ -24,7 +24,6 @@ class AdDivergenceStrategy(Strategy):
         scan_sub.marketCapAbove = 10_000_000_000
     """
     """ 
-
         la création du contrat d'ordre (entrée et sortie) 
         et la fourniture des données à scorer seront implémentées ici.
     """
