@@ -4,6 +4,7 @@ données historiques et signaux de trading.
 """
 import sqlite3
 import pandas as pd
+import pandas_ta as ta
 from datetime import datetime
 from pathlib import Path
 from typing import List, Dict, Optional, Any
@@ -80,6 +81,16 @@ class DatabaseManager:
                 dividends REAL DEFAULT 0,
                 stock_splits REAL DEFAULT 0,
                 source TEXT NOT NULL DEFAULT 'unknown',
+                sma20_volume REAL DEFAULT 0,
+                hl_sma20vol REAL DEFAULT 0,
+                oc_sma20vol REAL DEFAULT 0,
+                macd REAL DEFAULT 0,
+                macd_signal REAL DEFAULT 0,
+                rsi REAL DEFAULT 0,
+                adx REAL DEFAULT 0,
+                bb_high REAL DEFAULT 0,
+                bb_low REAL DEFAULT 0,
+                pct_close REAL DEFAULT 0,
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
                 UNIQUE(symbol, date, source)
             )
@@ -317,7 +328,8 @@ class DatabaseManager:
         
         # Reset index pour éviter les conflits
         df_copy = df_copy.reset_index(drop=True)
-        
+        self.enrich_features(df_copy)
+       
         try:
             df_copy.to_sql(
                 'historical_data', 
@@ -334,7 +346,17 @@ class DatabaseManager:
                     'volume': 'INTEGER',
                     'dividends': 'REAL',
                     'stock_splits': 'REAL',
-                    'source': 'TEXT'
+                    'source': 'TEXT',
+                    'sma20_volume': 'REAL',
+                    'hl_sma20vol': 'REAL',
+                    'oc_sma20vol': 'REAL',
+                    'macd': 'REAL',
+                    'macd_signal': 'REAL',
+                    'rsi': 'REAL',
+                    'adx': 'REAL',
+                    'bb_high': 'REAL',
+                    'bb_low': 'REAL',
+                    'pct_close': 'REAL' 
                 }
             )
             self.conn.commit()
@@ -347,6 +369,55 @@ class DatabaseManager:
         except Exception as e:
             print(f"[ERROR] Erreur sauvegarde {symbol}: {e}")
             return False
+        
+    def enrich_features(self, df):
+        try:
+            close = df['close'].dropna()
+
+            # MACD
+            if len(close) >= 26:
+                macd_df = ta.macd(df["close"], fast=12, slow=26)
+                df['macd'] = macd_df['MACD_12_26_9']
+                df['macd_signal'] = macd_df['MACDs_12_26_9']
+            else:
+                df['macd'] = 0
+                df['macd_signal'] = 0   
+
+            if len(close) >= 14:
+                # RSI
+                df['rsi'] = ta.rsi(df["close"], length=14)
+                # ADX
+                adx_df = ta.adx(df['high'], df['low'], df['close'], length=14)
+                df['adx'] = adx_df['ADX_14']
+            else:
+                df['rsi'] = 0
+                df['adx'] = 0
+
+            
+            if len(close) >= 20:
+                # Bollinger Bands
+                bb_df = ta.bbands(close, length=20, std=2)
+                df['bb_high'] = bb_df['BBU_20_2.0_2.0'] if 'BBU_20_2.0_2.0' in bb_df else 0
+                df['bb_low'] = bb_df['BBL_20_2.0_2.0'] if 'BBL_20_2.0_2.0' in bb_df else 0
+                # SMA20 du volume
+                df['sma20_volume'] = df['volume'].rolling(window=20).mean()
+                # Ratios
+                df['hl_sma20vol'] = (df['high'] - df['low']) / df['sma20_volume']
+                df['oc_sma20vol'] = (df['open'] - df['close']) / df['sma20_volume']
+
+            else:
+                df['bb_high'] = 0
+                df['bb_low'] = 0
+                df['sma20_volume'] = 0
+                df['hl_sma20vol'] = 0
+                df['oc_sma20vol'] = 0
+
+            # % close vs close-1
+            df['pct_close'] = df['close'].pct_change()
+            return df  
+        except Exception as e:
+            print(f"[ERROR] Erreur lors de l'enrichissement des features: {e}")
+            return None  
     
     def get_historical_data(
         self, 

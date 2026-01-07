@@ -28,6 +28,7 @@ class AdDivergenceScoring(Scoring):
             df["EMA200"] = ta.ema(df["close"], length=200)
             df["RSI"] = ta.rsi(df["close"], length=14)
             df["AD"] = ta.ad(df["high"], df["low"], df["close"], df["volume"])
+            
 
             self.df = df
             score = 0

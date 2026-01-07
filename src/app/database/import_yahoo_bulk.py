@@ -30,7 +30,7 @@ symbols = [
         # Materials
         'LIN', 'APD', 'SHW', 'ECL', 'NEM', 'FCX', 'NUE', 'DOW', 'DD', 'PPG'
     ]
-start_date = (datetime.now() - timedelta(days=365*10)).strftime('%Y-%m-%d')
+start_date = (datetime.now() - timedelta(days=365*12)).strftime('%Y-%m-%d')
 end_date = datetime.now().strftime('%Y-%m-%d')
 
 db = DatabaseManager("trading_data.db")
