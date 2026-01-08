@@ -1,0 +1,1166 @@
+--- Début du diagnostic Backtest (20260108_144922) ---
+Analyse pour la date 2025-05-30...
+[DIAG] Cash disponible: 100000.0 | Value: 100000.0
+[DIAG] AAPL | Position size: 0 | Price: 200.4280242919922
+[DIAG] ABBV | Position size: 0 | Price: 183.19564819335938
+[DIAG] ABNB | Position size: 0 | Price: 129.0
+[DIAG] ABT | Position size: 0 | Price: 132.39434814453125
+[DIAG] ACN | Position size: 0 | Price: 315.2433776855469
+[DIAG] ADBE | Position size: 0 | Price: 415.0899963378906
+[DIAG] ADI | Position size: 0 | Price: 211.42431640625
+[DIAG] AEP | Position size: 0 | Price: 101.8406982421875
+[DIAG] AFL | Position size: 0 | Price: 102.4437484741211
+[DIAG] AMAT | Position size: 0 | Price: 155.99624633789062
+[DIAG] AMD | Position size: 0 | Price: 110.7300033569336
+[DIAG] AMGN | Position size: 0 | Price: 283.8365478515625
+[DIAG] AMT | Position size: 0 | Price: 209.07839965820312
+[DIAG] AMZN | Position size: 0 | Price: 205.00999450683594
+[DIAG] AON | Position size: 0 | Price: 371.30072021484375
+[DIAG] APD | Position size: 0 | Price: 273.325927734375
+[DIAG] AVGO | Position size: 0 | Price: 240.62808227539062
+[DIAG] AXP | Position size: 0 | Price: 291.9197082519531
+[DIAG] BA | Position size: 0 | Price: 207.32000732421875
+[DIAG] BAC | Position size: 0 | Price: 43.40324020385742
+[DIAG] BMY | Position size: 0 | Price: 46.45648193359375
+[DIAG] C | Position size: 0 | Price: 74.38436126708984
+[DIAG] CAT | Position size: 0 | Price: 345.7663269042969
+[DIAG] CB | Position size: 0 | Price: 296.2034912109375
+[DIAG] CCI | Position size: 0 | Price: 97.02986907958984
+[DIAG] CI | Position size: 0 | Price: 311.787109375
+[DIAG] CME | Position size: 0 | Price: 284.9994201660156
+[DIAG] CMG | Position size: 0 | Price: 50.08000183105469
+[DIAG] COP | Position size: 0 | Price: 83.87342071533203
+[DIAG] CRM | Position size: 0 | Price: 264.06304931640625
+[DIAG] CSCO | Position size: 0 | Price: 61.955535888671875
+[DIAG] CVS | Position size: 0 | Price: 62.83542251586914
+[DIAG] CVX | Position size: 0 | Price: 133.70175170898438
+[DIAG] D | Position size: 0 | Price: 55.40066146850586
+[DIAG] DD | Position size: 0 | Price: 27.661190032958984
+[DIAG] DE | Position size: 0 | Price: 498.390625
+[DIAG] DHR | Position size: 0 | Price: 189.00234985351562
+[DIAG] DOW | Position size: 0 | Price: 26.944562911987305
+[DIAG] DUK | Position size: 0 | Price: 115.70532989501953
+[DIAG] ECL | Position size: 0 | Price: 263.5957946777344
+[DIAG] EMR | Position size: 0 | Price: 118.39715576171875
+[DIAG] EOG | Position size: 0 | Price: 106.65487670898438
+[DIAG] ETN | Position size: 0 | Price: 319.2702331542969
+[DIAG] EXC | Position size: 0 | Price: 43.057273864746094
+[DIAG] F | Position size: 0 | Price: 10.125353813171387
+[DIAG] FCX | Position size: 0 | Price: 38.216426849365234
+[DIAG] FDX | Position size: 0 | Price: 214.22308349609375
+[DIAG] GD | Position size: 0 | Price: 275.85626220703125
+[DIAG] GE | Position size: 0 | Price: 244.97157287597656
+[DIAG] GILD | Position size: 0 | Price: 107.83782958984375
+[DIAG] GM | Position size: 0 | Price: 49.2266731262207
+[DIAG] GOOG | Position size: 0 | Price: 172.3758544921875
+[DIAG] GOOGL | Position size: 0 | Price: 171.26702880859375
+[DIAG] GS | Position size: 0 | Price: 493.7691345214844
+[DIAG] HD | Position size: 0 | Price: 361.6117858886719
+[DIAG] HON | Position size: 0 | Price: 211.2663116455078
+[DIAG] HUM | Position size: 0 | Price: 230.6719207763672
+[DIAG] ICE | Position size: 0 | Price: 178.28651428222656
+[DIAG] INTC | Position size: 0 | Price: 19.549999237060547
+[DIAG] ISRG | Position size: 0 | Price: 487.92999267578125
+[DIAG] ITW | Position size: 0 | Price: 240.54359436035156
+[DIAG] JNJ | Position size: 0 | Price: 153.10693359375
+[DIAG] JPM | Position size: 0 | Price: 261.46307373046875
+[DIAG] LIN | Position size: 0 | Price: 462.9067077636719
+[DIAG] LMT | Position size: 0 | Price: 472.02642822265625
+[DIAG] LOW | Position size: 0 | Price: 223.437255859375
+[DIAG] LRCX | Position size: 0 | Price: 80.29844665527344
+[DIAG] LULU | Position size: 0 | Price: 316.6700134277344
+[DIAG] MA | Position size: 0 | Price: 498.0078125
+[DIAG] MAR | Position size: 0 | Price: 262.5388488769531
+[DIAG] MCD | Position size: 0 | Price: 308.4671936035156
+[DIAG] MCO | Position size: 0 | Price: 477.5079345703125
+[DIAG] MDT | Position size: 0 | Price: 81.67675018310547
+[DIAG] META | Position size: 0 | Price: 499.151123046875
+[DIAG] MMC | Position size: 0 | Price: 231.6173858642578
+[DIAG] MMM | Position size: 0 | Price: 147.03590393066406
+[DIAG] MPC | Position size: 0 | Price: 159.04934692382812
+[DIAG] MRK | Position size: 0 | Price: 74.6957015991211
+[DIAG] MS | Position size: 0 | Price: 126.37728881835938
+[DIAG] MSFT | Position size: 0 | Price: 458.7458190917969
+[DIAG] MU | Position size: 0 | Price: 94.27401733398438
+[DIAG] NEE | Position size: 0 | Price: 69.06759643554688
+[DIAG] NEM | Position size: 0 | Price: 52.39297866821289
+[DIAG] NFLX | Position size: 0 | Price: 120.7229995727539
+[DIAG] NKE | Position size: 0 | Price: 59.498958587646484
+[DIAG] NOC | Position size: 0 | Price: 478.6311950683594
+[DIAG] NSC | Position size: 0 | Price: 244.7430877685547
+[DIAG] NUE | Position size: 0 | Price: 108.09364318847656
+[DIAG] NVDA | Position size: 0 | Price: 135.10548400878906
+[DIAG] ORLY | Position size: 0 | Price: 91.16666412353516
+[DIAG] OXY | Position size: 0 | Price: 40.10503387451172
+[DIAG] PCAR | Position size: 0 | Price: 92.05682373046875
+[DIAG] PEP | Position size: 0 | Price: 127.51646423339844
+[DIAG] PFE | Position size: 0 | Price: 22.691978454589844
+[DIAG] PG | Position size: 0 | Price: 167.56430053710938
+[DIAG] PGR | Position size: 0 | Price: 267.70068359375
+[DIAG] PH | Position size: 0 | Price: 498.85430908203125
+[DIAG] PLD | Position size: 0 | Price: 105.79817962646484
+[DIAG] PNC | Position size: 0 | Price: 170.7459259033203
+[DIAG] PPG | Position size: 0 | Price: 109.25253295898438
+[DIAG] PSX | Position size: 0 | Price: 111.42396545410156
+[DIAG] QCOM | Position size: 0 | Price: 142.7866668701172
+[DIAG] REGN | Position size: 0 | Price: 488.92364501953125
+[DIAG] ROST | Position size: 0 | Price: 139.0009765625
+[DIAG] RTX | Position size: 0 | Price: 135.3466339111328
+[DIAG] SBUX | Position size: 0 | Price: 82.80152893066406
+[DIAG] SCHW | Position size: 0 | Price: 87.84209442138672
+[DIAG] SHW | Position size: 0 | Price: 357.1998291015625
+[DIAG] SLB | Position size: 0 | Price: 32.258819580078125
+[DIAG] SNPS | Position size: 0 | Price: 463.9800109863281
+[DIAG] SO | Position size: 0 | Price: 88.56342315673828
+[DIAG] SPGI | Position size: 0 | Price: 499.0249328613281
+[DIAG] SRE | Position size: 0 | Price: 76.79562377929688
+[DIAG] TFC | Position size: 0 | Price: 38.573028564453125
+[DIAG] TGT | Position size: 0 | Price: 91.84373474121094
+[DIAG] TMO | Position size: 0 | Price: 401.7399597167969
+[DIAG] TSLA | Position size: 0 | Price: 346.4599914550781
+[DIAG] TXN | Position size: 0 | Price: 179.9318389892578
+[DIAG] UNH | Position size: 0 | Price: 295.9129333496094
+[DIAG] UNP | Position size: 0 | Price: 219.00318908691406
+[DIAG] UPS | Position size: 0 | Price: 94.0963134765625
+[DIAG] USB | Position size: 0 | Price: 42.2476692199707
+[DIAG] V | Position size: 0 | Price: 363.8279113769531
+[DIAG] VLO | Position size: 0 | Price: 127.12271118164062
+[DIAG] VRTX | Position size: 0 | Price: 442.04998779296875
+[DIAG] WFC | Position size: 0 | Price: 73.95442962646484
+[DIAG] WM | Position size: 0 | Price: 238.31698608398438
+[DIAG] WMT | Position size: 0 | Price: 98.28960418701172
+[DIAG] XOM | Position size: 0 | Price: 100.4780044555664
+[DIAG] YUM | Position size: 0 | Price: 142.5695037841797
+[DIAG] ZTS | Position size: 0 | Price: 167.48484802246094
+2. Sélection + scoring
+2025-05-30 Les symboles selectionnés ['HUM', 'INTC', 'MU', 'AMD', 'NVDA']
+[DIAG] Avant entrée: HUM | Position size: 0
+[BT] Entry order submitted for HUM
+2025-05-30 Placing order for HUM: Entry at 232.98
+[DIAG] Avant entrée: INTC | Position size: 0
+[BT] Entry order submitted for INTC
+2025-05-30 Placing order for INTC: Entry at 19.75
+[DIAG] Avant entrée: MU | Position size: 0
+[BT] Entry order submitted for MU
+2025-05-30 Placing order for MU: Entry at 95.22
+[DIAG] Avant entrée: AMD | Position size: 0
+[BT] Entry order submitted for AMD
+2025-05-30 Placing order for AMD: Entry at 111.84
+[DIAG] Avant entrée: NVDA | Position size: 0
+[BT] Entry order submitted for NVDA
+2025-05-30 Placing order for NVDA: Entry at 136.46
+[notify_order] status=Submitted, symbol=HUM, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=HUM, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=HUM, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=INTC, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=INTC, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=INTC, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=MU, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=MU, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=MU, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=AMD, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=AMD, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=AMD, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=NVDA, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=NVDA, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=NVDA, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Accepted, symbol=HUM, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Accepted, symbol=HUM, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Accepted, symbol=HUM, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Accepted, symbol=INTC, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Margin, symbol=INTC, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Canceled, symbol=INTC, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Margin, symbol=INTC, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Margin, symbol=MU, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Margin, symbol=MU, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Margin, symbol=MU, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Margin, symbol=AMD, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Margin, symbol=AMD, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Margin, symbol=AMD, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Margin, symbol=NVDA, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Margin, symbol=NVDA, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Margin, symbol=NVDA, isbuy=True, exectype=3, price=0.0, size=0
+Analyse pour la date 2025-06-02...
+[DIAG] Cash disponible: 100000.0 | Value: 100000.0
+[DIAG] AAPL | Position size: 0 | Price: 201.27622985839844
+[DIAG] ABBV | Position size: 0 | Price: 184.06187438964844
+[DIAG] ABNB | Position size: 0 | Price: 129.6199951171875
+[DIAG] ABT | Position size: 0 | Price: 132.3844451904297
+[DIAG] ACN | Position size: 0 | Price: 312.9050598144531
+[DIAG] ADBE | Position size: 0 | Price: 403.3999938964844
+[DIAG] ADI | Position size: 0 | Price: 212.87677001953125
+[DIAG] AEP | Position size: 0 | Price: 101.53564453125
+[DIAG] AFL | Position size: 0 | Price: 102.70099639892578
+[DIAG] AMAT | Position size: 0 | Price: 156.5137481689453
+[DIAG] AMD | Position size: 0 | Price: 114.62999725341797
+[DIAG] AMGN | Position size: 0 | Price: 284.1221923828125
+[DIAG] AMT | Position size: 0 | Price: 208.55242919921875
+[DIAG] AMZN | Position size: 0 | Price: 206.64999389648438
+[DIAG] AON | Position size: 0 | Price: 375.3721923828125
+[DIAG] APD | Position size: 0 | Price: 273.1201171875
+[DIAG] AVGO | Position size: 0 | Price: 247.22854614257812
+[DIAG] AXP | Position size: 0 | Price: 293.1903991699219
+[DIAG] BA | Position size: 0 | Price: 211.47000122070312
+[DIAG] BAC | Position size: 0 | Price: 43.35406494140625
+[DIAG] BMY | Position size: 0 | Price: 46.94721984863281
+[DIAG] C | Position size: 0 | Price: 74.85840606689453
+[DIAG] CAT | Position size: 0 | Price: 342.4281921386719
+[DIAG] CB | Position size: 0 | Price: 298.92431640625
+[DIAG] CCI | Position size: 0 | Price: 96.58509063720703
+[DIAG] CI | Position size: 0 | Price: 310.1623840332031
+[DIAG] CME | Position size: 0 | Price: 286.6857604980469
+[DIAG] CMG | Position size: 0 | Price: 49.84000015258789
+[DIAG] COP | Position size: 0 | Price: 85.2197265625
+[DIAG] CRM | Position size: 0 | Price: 260.33154296875
+[DIAG] CSCO | Position size: 0 | Price: 62.75160217285156
+[DIAG] CVS | Position size: 0 | Price: 62.4036979675293
+[DIAG] CVX | Position size: 0 | Price: 134.81675720214844
+[DIAG] D | Position size: 0 | Price: 55.49842071533203
+[DIAG] DD | Position size: 0 | Price: 27.363046646118164
+[DIAG] DE | Position size: 0 | Price: 498.390625
+[DIAG] DHR | Position size: 0 | Price: 188.3355255126953
+[DIAG] DOW | Position size: 0 | Price: 26.420047760009766
+[DIAG] DUK | Position size: 0 | Price: 115.22371673583984
+[DIAG] ECL | Position size: 0 | Price: 263.1293640136719
+[DIAG] EMR | Position size: 0 | Price: 117.8814468383789
+[DIAG] EOG | Position size: 0 | Price: 109.37601470947266
+[DIAG] ETN | Position size: 0 | Price: 317.93408203125
+[DIAG] EXC | Position size: 0 | Price: 43.02779769897461
+[DIAG] F | Position size: 0 | Price: 9.735167503356934
+[DIAG] FCX | Position size: 0 | Price: 39.87499237060547
+[DIAG] FDX | Position size: 0 | Price: 214.0167999267578
+[DIAG] GD | Position size: 0 | Price: 273.1025390625
+[DIAG] GE | Position size: 0 | Price: 246.53558349609375
+[DIAG] GILD | Position size: 0 | Price: 106.69165802001953
+[DIAG] GM | Position size: 0 | Price: 47.32150650024414
+[DIAG] GOOG | Position size: 0 | Price: 169.90264892578125
+[DIAG] GOOGL | Position size: 0 | Price: 168.56448364257812
+[DIAG] GS | Position size: 0 | Price: 493.7691345214844
+[DIAG] HD | Position size: 0 | Price: 361.2877502441406
+[DIAG] HON | Position size: 0 | Price: 210.19447326660156
+[DIAG] HUM | Position size: 0 | Price: 228.95025634765625
+[DIAG] ICE | Position size: 0 | Price: 178.80213928222656
+[DIAG] INTC | Position size: 0 | Price: 19.739999771118164
+[DIAG] ISRG | Position size: 0 | Price: 487.92999267578125
+[DIAG] ITW | Position size: 0 | Price: 238.1585693359375
+[DIAG] JNJ | Position size: 0 | Price: 153.2943572998047
+[DIAG] JPM | Position size: 0 | Price: 262.1167297363281
+[DIAG] LIN | Position size: 0 | Price: 459.92681884765625
+[DIAG] LMT | Position size: 0 | Price: 471.7702331542969
+[DIAG] LOW | Position size: 0 | Price: 223.22938537597656
+[DIAG] LRCX | Position size: 0 | Price: 81.97816467285156
+[DIAG] LULU | Position size: 0 | Price: 322.95001220703125
+[DIAG] MA | Position size: 0 | Price: 498.0078125
+[DIAG] MAR | Position size: 0 | Price: 259.9316711425781
+[DIAG] MCD | Position size: 0 | Price: 309.06024169921875
+[DIAG] MCO | Position size: 0 | Price: 478.1156311035156
+[DIAG] MDT | Position size: 0 | Price: 82.4248046875
+[DIAG] META | Position size: 0 | Price: 499.151123046875
+[DIAG] MMC | Position size: 0 | Price: 232.707763671875
+[DIAG] MMM | Position size: 0 | Price: 145.1031494140625
+[DIAG] MPC | Position size: 0 | Price: 157.0802764892578
+[DIAG] MRK | Position size: 0 | Price: 74.12216186523438
+[DIAG] MS | Position size: 0 | Price: 126.74251556396484
+[DIAG] MSFT | Position size: 0 | Price: 460.3502197265625
+[DIAG] MU | Position size: 0 | Price: 97.98670196533203
+[DIAG] NEE | Position size: 0 | Price: 69.14349365234375
+[DIAG] NEM | Position size: 0 | Price: 55.23523712158203
+[DIAG] NFLX | Position size: 0 | Price: 121.89800262451172
+[DIAG] NKE | Position size: 0 | Price: 60.86311721801758
+[DIAG] NOC | Position size: 0 | Price: 479.5439453125
+[DIAG] NSC | Position size: 0 | Price: 242.90098571777344
+[DIAG] NUE | Position size: 0 | Price: 119.00580596923828
+[DIAG] NVDA | Position size: 0 | Price: 137.35507202148438
+[DIAG] ORLY | Position size: 0 | Price: 91.37866973876953
+[DIAG] OXY | Position size: 0 | Price: 40.754112243652344
+[DIAG] PCAR | Position size: 0 | Price: 90.01656341552734
+[DIAG] PEP | Position size: 0 | Price: 126.99264526367188
+[DIAG] PFE | Position size: 0 | Price: 22.662996292114258
+[DIAG] PG | Position size: 0 | Price: 165.4832000732422
+[DIAG] PGR | Position size: 0 | Price: 271.2802734375
+[DIAG] PH | Position size: 0 | Price: 498.85430908203125
+[DIAG] PLD | Position size: 0 | Price: 105.94430541992188
+[DIAG] PNC | Position size: 0 | Price: 170.87364196777344
+[DIAG] PPG | Position size: 0 | Price: 108.80882263183594
+[DIAG] PSX | Position size: 0 | Price: 112.20946502685547
+[DIAG] QCOM | Position size: 0 | Price: 144.19290161132812
+[DIAG] REGN | Position size: 0 | Price: 489.4521484375
+[DIAG] ROST | Position size: 0 | Price: 141.3128662109375
+[DIAG] RTX | Position size: 0 | Price: 136.31849670410156
+[DIAG] SBUX | Position size: 0 | Price: 84.02456665039062
+[DIAG] SCHW | Position size: 0 | Price: 87.61339569091797
+[DIAG] SHW | Position size: 0 | Price: 353.844970703125
+[DIAG] SLB | Position size: 0 | Price: 32.54187774658203
+[DIAG] SNPS | Position size: 0 | Price: 466.1499938964844
+[DIAG] SO | Position size: 0 | Price: 88.50438690185547
+[DIAG] SPGI | Position size: 0 | Price: 499.0249328613281
+[DIAG] SRE | Position size: 0 | Price: 76.23863220214844
+[DIAG] TFC | Position size: 0 | Price: 38.309364318847656
+[DIAG] TGT | Position size: 0 | Price: 91.16962432861328
+[DIAG] TMO | Position size: 0 | Price: 395.406982421875
+[DIAG] TSLA | Position size: 0 | Price: 342.69000244140625
+[DIAG] TXN | Position size: 0 | Price: 181.27012634277344
+[DIAG] UNH | Position size: 0 | Price: 298.6670837402344
+[DIAG] UNP | Position size: 0 | Price: 216.26637268066406
+[DIAG] UPS | Position size: 0 | Price: 93.92266082763672
+[DIAG] USB | Position size: 0 | Price: 42.2767448425293
+[DIAG] V | Position size: 0 | Price: 363.9573974609375
+[DIAG] VLO | Position size: 0 | Price: 126.46231079101562
+[DIAG] VRTX | Position size: 0 | Price: 445.42999267578125
+[DIAG] WFC | Position size: 0 | Price: 73.89509582519531
+[DIAG] WM | Position size: 0 | Price: 239.43455505371094
+[DIAG] WMT | Position size: 0 | Price: 99.33502197265625
+[DIAG] XOM | Position size: 0 | Price: 101.21463775634766
+[DIAG] YUM | Position size: 0 | Price: 143.2529296875
+[DIAG] ZTS | Position size: 0 | Price: 168.2694854736328
+2. Sélection + scoring
+2025-06-02 Les symboles selectionnés ['HUM', 'NVDA', 'INTC', 'AMD', 'DOW']
+[DIAG] Avant entrée: HUM | Position size: 0
+[DIAG] Avant entrée: NVDA | Position size: 0
+[DIAG] Avant entrée: INTC | Position size: 0
+[DIAG] Avant entrée: AMD | Position size: 0
+[DIAG] Avant entrée: DOW | Position size: 0
+[BT] Entry order submitted for DOW
+2025-06-02 Placing order for DOW: Entry at 26.68
+[notify_order] status=Submitted, symbol=DOW, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=DOW, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=DOW, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Accepted, symbol=DOW, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Accepted, symbol=DOW, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Accepted, symbol=DOW, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Completed, symbol=DOW, isbuy=True, exectype=3, price=26.679999999999996, size=757
+[BT] Stop order submitted for DOW (post-entry)
+[BT] Take profit order submitted for DOW (post-entry)
+[notify_order] Order Completed for DOW
+[notify_order] status=Canceled, symbol=DOW, isbuy=True, exectype=3, price=26.679999999999996, size=757
+[notify_order] status=Canceled, symbol=DOW, isbuy=True, exectype=3, price=26.679999999999996, size=757
+Analyse pour la date 2025-06-03...
+[DIAG] Cash disponible: 79783.04324 | Value: 100216.84100191711
+[DIAG] AAPL | Position size: 0 | Price: 202.84292602539062
+[DIAG] ABBV | Position size: 0 | Price: 184.3177947998047
+[DIAG] ABNB | Position size: 0 | Price: 132.89999389648438
+[DIAG] ABT | Position size: 0 | Price: 132.523193359375
+[DIAG] ACN | Position size: 0 | Price: 311.3428649902344
+[DIAG] ADBE | Position size: 0 | Price: 412.489990234375
+[DIAG] ADI | Position size: 0 | Price: 215.8211669921875
+[DIAG] AEP | Position size: 0 | Price: 101.19122314453125
+[DIAG] AFL | Position size: 0 | Price: 102.96813201904297
+[DIAG] AMAT | Position size: 0 | Price: 160.96224975585938
+[DIAG] AMD | Position size: 0 | Price: 117.30999755859375
+[DIAG] AMGN | Position size: 0 | Price: 285.20562744140625
+[DIAG] AMT | Position size: 0 | Price: 207.8511199951172
+[DIAG] AMZN | Position size: 0 | Price: 205.7100067138672
+[DIAG] AON | Position size: 0 | Price: 373.6957092285156
+[DIAG] APD | Position size: 0 | Price: 277.61822509765625
+[DIAG] AVGO | Position size: 0 | Price: 255.32005310058594
+[DIAG] AXP | Position size: 0 | Price: 295.2355041503906
+[DIAG] BA | Position size: 0 | Price: 213.42999267578125
+[DIAG] BAC | Position size: 0 | Price: 43.914676666259766
+[DIAG] BMY | Position size: 0 | Price: 46.273658752441406
+[DIAG] C | Position size: 0 | Price: 75.57933044433594
+[DIAG] CAT | Position size: 0 | Price: 347.1274108886719
+[DIAG] CB | Position size: 0 | Price: 295.4161376953125
+[DIAG] CCI | Position size: 0 | Price: 96.55608367919922
+[DIAG] CI | Position size: 0 | Price: 308.3715515136719
+[DIAG] CME | Position size: 0 | Price: 278.40203857421875
+[DIAG] CMG | Position size: 0 | Price: 50.06999969482422
+[DIAG] COP | Position size: 0 | Price: 86.3891372680664
+[DIAG] CRM | Position size: 0 | Price: 263.1675109863281
+[DIAG] CSCO | Position size: 0 | Price: 63.25283432006836
+[DIAG] CVS | Position size: 0 | Price: 62.393890380859375
+[DIAG] CVX | Position size: 0 | Price: 136.4892578125
+[DIAG] D | Position size: 0 | Price: 55.42021560668945
+[DIAG] DD | Position size: 0 | Price: 27.92620849609375
+[DIAG] DE | Position size: 0 | Price: 498.390625
+[DIAG] DHR | Position size: 0 | Price: 191.1521453857422
+[DIAG] DOW | Position size: 757 | Price: 26.993127822875977
+[DIAG] DUK | Position size: 0 | Price: 114.7322769165039
+[DIAG] ECL | Position size: 0 | Price: 263.3973388671875
+[DIAG] EMR | Position size: 0 | Price: 119.39884185791016
+[DIAG] EOG | Position size: 0 | Price: 110.82991027832031
+[DIAG] ETN | Position size: 0 | Price: 324.8938293457031
+[DIAG] EXC | Position size: 0 | Price: 42.70354080200195
+[DIAG] F | Position size: 0 | Price: 9.940014839172363
+[DIAG] FCX | Position size: 0 | Price: 39.964378356933594
+[DIAG] FDX | Position size: 0 | Price: 215.8732147216797
+[DIAG] GD | Position size: 0 | Price: 273.429443359375
+[DIAG] GE | Position size: 0 | Price: 247.9202880859375
+[DIAG] GILD | Position size: 0 | Price: 107.10310363769531
+[DIAG] GM | Position size: 0 | Price: 48.68092727661133
+[DIAG] GOOG | Position size: 0 | Price: 167.2499542236328
+[DIAG] GOOGL | Position size: 0 | Price: 165.7223358154297
+[DIAG] GS | Position size: 0 | Price: 493.7691345214844
+[DIAG] HD | Position size: 0 | Price: 366.31488037109375
+[DIAG] HON | Position size: 0 | Price: 211.35951232910156
+[DIAG] HUM | Position size: 0 | Price: 230.95884704589844
+[DIAG] ICE | Position size: 0 | Price: 177.83038330078125
+[DIAG] INTC | Position size: 0 | Price: 20.290000915527344
+[DIAG] ISRG | Position size: 0 | Price: 487.92999267578125
+[DIAG] ITW | Position size: 0 | Price: 240.72024536132812
+[DIAG] JNJ | Position size: 0 | Price: 152.32763671875
+[DIAG] JPM | Position size: 0 | Price: 263.71124267578125
+[DIAG] LIN | Position size: 0 | Price: 467.1043395996094
+[DIAG] LMT | Position size: 0 | Price: 473.1003723144531
+[DIAG] LOW | Position size: 0 | Price: 226.47607421875
+[DIAG] LRCX | Position size: 0 | Price: 83.15099334716797
+[DIAG] LULU | Position size: 0 | Price: 334.9100036621094
+[DIAG] MA | Position size: 0 | Price: 498.0078125
+[DIAG] MAR | Position size: 0 | Price: 263.1060485839844
+[DIAG] MCD | Position size: 0 | Price: 308.77362060546875
+[DIAG] MCO | Position size: 0 | Price: 480.24755859375
+[DIAG] MDT | Position size: 0 | Price: 84.19654083251953
+[DIAG] META | Position size: 0 | Price: 499.151123046875
+[DIAG] MMC | Position size: 0 | Price: 232.80690002441406
+[DIAG] MMM | Position size: 0 | Price: 146.81785583496094
+[DIAG] MPC | Position size: 0 | Price: 160.2664031982422
+[DIAG] MRK | Position size: 0 | Price: 74.9873275756836
+[DIAG] MS | Position size: 0 | Price: 127.0188980102539
+[DIAG] MSFT | Position size: 0 | Price: 461.3466796875
+[DIAG] MU | Position size: 0 | Price: 102.0486831665039
+[DIAG] NEE | Position size: 0 | Price: 69.9320068359375
+[DIAG] NEM | Position size: 0 | Price: 54.99672317504883
+[DIAG] NFLX | Position size: 0 | Price: 121.79399871826172
+[DIAG] NKE | Position size: 0 | Price: 61.6539306640625
+[DIAG] NOC | Position size: 0 | Price: 484.34552001953125
+[DIAG] NSC | Position size: 0 | Price: 245.59481811523438
+[DIAG] NUE | Position size: 0 | Price: 120.90357208251953
+[DIAG] NVDA | Position size: 0 | Price: 141.19436645507812
+[DIAG] ORLY | Position size: 0 | Price: 91.4713363647461
+[DIAG] OXY | Position size: 0 | Price: 41.983421325683594
+[DIAG] PCAR | Position size: 0 | Price: 91.77236938476562
+[DIAG] PEP | Position size: 0 | Price: 127.90450286865234
+[DIAG] PFE | Position size: 0 | Price: 22.55673599243164
+[DIAG] PG | Position size: 0 | Price: 164.56593322753906
+[DIAG] PGR | Position size: 0 | Price: 269.8804016113281
+[DIAG] PH | Position size: 0 | Price: 498.85430908203125
+[DIAG] PLD | Position size: 0 | Price: 106.20733642578125
+[DIAG] PNC | Position size: 0 | Price: 173.2018585205078
+[DIAG] PPG | Position size: 0 | Price: 109.8145751953125
+[DIAG] PSX | Position size: 0 | Price: 113.86884307861328
+[DIAG] QCOM | Position size: 0 | Price: 146.46450805664062
+[DIAG] REGN | Position size: 0 | Price: 486.5103454589844
+[DIAG] ROST | Position size: 0 | Price: 142.9103546142578
+[DIAG] RTX | Position size: 0 | Price: 136.35816955566406
+[DIAG] SBUX | Position size: 0 | Price: 85.41526794433594
+[DIAG] SCHW | Position size: 0 | Price: 87.50401306152344
+[DIAG] SHW | Position size: 0 | Price: 356.1545715332031
+[DIAG] SLB | Position size: 0 | Price: 33.2934455871582
+[DIAG] SNPS | Position size: 0 | Price: 466.260009765625
+[DIAG] SO | Position size: 0 | Price: 88.15996551513672
+[DIAG] SPGI | Position size: 0 | Price: 499.0249328613281
+[DIAG] SRE | Position size: 0 | Price: 76.0138931274414
+[DIAG] TFC | Position size: 0 | Price: 38.690216064453125
+[DIAG] TGT | Position size: 0 | Price: 93.57294464111328
+[DIAG] TMO | Position size: 0 | Price: 398.8576965332031
+[DIAG] TSLA | Position size: 0 | Price: 344.2699890136719
+[DIAG] TXN | Position size: 0 | Price: 185.078369140625
+[DIAG] UNH | Position size: 0 | Price: 295.2366027832031
+[DIAG] UNP | Position size: 0 | Price: 219.12173461914062
+[DIAG] UPS | Position size: 0 | Price: 94.61724853515625
+[DIAG] USB | Position size: 0 | Price: 43.013343811035156
+[DIAG] V | Position size: 0 | Price: 364.495361328125
+[DIAG] VLO | Position size: 0 | Price: 129.0743408203125
+[DIAG] VRTX | Position size: 0 | Price: 446.4800109863281
+[DIAG] WFC | Position size: 0 | Price: 74.81482696533203
+[DIAG] WM | Position size: 0 | Price: 237.5455780029297
+[DIAG] WMT | Position size: 0 | Price: 99.54411315917969
+[DIAG] XOM | Position size: 0 | Price: 101.95128631591797
+[DIAG] YUM | Position size: 0 | Price: 142.5991973876953
+[DIAG] ZTS | Position size: 0 | Price: 169.1435089111328
+2. Sélection + scoring
+2025-06-03 Les symboles selectionnés ['NVDA', 'HUM', 'INTC', 'TGT', 'UNH']
+[DIAG] Avant entrée: NVDA | Position size: 0
+[DIAG] Avant entrée: HUM | Position size: 0
+[DIAG] Avant entrée: INTC | Position size: 0
+[DIAG] Avant entrée: TGT | Position size: 0
+[BT] Entry order submitted for TGT
+2025-06-03 Placing order for TGT: Entry at 94.51
+[DIAG] Avant entrée: UNH | Position size: 0
+[BT] Entry order submitted for UNH
+2025-06-03 Placing order for UNH: Entry at 298.19
+[notify_order] status=Submitted, symbol=DOW, isbuy=False, exectype=5, price=0.0, size=0
+[notify_order] status=Submitted, symbol=DOW, isbuy=False, exectype=2, price=0.0, size=0
+[notify_order] status=Submitted, symbol=DOW, isbuy=False, exectype=5, price=0.0, size=0
+[notify_order] status=Submitted, symbol=DOW, isbuy=False, exectype=5, price=0.0, size=0
+[notify_order] status=Submitted, symbol=DOW, isbuy=False, exectype=2, price=0.0, size=0
+[notify_order] status=Submitted, symbol=DOW, isbuy=False, exectype=2, price=0.0, size=0
+[notify_order] status=Submitted, symbol=TGT, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=TGT, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=TGT, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=UNH, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=UNH, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=UNH, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Accepted, symbol=DOW, isbuy=False, exectype=5, price=0.0, size=0
+[notify_order] status=Accepted, symbol=DOW, isbuy=False, exectype=2, price=0.0, size=0
+[notify_order] status=Accepted, symbol=DOW, isbuy=False, exectype=5, price=0.0, size=0
+[notify_order] status=Accepted, symbol=DOW, isbuy=False, exectype=5, price=0.0, size=0
+[notify_order] status=Accepted, symbol=DOW, isbuy=False, exectype=2, price=0.0, size=0
+[notify_order] status=Accepted, symbol=DOW, isbuy=False, exectype=2, price=0.0, size=0
+[notify_order] status=Accepted, symbol=TGT, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Accepted, symbol=TGT, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Accepted, symbol=TGT, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Accepted, symbol=UNH, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Accepted, symbol=UNH, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Accepted, symbol=UNH, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Completed, symbol=HUM, isbuy=True, exectype=3, price=232.98, size=86
+[BT] Stop order submitted for HUM (post-entry)
+[BT] Take profit order submitted for HUM (post-entry)
+[notify_order] Order Completed for HUM
+[notify_order] status=Canceled, symbol=HUM, isbuy=True, exectype=3, price=232.98, size=86
+[notify_order] status=Canceled, symbol=HUM, isbuy=True, exectype=3, price=232.98, size=86
+[notify_order] status=Completed, symbol=UNH, isbuy=True, exectype=3, price=298.19, size=67
+[BT] Stop order submitted for UNH (post-entry)
+[BT] Take profit order submitted for UNH (post-entry)
+[notify_order] Order Completed for UNH
+[notify_order] status=Canceled, symbol=UNH, isbuy=True, exectype=3, price=298.19, size=67
+[notify_order] status=Canceled, symbol=UNH, isbuy=True, exectype=3, price=298.19, size=67
+Analyse pour la date 2025-06-04...
+[DIAG] Cash disponible: 39728.01823 | Value: 99889.87149385497
+[DIAG] AAPL | Position size: 0 | Price: 202.39389038085938
+[DIAG] ABBV | Position size: 0 | Price: 184.40638732910156
+[DIAG] ABNB | Position size: 0 | Price: 133.50999450683594
+[DIAG] ABT | Position size: 0 | Price: 131.7798614501953
+[DIAG] ACN | Position size: 0 | Price: 314.825439453125
+[DIAG] ADBE | Position size: 0 | Price: 413.9100036621094
+[DIAG] ADI | Position size: 0 | Price: 216.87327575683594
+[DIAG] AEP | Position size: 0 | Price: 100.22683715820312
+[DIAG] AFL | Position size: 0 | Price: 101.74126434326172
+[DIAG] AMAT | Position size: 0 | Price: 161.15133666992188
+[DIAG] AMD | Position size: 0 | Price: 118.58000183105469
+[DIAG] AMGN | Position size: 0 | Price: 282.6842346191406
+[DIAG] AMT | Position size: 0 | Price: 208.7959442138672
+[DIAG] AMZN | Position size: 0 | Price: 207.22999572753906
+[DIAG] AON | Position size: 0 | Price: 371.8395690917969
+[DIAG] APD | Position size: 0 | Price: 274.5998840332031
+[DIAG] AVGO | Position size: 0 | Price: 259.52484130859375
+[DIAG] AXP | Position size: 0 | Price: 293.7860412597656
+[DIAG] BA | Position size: 0 | Price: 211.97999572753906
+[DIAG] BAC | Position size: 0 | Price: 43.62944793701172
+[DIAG] BMY | Position size: 0 | Price: 46.13894271850586
+[DIAG] C | Position size: 0 | Price: 75.4509506225586
+[DIAG] CAT | Position size: 0 | Price: 347.057861328125
+[DIAG] CB | Position size: 0 | Price: 290.8016357421875
+[DIAG] CCI | Position size: 0 | Price: 96.9138412475586
+[DIAG] CI | Position size: 0 | Price: 306.83795166015625
+[DIAG] CME | Position size: 0 | Price: 274.0333557128906
+[DIAG] CMG | Position size: 0 | Price: 52.15999984741211
+[DIAG] COP | Position size: 0 | Price: 84.46304321289062
+[DIAG] CRM | Position size: 0 | Price: 261.8739318847656
+[DIAG] CSCO | Position size: 0 | Price: 63.28231430053711
+[DIAG] CVS | Position size: 0 | Price: 62.374263763427734
+[DIAG] CVX | Position size: 0 | Price: 134.3570556640625
+[DIAG] D | Position size: 0 | Price: 54.82387924194336
+[DIAG] DD | Position size: 0 | Price: 28.137393951416016
+[DIAG] DE | Position size: 0 | Price: 498.390625
+[DIAG] DHR | Position size: 0 | Price: 192.16734313964844
+[DIAG] DOW | Position size: 757 | Price: 27.469078063964844
+[DIAG] DUK | Position size: 0 | Price: 113.99510955810547
+[DIAG] ECL | Position size: 0 | Price: 265.0049743652344
+[DIAG] EMR | Position size: 0 | Price: 120.60881042480469
+[DIAG] EOG | Position size: 0 | Price: 108.8160629272461
+[DIAG] ETN | Position size: 0 | Price: 326.1302185058594
+[DIAG] EXC | Position size: 0 | Price: 42.00590133666992
+[DIAG] F | Position size: 0 | Price: 9.988788604736328
+[DIAG] FCX | Position size: 0 | Price: 40.58013153076172
+[DIAG] FDX | Position size: 0 | Price: 214.9990234375
+[DIAG] GD | Position size: 0 | Price: 272.4289855957031
+[DIAG] GE | Position size: 0 | Price: 249.92262268066406
+[DIAG] GILD | Position size: 0 | Price: 106.79940795898438
+[DIAG] GM | Position size: 0 | Price: 47.301666259765625
+[DIAG] GOOG | Position size: 0 | Price: 168.9253387451172
+[DIAG] GOOGL | Position size: 0 | Price: 167.5872039794922
+[DIAG] GS | Position size: 0 | Price: 493.7691345214844
+[DIAG] HD | Position size: 0 | Price: 365.6471862792969
+[DIAG] HON | Position size: 0 | Price: 211.99330139160156
+[DIAG] HUM | Position size: 86 | Price: 228.3961639404297
+[DIAG] ICE | Position size: 0 | Price: 177.62216186523438
+[DIAG] INTC | Position size: 0 | Price: 20.25
+[DIAG] ISRG | Position size: 0 | Price: 487.92999267578125
+[DIAG] ITW | Position size: 0 | Price: 241.94712829589844
+[DIAG] JNJ | Position size: 0 | Price: 151.14390563964844
+[DIAG] JPM | Position size: 0 | Price: 261.68096923828125
+[DIAG] LIN | Position size: 0 | Price: 470.53076171875
+[DIAG] LMT | Position size: 0 | Price: 475.11029052734375
+[DIAG] LOW | Position size: 0 | Price: 226.0702362060547
+[DIAG] LRCX | Position size: 0 | Price: 84.25422668457031
+[DIAG] LULU | Position size: 0 | Price: 335.19000244140625
+[DIAG] MA | Position size: 0 | Price: 498.0078125
+[DIAG] MAR | Position size: 0 | Price: 260.64813232421875
+[DIAG] MCD | Position size: 0 | Price: 307.9631042480469
+[DIAG] MCO | Position size: 0 | Price: 483.6844787597656
+[DIAG] MDT | Position size: 0 | Price: 84.2555923461914
+[DIAG] META | Position size: 0 | Price: 499.151123046875
+[DIAG] MMC | Position size: 0 | Price: 230.2891082763672
+[DIAG] MMM | Position size: 0 | Price: 145.50953674316406
+[DIAG] MPC | Position size: 0 | Price: 155.2991943359375
+[DIAG] MRK | Position size: 0 | Price: 76.0857925415039
+[DIAG] MS | Position size: 0 | Price: 126.50562286376953
+[DIAG] MSFT | Position size: 0 | Price: 462.2435302734375
+[DIAG] MU | Position size: 0 | Price: 103.04671478271484
+[DIAG] NEE | Position size: 0 | Price: 68.87736511230469
+[DIAG] NEM | Position size: 0 | Price: 54.93709182739258
+[DIAG] NFLX | Position size: 0 | Price: 123.96600341796875
+[DIAG] NKE | Position size: 0 | Price: 62.049339294433594
+[DIAG] NOC | Position size: 0 | Price: 487.3911437988281
+[DIAG] NSC | Position size: 0 | Price: 245.02040100097656
+[DIAG] NUE | Position size: 0 | Price: 120.44889831542969
+[DIAG] NVDA | Position size: 0 | Price: 141.8942413330078
+[DIAG] ORLY | Position size: 0 | Price: 91.10600280761719
+[DIAG] OXY | Position size: 0 | Price: 41.21633529663086
+[DIAG] PCAR | Position size: 0 | Price: 90.8208999633789
+[DIAG] PEP | Position size: 0 | Price: 127.79779815673828
+[DIAG] PFE | Position size: 0 | Price: 22.595375061035156
+[DIAG] PG | Position size: 0 | Price: 163.67823791503906
+[DIAG] PGR | Position size: 0 | Price: 265.10760498046875
+[DIAG] PH | Position size: 0 | Price: 498.85430908203125
+[DIAG] PLD | Position size: 0 | Price: 105.63256072998047
+[DIAG] PNC | Position size: 0 | Price: 171.7774200439453
+[DIAG] PPG | Position size: 0 | Price: 110.36675262451172
+[DIAG] PSX | Position size: 0 | Price: 110.44207763671875
+[DIAG] QCOM | Position size: 0 | Price: 146.5726776123047
+[DIAG] REGN | Position size: 0 | Price: 483.58843994140625
+[DIAG] ROST | Position size: 0 | Price: 141.4021759033203
+[DIAG] RTX | Position size: 0 | Price: 137.39944458007812
+[DIAG] SBUX | Position size: 0 | Price: 86.90461730957031
+[DIAG] SCHW | Position size: 0 | Price: 86.98694610595703
+[DIAG] SHW | Position size: 0 | Price: 360.59454345703125
+[DIAG] SLB | Position size: 0 | Price: 32.7176399230957
+[DIAG] SNPS | Position size: 0 | Price: 473.19000244140625
+[DIAG] SO | Position size: 0 | Price: 86.88072204589844
+[DIAG] SPGI | Position size: 0 | Price: 499.0249328613281
+[DIAG] SRE | Position size: 0 | Price: 74.68494415283203
+[DIAG] TFC | Position size: 0 | Price: 38.582794189453125
+[DIAG] TGT | Position size: 0 | Price: 91.77534484863281
+[DIAG] TMO | Position size: 0 | Price: 402.5777282714844
+[DIAG] TSLA | Position size: 0 | Price: 332.04998779296875
+[DIAG] TXN | Position size: 0 | Price: 187.6762237548828
+[DIAG] UNH | Position size: 67 | Price: 294.4132995605469
+[DIAG] UNP | Position size: 0 | Price: 218.22264099121094
+[DIAG] UPS | Position size: 0 | Price: 95.07064819335938
+[DIAG] USB | Position size: 0 | Price: 42.548126220703125
+[DIAG] V | Position size: 0 | Price: 366.6274108886719
+[DIAG] VLO | Position size: 0 | Price: 124.72752380371094
+[DIAG] VRTX | Position size: 0 | Price: 445.8500061035156
+[DIAG] WFC | Position size: 0 | Price: 74.54780578613281
+[DIAG] WM | Position size: 0 | Price: 236.2598876953125
+[DIAG] WMT | Position size: 0 | Price: 98.91685485839844
+[DIAG] XOM | Position size: 0 | Price: 100.4780044555664
+[DIAG] YUM | Position size: 0 | Price: 142.63882446289062
+[DIAG] ZTS | Position size: 0 | Price: 167.4451141357422
+2. Sélection + scoring
+2025-06-04 Les symboles selectionnés ['HUM', 'UNH', 'NVDA', 'TSLA', 'INTC']
+[DIAG] Avant entrée: HUM | Position size: 86
+[CONTROL] Position déjà ouverte sur HUM (size=86), pas de nouvelle entrée.
+[DIAG] Avant entrée: UNH | Position size: 67
+[CONTROL] Position déjà ouverte sur UNH (size=67), pas de nouvelle entrée.
+[DIAG] Avant entrée: NVDA | Position size: 0
+[DIAG] Avant entrée: TSLA | Position size: 0
+[BT] Entry order submitted for TSLA
+2025-06-04 Placing order for TSLA: Entry at 335.37
+[DIAG] Avant entrée: INTC | Position size: 0
+[notify_order] status=Submitted, symbol=HUM, isbuy=False, exectype=5, price=0.0, size=0
+[notify_order] status=Submitted, symbol=HUM, isbuy=False, exectype=2, price=0.0, size=0
+[notify_order] status=Submitted, symbol=HUM, isbuy=False, exectype=5, price=0.0, size=0
+[notify_order] status=Submitted, symbol=HUM, isbuy=False, exectype=5, price=0.0, size=0
+[notify_order] status=Submitted, symbol=HUM, isbuy=False, exectype=2, price=0.0, size=0
+[notify_order] status=Submitted, symbol=HUM, isbuy=False, exectype=2, price=0.0, size=0
+[notify_order] status=Submitted, symbol=UNH, isbuy=False, exectype=5, price=0.0, size=0
+[notify_order] status=Submitted, symbol=UNH, isbuy=False, exectype=2, price=0.0, size=0
+[notify_order] status=Submitted, symbol=UNH, isbuy=False, exectype=5, price=0.0, size=0
+[notify_order] status=Submitted, symbol=UNH, isbuy=False, exectype=5, price=0.0, size=0
+[notify_order] status=Submitted, symbol=UNH, isbuy=False, exectype=2, price=0.0, size=0
+[notify_order] status=Submitted, symbol=UNH, isbuy=False, exectype=2, price=0.0, size=0
+[notify_order] status=Submitted, symbol=TSLA, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=TSLA, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=TSLA, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Accepted, symbol=HUM, isbuy=False, exectype=5, price=0.0, size=0
+[notify_order] status=Accepted, symbol=HUM, isbuy=False, exectype=2, price=0.0, size=0
+[notify_order] status=Accepted, symbol=HUM, isbuy=False, exectype=5, price=0.0, size=0
+[notify_order] status=Accepted, symbol=HUM, isbuy=False, exectype=5, price=0.0, size=0
+[notify_order] status=Accepted, symbol=HUM, isbuy=False, exectype=2, price=0.0, size=0
+[notify_order] status=Accepted, symbol=HUM, isbuy=False, exectype=2, price=0.0, size=0
+[notify_order] status=Accepted, symbol=UNH, isbuy=False, exectype=5, price=0.0, size=0
+[notify_order] status=Accepted, symbol=UNH, isbuy=False, exectype=2, price=0.0, size=0
+[notify_order] status=Accepted, symbol=UNH, isbuy=False, exectype=5, price=0.0, size=0
+[notify_order] status=Accepted, symbol=UNH, isbuy=False, exectype=5, price=0.0, size=0
+[notify_order] status=Accepted, symbol=UNH, isbuy=False, exectype=2, price=0.0, size=0
+[notify_order] status=Accepted, symbol=UNH, isbuy=False, exectype=2, price=0.0, size=0
+[notify_order] status=Accepted, symbol=TSLA, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Accepted, symbol=TSLA, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Accepted, symbol=TSLA, isbuy=True, exectype=3, price=0.0, size=0
+Analyse pour la date 2025-06-05...
+[DIAG] Cash disponible: 39728.01823 | Value: 99205.91562036559
+[DIAG] AAPL | Position size: 0 | Price: 200.20849609375
+[DIAG] ABBV | Position size: 0 | Price: 184.5343475341797
+[DIAG] ABNB | Position size: 0 | Price: 137.2899932861328
+[DIAG] ABT | Position size: 0 | Price: 132.75115966796875
+[DIAG] ACN | Position size: 0 | Price: 313.810546875
+[DIAG] ADBE | Position size: 0 | Price: 415.20001220703125
+[DIAG] ADI | Position size: 0 | Price: 216.4167022705078
+[DIAG] AEP | Position size: 0 | Price: 100.14810943603516
+[DIAG] AFL | Position size: 0 | Price: 101.12782287597656
+[DIAG] AMAT | Position size: 0 | Price: 163.40048217773438
+[DIAG] AMD | Position size: 0 | Price: 115.69000244140625
+[DIAG] AMGN | Position size: 0 | Price: 282.7728576660156
+[DIAG] AMT | Position size: 0 | Price: 210.60765075683594
+[DIAG] AMZN | Position size: 0 | Price: 207.91000366210938
+[DIAG] AON | Position size: 0 | Price: 369.71405029296875
+[DIAG] APD | Position size: 0 | Price: 270.68975830078125
+[DIAG] AVGO | Position size: 0 | Price: 258.3817138671875
+[DIAG] AXP | Position size: 0 | Price: 293.8158264160156
+[DIAG] BA | Position size: 0 | Price: 209.02000427246094
+[DIAG] BAC | Position size: 0 | Price: 43.64912033081055
+[DIAG] BMY | Position size: 0 | Price: 46.03309631347656
+[DIAG] C | Position size: 0 | Price: 75.71759033203125
+[DIAG] CAT | Position size: 0 | Price: 346.69024658203125
+[DIAG] CB | Position size: 0 | Price: 290.5425109863281
+[DIAG] CCI | Position size: 0 | Price: 96.96217346191406
+[DIAG] CI | Position size: 0 | Price: 307.7284240722656
+[DIAG] CME | Position size: 0 | Price: 271.0946044921875
+[DIAG] CMG | Position size: 0 | Price: 52.599998474121094
+[DIAG] COP | Position size: 0 | Price: 83.87342071533203
+[DIAG] CRM | Position size: 0 | Price: 265.8243408203125
+[DIAG] CSCO | Position size: 0 | Price: 63.508358001708984
+[DIAG] CVS | Position size: 0 | Price: 61.89348220825195
+[DIAG] CVX | Position size: 0 | Price: 133.89736938476562
+[DIAG] D | Position size: 0 | Price: 54.745670318603516
+[DIAG] DD | Position size: 0 | Price: 27.913785934448242
+[DIAG] DE | Position size: 0 | Price: 498.390625
+[DIAG] DHR | Position size: 0 | Price: 191.24171447753906
+[DIAG] DOW | Position size: 757 | Price: 27.371946334838867
+[DIAG] DUK | Position size: 0 | Price: 113.75921630859375
+[DIAG] ECL | Position size: 0 | Price: 264.8958435058594
+[DIAG] EMR | Position size: 0 | Price: 121.4914779663086
+[DIAG] EOG | Position size: 0 | Price: 109.07147979736328
+[DIAG] ETN | Position size: 0 | Price: 325.531982421875
+[DIAG] EXC | Position size: 0 | Price: 42.113983154296875
+[DIAG] F | Position size: 0 | Price: 9.85222339630127
+[DIAG] FCX | Position size: 0 | Price: 41.404441833496094
+[DIAG] FDX | Position size: 0 | Price: 212.87742614746094
+[DIAG] GD | Position size: 0 | Price: 271.82476806640625
+[DIAG] GE | Position size: 0 | Price: 250.95863342285156
+[DIAG] GILD | Position size: 0 | Price: 108.2100830078125
+[DIAG] GM | Position size: 0 | Price: 46.884910583496094
+[DIAG] GOOG | Position size: 0 | Price: 169.3441925048828
+[DIAG] GOOGL | Position size: 0 | Price: 167.7467498779297
+[DIAG] GS | Position size: 0 | Price: 493.7691345214844
+[DIAG] HD | Position size: 0 | Price: 364.83709716796875
+[DIAG] HON | Position size: 0 | Price: 211.2663116455078
+[DIAG] HUM | Position size: 86 | Price: 224.76487731933594
+[DIAG] ICE | Position size: 0 | Price: 177.05694580078125
+[DIAG] INTC | Position size: 0 | Price: 19.989999771118164
+[DIAG] ISRG | Position size: 0 | Price: 487.92999267578125
+[DIAG] ITW | Position size: 0 | Price: 241.5545196533203
+[DIAG] JNJ | Position size: 0 | Price: 151.57794189453125
+[DIAG] JPM | Position size: 0 | Price: 259.43280029296875
+[DIAG] LIN | Position size: 0 | Price: 467.0447998046875
+[DIAG] LMT | Position size: 0 | Price: 470.9918518066406
+[DIAG] LOW | Position size: 0 | Price: 225.27835083007812
+[DIAG] LRCX | Position size: 0 | Price: 84.39337921142578
+[DIAG] LULU | Position size: 0 | Price: 330.7799987792969
+[DIAG] MA | Position size: 0 | Price: 498.0078125
+[DIAG] MAR | Position size: 0 | Price: 258.5385437011719
+[DIAG] MCD | Position size: 0 | Price: 305.403076171875
+[DIAG] MCO | Position size: 0 | Price: 485.6968688964844
+[DIAG] MDT | Position size: 0 | Price: 85.63361358642578
+[DIAG] META | Position size: 0 | Price: 499.151123046875
+[DIAG] MMC | Position size: 0 | Price: 226.85935974121094
+[DIAG] MMM | Position size: 0 | Price: 144.96441650390625
+[DIAG] MPC | Position size: 0 | Price: 156.54595947265625
+[DIAG] MRK | Position size: 0 | Price: 75.45393371582031
+[DIAG] MS | Position size: 0 | Price: 128.93385314941406
+[DIAG] MSFT | Position size: 0 | Price: 466.0401611328125
+[DIAG] MU | Position size: 0 | Price: 106.08073425292969
+[DIAG] NEE | Position size: 0 | Price: 70.47412872314453
+[DIAG] NEM | Position size: 0 | Price: 54.17186737060547
+[DIAG] NFLX | Position size: 0 | Price: 125.052001953125
+[DIAG] NKE | Position size: 0 | Price: 61.95048522949219
+[DIAG] NOC | Position size: 0 | Price: 484.2463073730469
+[DIAG] NSC | Position size: 0 | Price: 244.54502868652344
+[DIAG] NUE | Position size: 0 | Price: 117.37490844726562
+[DIAG] NVDA | Position size: 0 | Price: 139.964599609375
+[DIAG] ORLY | Position size: 0 | Price: 91.45333099365234
+[DIAG] OXY | Position size: 0 | Price: 41.12782287597656
+[DIAG] PCAR | Position size: 0 | Price: 90.68357849121094
+[DIAG] PEP | Position size: 0 | Price: 127.18665313720703
+[DIAG] PFE | Position size: 0 | Price: 22.334548950195312
+[DIAG] PG | Position size: 0 | Price: 160.5713653564453
+[DIAG] PGR | Position size: 0 | Price: 263.2567138671875
+[DIAG] PH | Position size: 0 | Price: 498.85430908203125
+[DIAG] PLD | Position size: 0 | Price: 105.03829193115234
+[DIAG] PNC | Position size: 0 | Price: 171.6202392578125
+[DIAG] PPG | Position size: 0 | Price: 109.70610809326172
+[DIAG] PSX | Position size: 0 | Price: 110.19660949707031
+[DIAG] QCOM | Position size: 0 | Price: 145.97909545898438
+[DIAG] REGN | Position size: 0 | Price: 481.73358154296875
+[DIAG] ROST | Position size: 0 | Price: 141.13429260253906
+[DIAG] RTX | Position size: 0 | Price: 137.9151153564453
+[DIAG] SBUX | Position size: 0 | Price: 85.79993438720703
+[DIAG] SCHW | Position size: 0 | Price: 86.748291015625
+[DIAG] SHW | Position size: 0 | Price: 356.2740478515625
+[DIAG] SLB | Position size: 0 | Price: 32.56015396118164
+[DIAG] SNPS | Position size: 0 | Price: 482.20001220703125
+[DIAG] SO | Position size: 0 | Price: 86.96927642822266
+[DIAG] SPGI | Position size: 0 | Price: 499.0249328613281
+[DIAG] SRE | Position size: 0 | Price: 74.21590423583984
+[DIAG] TFC | Position size: 0 | Price: 38.699981689453125
+[DIAG] TGT | Position size: 0 | Price: 91.36502075195312
+[DIAG] TMO | Position size: 0 | Price: 397.2919006347656
+[DIAG] TSLA | Position size: 0 | Price: 284.70001220703125
+[DIAG] TXN | Position size: 0 | Price: 187.4499053955078
+[DIAG] UNH | Position size: 67 | Price: 289.9635009765625
+[DIAG] UNP | Position size: 0 | Price: 218.00526428222656
+[DIAG] UPS | Position size: 0 | Price: 93.44996643066406
+[DIAG] USB | Position size: 0 | Price: 42.334896087646484
+[DIAG] V | Position size: 0 | Price: 365.4019775390625
+[DIAG] VLO | Position size: 0 | Price: 125.0626449584961
+[DIAG] VRTX | Position size: 0 | Price: 443.82000732421875
+[DIAG] WFC | Position size: 0 | Price: 74.07310485839844
+[DIAG] WM | Position size: 0 | Price: 236.0126495361328
+[DIAG] WMT | Position size: 0 | Price: 97.53292083740234
+[DIAG] XOM | Position size: 0 | Price: 100.01637268066406
+[DIAG] YUM | Position size: 0 | Price: 141.51959228515625
+[DIAG] ZTS | Position size: 0 | Price: 167.46498107910156
+2. Sélection + scoring
+2025-06-05 Les symboles selectionnés ['HUM', 'INTC', 'UNH', 'DOW', 'NVDA']
+[DIAG] Avant entrée: HUM | Position size: 86
+[CONTROL] Position déjà ouverte sur HUM (size=86), pas de nouvelle entrée.
+[DIAG] Avant entrée: INTC | Position size: 0
+[DIAG] Avant entrée: UNH | Position size: 67
+[CONTROL] Position déjà ouverte sur UNH (size=67), pas de nouvelle entrée.
+[DIAG] Avant entrée: DOW | Position size: 757
+[CONTROL] Position déjà ouverte sur DOW (size=757), pas de nouvelle entrée.
+[DIAG] Avant entrée: NVDA | Position size: 0
+[notify_order] status=Completed, symbol=TGT, isbuy=True, exectype=3, price=94.51, size=213
+[BT] Stop order submitted for TGT (post-entry)
+[BT] Take profit order submitted for TGT (post-entry)
+[notify_order] Order Completed for TGT
+[notify_order] status=Canceled, symbol=TGT, isbuy=True, exectype=3, price=94.51, size=213
+[notify_order] status=Canceled, symbol=TGT, isbuy=True, exectype=3, price=94.51, size=213
+Analyse pour la date 2025-06-06...
+[DIAG] Cash disponible: 19577.2576 | Value: 100364.5735751892
+[DIAG] AAPL | Position size: 0 | Price: 203.49156188964844
+[DIAG] ABBV | Position size: 0 | Price: 186.85740661621094
+[DIAG] ABNB | Position size: 0 | Price: 140.63999938964844
+[DIAG] ABT | Position size: 0 | Price: 132.39434814453125
+[DIAG] ACN | Position size: 0 | Price: 316.0692138671875
+[DIAG] ADBE | Position size: 0 | Price: 416.9200134277344
+[DIAG] ADI | Position size: 0 | Price: 220.60528564453125
+[DIAG] AEP | Position size: 0 | Price: 100.16780090332031
+[DIAG] AFL | Position size: 0 | Price: 102.58226776123047
+[DIAG] AMAT | Position size: 0 | Price: 165.93821716308594
+[DIAG] AMD | Position size: 0 | Price: 116.19000244140625
+[DIAG] AMGN | Position size: 0 | Price: 285.9541320800781
+[DIAG] AMT | Position size: 0 | Price: 207.02317810058594
+[DIAG] AMZN | Position size: 0 | Price: 213.57000732421875
+[DIAG] AON | Position size: 0 | Price: 370.3127746582031
+[DIAG] APD | Position size: 0 | Price: 274.178466796875
+[DIAG] AVGO | Position size: 0 | Price: 245.45913696289062
+[DIAG] AXP | Position size: 0 | Price: 300.2786865234375
+[DIAG] BA | Position size: 0 | Price: 210.8000030517578
+[DIAG] BAC | Position size: 0 | Price: 44.490047454833984
+[DIAG] BMY | Position size: 0 | Price: 46.58156967163086
+[DIAG] C | Position size: 0 | Price: 77.287841796875
+[DIAG] CAT | Position size: 0 | Price: 351.0517272949219
+[DIAG] CB | Position size: 0 | Price: 292.8348083496094
+[DIAG] CCI | Position size: 0 | Price: 95.67618560791016
+[DIAG] CI | Position size: 0 | Price: 308.8761291503906
+[DIAG] CME | Position size: 0 | Price: 270.4437255859375
+[DIAG] CMG | Position size: 0 | Price: 52.5
+[DIAG] COP | Position size: 0 | Price: 85.71107482910156
+[DIAG] CRM | Position size: 0 | Price: 273.1580505371094
+[DIAG] CSCO | Position size: 0 | Price: 64.923583984375
+[DIAG] CVS | Position size: 0 | Price: 62.38407897949219
+[DIAG] CVX | Position size: 0 | Price: 137.13478088378906
+[DIAG] D | Position size: 0 | Price: 54.52082061767578
+[DIAG] DD | Position size: 0 | Price: 28.211929321289062
+[DIAG] DE | Position size: 0 | Price: 498.390625
+[DIAG] DHR | Position size: 0 | Price: 195.0934295654297
+[DIAG] DOW | Position size: 757 | Price: 27.731334686279297
+[DIAG] DUK | Position size: 0 | Price: 113.25794982910156
+[DIAG] ECL | Position size: 0 | Price: 265.0248107910156
+[DIAG] EMR | Position size: 0 | Price: 122.4931640625
+[DIAG] EOG | Position size: 0 | Price: 112.03821563720703
+[DIAG] ETN | Position size: 0 | Price: 330.487548828125
+[DIAG] EXC | Position size: 0 | Price: 41.87815856933594
+[DIAG] F | Position size: 0 | Price: 10.008298873901367
+[DIAG] FCX | Position size: 0 | Price: 41.19588088989258
+[DIAG] FDX | Position size: 0 | Price: 215.70623779296875
+[DIAG] GD | Position size: 0 | Price: 273.86529541015625
+[DIAG] GE | Position size: 0 | Price: 254.6544952392578
+[DIAG] GILD | Position size: 0 | Price: 110.16934204101562
+[DIAG] GM | Position size: 0 | Price: 47.25322341918945
+[DIAG] GOOG | Position size: 0 | Price: 174.440185546875
+[DIAG] GOOGL | Position size: 0 | Price: 173.20169067382812
+[DIAG] GS | Position size: 0 | Price: 493.7691345214844
+[DIAG] HD | Position size: 0 | Price: 362.9105529785156
+[DIAG] HON | Position size: 0 | Price: 213.23292541503906
+[DIAG] HUM | Position size: 86 | Price: 228.2675323486328
+[DIAG] ICE | Position size: 0 | Price: 177.17593383789062
+[DIAG] INTC | Position size: 0 | Price: 20.059999465942383
+[DIAG] ISRG | Position size: 0 | Price: 487.92999267578125
+[DIAG] ITW | Position size: 0 | Price: 242.97769165039062
+[DIAG] JNJ | Position size: 0 | Price: 152.92938232421875
+[DIAG] JPM | Position size: 0 | Price: 263.17645263671875
+[DIAG] LIN | Position size: 0 | Price: 469.4779968261719
+[DIAG] LMT | Position size: 0 | Price: 474.5979919433594
+[DIAG] LOW | Position size: 0 | Price: 222.98191833496094
+[DIAG] LRCX | Position size: 0 | Price: 85.82462310791016
+[DIAG] LULU | Position size: 0 | Price: 265.2699890136719
+[DIAG] MA | Position size: 0 | Price: 498.0078125
+[DIAG] MAR | Position size: 0 | Price: 264.3300476074219
+[DIAG] MCD | Position size: 0 | Price: 303.80181884765625
+[DIAG] MCO | Position size: 0 | Price: 485.6968688964844
+[DIAG] MDT | Position size: 0 | Price: 86.06669616699219
+[DIAG] META | Position size: 0 | Price: 499.151123046875
+[DIAG] MMC | Position size: 0 | Price: 227.99929809570312
+[DIAG] MMM | Position size: 0 | Price: 144.21115112304688
+[DIAG] MPC | Position size: 0 | Price: 158.43585205078125
+[DIAG] MRK | Position size: 0 | Price: 76.7662582397461
+[DIAG] MS | Position size: 0 | Price: 130.11837768554688
+[DIAG] MSFT | Position size: 0 | Price: 468.7307434082031
+[DIAG] MU | Position size: 0 | Price: 108.34626770019531
+[DIAG] NEE | Position size: 0 | Price: 71.1246566772461
+[DIAG] NEM | Position size: 0 | Price: 52.03520965576172
+[DIAG] NFLX | Position size: 0 | Price: 124.14700317382812
+[DIAG] NKE | Position size: 0 | Price: 62.07899475097656
+[DIAG] NOC | Position size: 0 | Price: 484.2463073730469
+[DIAG] NSC | Position size: 0 | Price: 248.3579864501953
+[DIAG] NUE | Position size: 0 | Price: 120.1622543334961
+[DIAG] NVDA | Position size: 0 | Price: 141.69427490234375
+[DIAG] ORLY | Position size: 0 | Price: 91.8479995727539
+[DIAG] OXY | Position size: 0 | Price: 41.83591079711914
+[DIAG] PCAR | Position size: 0 | Price: 91.71351623535156
+[DIAG] PEP | Position size: 0 | Price: 127.52302551269531
+[DIAG] PFE | Position size: 0 | Price: 22.55673599243164
+[DIAG] PG | Position size: 0 | Price: 161.77467346191406
+[DIAG] PGR | Position size: 0 | Price: 262.4299011230469
+[DIAG] PH | Position size: 0 | Price: 498.85430908203125
+[DIAG] PLD | Position size: 0 | Price: 105.9832763671875
+[DIAG] PNC | Position size: 0 | Price: 175.48095703125
+[DIAG] PPG | Position size: 0 | Price: 111.02739715576172
+[DIAG] PSX | Position size: 0 | Price: 112.21928405761719
+[DIAG] QCOM | Position size: 0 | Price: 147.64111328125
+[DIAG] REGN | Position size: 0 | Price: 491.85552978515625
+[DIAG] ROST | Position size: 0 | Price: 142.68215942382812
+[DIAG] RTX | Position size: 0 | Price: 137.94488525390625
+[DIAG] SBUX | Position size: 0 | Price: 88.41368103027344
+[DIAG] SCHW | Position size: 0 | Price: 87.75260162353516
+[DIAG] SHW | Position size: 0 | Price: 355.8758239746094
+[DIAG] SLB | Position size: 0 | Price: 33.337738037109375
+[DIAG] SNPS | Position size: 0 | Price: 486.0
+[DIAG] SO | Position size: 0 | Price: 86.8511962890625
+[DIAG] SPGI | Position size: 0 | Price: 499.0249328613281
+[DIAG] SRE | Position size: 0 | Price: 75.09534454345703
+[DIAG] TFC | Position size: 0 | Price: 39.705806732177734
+[DIAG] TGT | Position size: 213 | Price: 95.07745361328125
+[DIAG] TMO | Position size: 0 | Price: 400.8224182128906
+[DIAG] TSLA | Position size: 0 | Price: 295.1400146484375
+[DIAG] TXN | Position size: 0 | Price: 189.34909057617188
+[DIAG] UNH | Position size: 67 | Price: 297.1968688964844
+[DIAG] UNP | Position size: 0 | Price: 220.751953125
+[DIAG] UPS | Position size: 0 | Price: 94.78124237060547
+[DIAG] USB | Position size: 0 | Price: 43.39133071899414
+[DIAG] V | Position size: 0 | Price: 368.839111328125
+[DIAG] VLO | Position size: 0 | Price: 126.5115966796875
+[DIAG] VRTX | Position size: 0 | Price: 450.5
+[DIAG] WFC | Position size: 0 | Price: 75.4873275756836
+[DIAG] WM | Position size: 0 | Price: 234.5388946533203
+[DIAG] WMT | Position size: 0 | Price: 97.04505920410156
+[DIAG] XOM | Position size: 0 | Price: 102.41291046142578
+[DIAG] YUM | Position size: 0 | Price: 143.45101928710938
+[DIAG] ZTS | Position size: 0 | Price: 169.00445556640625
+2. Sélection + scoring
+2025-06-06 Les symboles selectionnés ['NVDA', 'INTC', 'AVGO', 'ETN', 'MSFT']
+[DIAG] Avant entrée: NVDA | Position size: 0
+[DIAG] Avant entrée: INTC | Position size: 0
+[DIAG] Avant entrée: AVGO | Position size: 0
+[BT] Entry order submitted for AVGO
+2025-06-06 Placing order for AVGO: Entry at 247.91
+[DIAG] Avant entrée: ETN | Position size: 0
+[BT] Entry order submitted for ETN
+2025-06-06 Placing order for ETN: Entry at 333.79
+[DIAG] Avant entrée: MSFT | Position size: 0
+[BT] Entry order submitted for MSFT
+2025-06-06 Placing order for MSFT: Entry at 473.42
+[notify_order] status=Submitted, symbol=TGT, isbuy=False, exectype=5, price=0.0, size=0
+[notify_order] status=Submitted, symbol=TGT, isbuy=False, exectype=2, price=0.0, size=0
+[notify_order] status=Submitted, symbol=TGT, isbuy=False, exectype=5, price=0.0, size=0
+[notify_order] status=Submitted, symbol=TGT, isbuy=False, exectype=5, price=0.0, size=0
+[notify_order] status=Submitted, symbol=TGT, isbuy=False, exectype=2, price=0.0, size=0
+[notify_order] status=Submitted, symbol=TGT, isbuy=False, exectype=2, price=0.0, size=0
+[notify_order] status=Submitted, symbol=AVGO, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=AVGO, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=AVGO, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=ETN, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=ETN, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=ETN, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=MSFT, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=MSFT, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=MSFT, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Accepted, symbol=TGT, isbuy=False, exectype=5, price=0.0, size=0
+[notify_order] status=Accepted, symbol=TGT, isbuy=False, exectype=2, price=0.0, size=0
+[notify_order] status=Accepted, symbol=TGT, isbuy=False, exectype=5, price=0.0, size=0
+[notify_order] status=Accepted, symbol=TGT, isbuy=False, exectype=5, price=0.0, size=0
+[notify_order] status=Accepted, symbol=TGT, isbuy=False, exectype=2, price=0.0, size=0
+[notify_order] status=Accepted, symbol=TGT, isbuy=False, exectype=2, price=0.0, size=0
+[notify_order] status=Accepted, symbol=AVGO, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Accepted, symbol=AVGO, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Accepted, symbol=AVGO, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Accepted, symbol=ETN, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Accepted, symbol=ETN, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Accepted, symbol=ETN, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Accepted, symbol=MSFT, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Margin, symbol=MSFT, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Canceled, symbol=MSFT, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Margin, symbol=MSFT, isbuy=True, exectype=3, price=0.0, size=0
+Analyse pour la date 2025-06-09...
+[DIAG] Cash disponible: 19577.2576 | Value: 101188.16982381592
+[DIAG] AAPL | Position size: 0 | Price: 201.02676391601562
+[DIAG] ABBV | Position size: 0 | Price: 186.19789123535156
+[DIAG] ABNB | Position size: 0 | Price: 139.00999450683594
+[DIAG] ABT | Position size: 0 | Price: 132.2159423828125
+[DIAG] ACN | Position size: 0 | Price: 315.0443420410156
+[DIAG] ADBE | Position size: 0 | Price: 416.260009765625
+[DIAG] ADI | Position size: 0 | Price: 225.965087890625
+[DIAG] AEP | Position size: 0 | Price: 99.79385375976562
+[DIAG] AFL | Position size: 0 | Price: 101.42465209960938
+[DIAG] AMAT | Position size: 0 | Price: 168.97354125976562
+[DIAG] AMD | Position size: 0 | Price: 121.7300033569336
+[DIAG] AMGN | Position size: 0 | Price: 285.6094665527344
+[DIAG] AMT | Position size: 0 | Price: 207.3056640625
+[DIAG] AMZN | Position size: 0 | Price: 216.97999572753906
+[DIAG] AON | Position size: 0 | Price: 353.08892822265625
+[DIAG] APD | Position size: 0 | Price: 274.315673828125
+[DIAG] AVGO | Position size: 0 | Price: 242.82493591308594
+[DIAG] AXP | Position size: 0 | Price: 299.3752746582031
+[DIAG] BA | Position size: 0 | Price: 217.50999450683594
+[DIAG] BAC | Position size: 0 | Price: 44.39111328125
+[DIAG] BMY | Position size: 0 | Price: 47.14928436279297
+[DIAG] C | Position size: 0 | Price: 77.1989517211914
+[DIAG] CAT | Position size: 0 | Price: 355.74102783203125
+[DIAG] CB | Position size: 0 | Price: 288.8282775878906
+[DIAG] CCI | Position size: 0 | Price: 95.7438735961914
+[DIAG] CI | Position size: 0 | Price: 308.1043701171875
+[DIAG] CME | Position size: 0 | Price: 265.8470458984375
+[DIAG] CMG | Position size: 0 | Price: 51.130001068115234
+[DIAG] COP | Position size: 0 | Price: 86.51688385009766
+[DIAG] CRM | Position size: 0 | Price: 270.9091796875
+[DIAG] CSCO | Position size: 0 | Price: 64.7663345336914
+[DIAG] CVS | Position size: 0 | Price: 62.658809661865234
+[DIAG] CVX | Position size: 0 | Price: 137.67269897460938
+[DIAG] D | Position size: 0 | Price: 54.423057556152344
+[DIAG] DD | Position size: 0 | Price: 28.398271560668945
+[DIAG] DE | Position size: 0 | Price: 498.390625
+[DIAG] DHR | Position size: 0 | Price: 198.25839233398438
+[DIAG] DOW | Position size: 757 | Price: 28.54724884033203
+[DIAG] DUK | Position size: 0 | Price: 113.49383544921875
+[DIAG] ECL | Position size: 0 | Price: 264.3202209472656
+[DIAG] EMR | Position size: 0 | Price: 124.56595611572266
+[DIAG] EOG | Position size: 0 | Price: 112.31327819824219
+[DIAG] ETN | Position size: 0 | Price: 324.8639221191406
+[DIAG] EXC | Position size: 0 | Price: 41.46547317504883
+[DIAG] F | Position size: 0 | Price: 10.086336135864258
+[DIAG] FCX | Position size: 0 | Price: 42.049991607666016
+[DIAG] FDX | Position size: 0 | Price: 218.23052978515625
+[DIAG] GD | Position size: 0 | Price: 274.68743896484375
+[DIAG] GE | Position size: 0 | Price: 250.45059204101562
+[DIAG] GILD | Position size: 0 | Price: 110.69834899902344
+[DIAG] GM | Position size: 0 | Price: 47.71112060546875
+[DIAG] GOOG | Position size: 0 | Price: 177.3556671142578
+[DIAG] GOOGL | Position size: 0 | Price: 175.81764221191406
+[DIAG] GS | Position size: 0 | Price: 493.7691345214844
+[DIAG] HD | Position size: 0 | Price: 360.8061828613281
+[DIAG] HON | Position size: 0 | Price: 211.69505310058594
+[DIAG] HUM | Position size: 86 | Price: 230.61256408691406
+[DIAG] ICE | Position size: 0 | Price: 174.48873901367188
+[DIAG] INTC | Position size: 0 | Price: 20.479999542236328
+[DIAG] ISRG | Position size: 0 | Price: 487.92999267578125
+[DIAG] ITW | Position size: 0 | Price: 242.702880859375
+[DIAG] JNJ | Position size: 0 | Price: 153.1266632080078
+[DIAG] JPM | Position size: 0 | Price: 264.1767272949219
+[DIAG] LIN | Position size: 0 | Price: 468.9417419433594
+[DIAG] LMT | Position size: 0 | Price: 473.7506103515625
+[DIAG] LOW | Position size: 0 | Price: 221.3387908935547
+[DIAG] LRCX | Position size: 0 | Price: 87.76275634765625
+[DIAG] LULU | Position size: 0 | Price: 259.0400085449219
+[DIAG] MA | Position size: 0 | Price: 498.0078125
+[DIAG] MAR | Position size: 0 | Price: 264.6285705566406
+[DIAG] MCD | Position size: 0 | Price: 301.251708984375
+[DIAG] MCO | Position size: 0 | Price: 485.6968688964844
+[DIAG] MDT | Position size: 0 | Price: 86.0765380859375
+[DIAG] META | Position size: 0 | Price: 499.151123046875
+[DIAG] MMC | Position size: 0 | Price: 220.57476806640625
+[DIAG] MMM | Position size: 0 | Price: 142.95237731933594
+[DIAG] MPC | Position size: 0 | Price: 158.5842742919922
+[DIAG] MRK | Position size: 0 | Price: 77.1162109375
+[DIAG] MS | Position size: 0 | Price: 130.24668884277344
+[DIAG] MSFT | Position size: 0 | Price: 471.0924072265625
+[DIAG] MU | Position size: 0 | Price: 110.73155975341797
+[DIAG] NEE | Position size: 0 | Price: 70.8683853149414
+[DIAG] NEM | Position size: 0 | Price: 52.949501037597656
+[DIAG] NFLX | Position size: 0 | Price: 122.44599914550781
+[DIAG] NKE | Position size: 0 | Price: 61.199214935302734
+[DIAG] NOC | Position size: 0 | Price: 487.4605712890625
+[DIAG] NSC | Position size: 0 | Price: 248.15992736816406
+[DIAG] NUE | Position size: 0 | Price: 121.11112976074219
+[DIAG] NVDA | Position size: 0 | Price: 142.6041259765625
+[DIAG] ORLY | Position size: 0 | Price: 89.87333679199219
+[DIAG] OXY | Position size: 0 | Price: 42.524322509765625
+[DIAG] PCAR | Position size: 0 | Price: 92.62574768066406
+[DIAG] PEP | Position size: 0 | Price: 127.45439147949219
+[DIAG] PFE | Position size: 0 | Price: 23.155670166015625
+[DIAG] PG | Position size: 0 | Price: 160.33465576171875
+[DIAG] PGR | Position size: 0 | Price: 254.90428161621094
+[DIAG] PH | Position size: 0 | Price: 498.85430908203125
+[DIAG] PLD | Position size: 0 | Price: 106.11965942382812
+[DIAG] PNC | Position size: 0 | Price: 175.5890350341797
+[DIAG] PPG | Position size: 0 | Price: 111.8753890991211
+[DIAG] PSX | Position size: 0 | Price: 113.99649047851562
+[DIAG] QCOM | Position size: 0 | Price: 153.74501037597656
+[DIAG] REGN | Position size: 0 | Price: 491.85552978515625
+[DIAG] ROST | Position size: 0 | Price: 141.05491638183594
+[DIAG] RTX | Position size: 0 | Price: 139.80926513671875
+[DIAG] SBUX | Position size: 0 | Price: 89.4295883178711
+[DIAG] SCHW | Position size: 0 | Price: 87.71282958984375
+[DIAG] SHW | Position size: 0 | Price: 356.3437194824219
+[DIAG] SLB | Position size: 0 | Price: 33.58380889892578
+[DIAG] SNPS | Position size: 0 | Price: 495.7699890136719
+[DIAG] SO | Position size: 0 | Price: 87.08737182617188
+[DIAG] SPGI | Position size: 0 | Price: 499.0249328613281
+[DIAG] SRE | Position size: 0 | Price: 72.98468017578125
+[DIAG] TFC | Position size: 0 | Price: 39.500736236572266
+[DIAG] TGT | Position size: 213 | Price: 95.10676574707031
+[DIAG] TMO | Position size: 0 | Price: 407.4346618652344
+[DIAG] TSLA | Position size: 0 | Price: 308.5799865722656
+[DIAG] TXN | Position size: 0 | Price: 196.03074645996094
+[DIAG] UNH | Position size: 67 | Price: 297.1675109863281
+[DIAG] UNP | Position size: 0 | Price: 221.4534454345703
+[DIAG] UPS | Position size: 0 | Price: 95.80381774902344
+[DIAG] USB | Position size: 0 | Price: 43.488250732421875
+[DIAG] V | Position size: 0 | Price: 365.2923889160156
+[DIAG] VLO | Position size: 0 | Price: 126.42288208007812
+[DIAG] VRTX | Position size: 0 | Price: 446.1499938964844
+[DIAG] WFC | Position size: 0 | Price: 75.61588287353516
+[DIAG] WM | Position size: 0 | Price: 232.21664428710938
+[DIAG] WMT | Position size: 0 | Price: 97.02513885498047
+[DIAG] XOM | Position size: 0 | Price: 103.1004409790039
+[DIAG] YUM | Position size: 0 | Price: 141.77711486816406
+[DIAG] ZTS | Position size: 0 | Price: 163.49215698242188
+2. Sélection + scoring
+2025-06-09 Les symboles selectionnés ['NVDA', 'AVGO', 'NUE', 'ETN', 'TGT']
+[DIAG] Avant entrée: NVDA | Position size: 0
+[DIAG] Avant entrée: AVGO | Position size: 0
+[DIAG] Avant entrée: NUE | Position size: 0
+[BT] Entry order submitted for NUE
+2025-06-09 Placing order for NUE: Entry at 122.32
+[DIAG] Avant entrée: ETN | Position size: 0
+[DIAG] Avant entrée: TGT | Position size: 213
+[CONTROL] Position déjà ouverte sur TGT (size=213), pas de nouvelle entrée.
+[notify_order] status=Submitted, symbol=NUE, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=NUE, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Submitted, symbol=NUE, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Margin, symbol=NUE, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Margin, symbol=NUE, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Margin, symbol=NUE, isbuy=True, exectype=3, price=0.0, size=0
+[notify_order] status=Completed, symbol=DOW, isbuy=False, exectype=2, price=29.06, size=-757

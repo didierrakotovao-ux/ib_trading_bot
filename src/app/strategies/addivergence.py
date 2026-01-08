@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
+from src.app.ml.ml_scoring import MLScoring
 from src.app.ml.addivergencescoring import AdDivergenceScoring
 from src.app.screener.providers.market_data_provider import MarketDataProvider
 from src.app.strategies.strategy import Strategy
@@ -28,7 +29,7 @@ class AdDivergenceStrategy(Strategy):
         et la fourniture des données à scorer seront implémentées ici.
     """
     def __init__(self, market_data: MarketDataProvider, capital=10000, max_stocks=5):
-        self.scoring = AdDivergenceScoring()
+        self.scoring = MLScoring(model_path="models/momentum_model.pkl")
         self.market_data = market_data
         self.lookback_days = 350
         self.score_threshold = 60
