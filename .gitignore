@@ -5,5 +5,10 @@
 *.csv
 *.db
 
+# Ignore les fichiers backtests
+*backtest*.json
+*backtest*.txt
+*diagno*.txt
+
 # Ignore Python cache directories
 __pycache__/

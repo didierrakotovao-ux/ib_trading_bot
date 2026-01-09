@@ -9,8 +9,8 @@ from src.app.strategies.strategy import Strategy
 from ibapi.scanner import ScannerSubscription
 from ibapi.order import Order
 
-class AdDivergenceStrategy(Strategy):
-    name = "AdDivergenceStrategy"
+class MomentumStrategy(Strategy):
+    name = "MomentumStrategy"
     symbolsToAnalyse = []
     symbolsToTrade = []
     """
@@ -29,7 +29,7 @@ class AdDivergenceStrategy(Strategy):
         et la fourniture des données à scorer seront implémentées ici.
     """
     def __init__(self, market_data: MarketDataProvider, capital=10000, max_stocks=5):
-        self.scoring = MLScoring(model_path="models/momentum_model_sc.pkl")
+        self.scoring = MLScoring(model_path="models/momentum_model.pkl")
         self.market_data = market_data
         self.lookback_days = 350
         self.score_threshold = 65
@@ -120,35 +120,15 @@ class AdDivergenceStrategy(Strategy):
             slorder.orderId = stop_id
             slorder.trailingPercent = 5.0  # Trailing de 10%
             slorder.tif = "GTC"  # Good Till Cancelled
-
-            # Child 2: Take profit
-            tporder = Order()
-            tporder.action = "SELL"
-            tporder.orderType = "LMT"
-            tporder.lmtPrice = round(last_close * 1.10, 2)  # Take profit à 20% au-dessus du close
-            tporder.totalQuantity = qty
-            tporder.parentId = parent_id
-            tporder.transmit = True  # Le dernier transmet l'ensemble
-            tporder.eTradeOnly = False
-            tporder.firmQuoteOnly = False
-            tporder.orderId = tp_id
-            tporder.tif = "GTC"  # Good Till Cancelled
                             
             order_params.append({
                 'symbol': symbol,
                 'entry_order': entryorder,
-                'stop_order': slorder,
-                'take_profit_order': tporder
+                'stop_order': slorder
             })
-            self.market_data._next_req_id += 3  # Incrémente l'ID pour les prochains ordres
+            self.market_data._next_req_id += 2  # Incrémente l'ID pour les prochains ordres
         return order_params
 
     def set_symbols_to_analyse(self, symbols: list):
         """Définit la liste des symboles analysés"""
         self.symbolsToAnalyse= symbols
-
-
-
-
-
-

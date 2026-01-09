@@ -29,7 +29,7 @@ class MLScoring(Scoring):
         'return_10d', 'return_20d', 'volatility_10d', 'high_52w_pct',
     ]
 
-    def __init__(self, model_path: str = "models/momentum_model.pkl"):
+    def __init__(self, model_path: str = "models/momentum_model_sc.pkl"):
         """
         Initialise le scoring ML.
 
@@ -267,9 +267,9 @@ if __name__ == "__main__":
     db_path = "trading_data.db"
     conn = sqlite3.connect(db_path)
 
-    symbols_to_test = ['AAPL', 'NVDA', 'TSLA', 'MSFT', 'AMD']
+    symbols_to_test = ['AAPL', 'NVDA', 'GOOGL', 'QCOM', 'TXN', 'INTU','TFC', 'USB', 'PNC','ABBV', 'MRK', 'PFE', 'ORLY', 'AZO', 'YUM', 'RTX', 'GE', 'LMT', 'EOG', 'MPC', 'PSX', 'EXC', 'SRE', 'PLD', 'NEM', 'FCX', 'NUE']
 
-    scoring = MLScoring(model_path="models/momentum_model.pkl")
+    scoring = MLScoring(model_path="models/momentum_model_sc.pkl")
 
     print("\n" + "="*60)
     print("TEST MLScoring")

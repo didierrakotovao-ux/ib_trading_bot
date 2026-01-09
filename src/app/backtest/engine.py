@@ -48,7 +48,7 @@ class BacktestEngine:
             FROM historical_data
             WHERE date BETWEEN ? AND ?
             AND close >= 5.0
-            AND close <= 500.0
+            AND close <= 1000.0
             AND volume >= 500000
             ORDER BY symbol, date
         """

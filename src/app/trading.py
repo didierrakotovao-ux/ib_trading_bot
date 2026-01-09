@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from strategies.momentum import MomentumStrategy
 from screener.providers.market_data_provider import MarketDataProvider
 from strategies.addivergence import AdDivergenceStrategy
 from position_manager import PositionManager
@@ -16,7 +17,8 @@ class Trading:
     """
     def __init__(self):
         self.market_data_provider = MarketDataProvider(port=7497, client_id=1)
-        self.strategies = [AdDivergenceStrategy(self.market_data_provider)]
+        # , AdDivergenceStrategy(self.market_data_provider)
+        self.strategies = [MomentumStrategy(self.market_data_provider)]
         self.orders = []
         self.position_manager = PositionManager()
         self.order_callbacks = []  # Liste de callbacks à appeler sur exécution d'ordre
@@ -102,7 +104,9 @@ class Trading:
                     contrat = self.market_data_provider.create_contract(orders['symbol'])
                     self.place_order(contrat, orders['entry_order'])
                     self.place_order(contrat, orders['stop_order'])
-                    self.place_order(contrat, orders['take_profit_order'])
+                    if 'take_profit_order' in orders:
+                        self.place_order(contrat, orders['take_profit_order'])
+
             for symbol in symbolToTrade:
                 print(f"  Stocks a trader: {symbol}")
 
