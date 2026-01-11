@@ -29,7 +29,7 @@ class AdDivergenceStrategy(Strategy):
         et la fourniture des données à scorer seront implémentées ici.
     """
     def __init__(self, market_data: MarketDataProvider, capital=10000, max_stocks=5):
-        self.scoring = MLScoring(model_path="models/momentum_model_sc.pkl")
+        self.scoring = MLScoring(model_path="models/momentum_model.pkl")
         self.market_data = market_data
         self.lookback_days = 350
         self.score_threshold = 65

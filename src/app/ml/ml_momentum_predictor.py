@@ -60,7 +60,7 @@ class MLMomentumPredictor:
         'high_52w_pct',     # % vs plus haut 52 semaines
     ]
 
-    def __init__(self, db_path: str = "trading_data.db", model_path: str = "models/momentum_model_sc.pkl"):
+    def __init__(self, db_path: str = "trading_data.db", model_path: str = "models/momentum_model.pkl"):
         self.db_path = db_path
         self.model_path = Path(model_path)
         self.model = None
@@ -464,7 +464,7 @@ class MLMomentumScoring:
     """
     name = "MLMomentumScoring"
 
-    def __init__(self, model_path: str = "models/momentum_model_sc.pkl"):
+    def __init__(self, model_path: str = "models/momentum_model.pkl"):
         self.predictor = MLMomentumPredictor(model_path=model_path)
         try:
             self.predictor.load_model()
@@ -515,7 +515,7 @@ class MLMomentumScoring:
 if __name__ == "__main__":
     predictor = MLMomentumPredictor(
         db_path="trading_data.db",
-        model_path="models/momentum_model_sc.pkl"
+        model_path="models/momentum_model.pkl"
     )
 
     # Entraîner le modèle
