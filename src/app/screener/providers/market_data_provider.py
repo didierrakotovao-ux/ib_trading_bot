@@ -276,6 +276,38 @@ class MarketDataProvider(EWrapper, EClient):
         super().placeOrder(order.orderId if hasattr(order, 'orderId') else self._next_req_id, contract, order)
         self._next_req_id += 1
 
+    def orderStatus(self, orderId, status, filled, remaining, avgFillPrice,
+                    permId, parentId, lastFillPrice, clientId, whyHeld, mktCapPrice=0.0):
+        """Callback IB pour le statut des ordres."""
+        print(f"[ORDER STATUS] orderId={orderId} status={status} filled={filled} remaining={remaining} avgFillPrice={avgFillPrice}")
+        # Stocker le statut pour utilisation ultérieure
+        if not hasattr(self, 'order_statuses'):
+            self.order_statuses = {}
+        self.order_statuses[orderId] = {
+            'status': status,
+            'filled': filled,
+            'remaining': remaining,
+            'avgFillPrice': avgFillPrice,
+            'parentId': parentId
+        }
+
+    def execDetails(self, reqId, contract, execution):
+        """Callback IB pour les détails d'exécution."""
+        print(f"[EXEC DETAILS] orderId={execution.orderId} symbol={contract.symbol} side={execution.side} "
+              f"shares={execution.shares} price={execution.price} time={execution.time}")
+        # Stocker les exécutions pour utilisation ultérieure
+        if not hasattr(self, 'executions'):
+            self.executions = []
+        self.executions.append({
+            'orderId': execution.orderId,
+            'symbol': contract.symbol,
+            'side': execution.side,
+            'shares': execution.shares,
+            'price': execution.price,
+            'time': execution.time,
+            'execId': execution.execId
+        })
+
     def create_contract(self, ticker: str, sec_type: str = 'STK', exchange: str = 'SMART', currency: str = 'USD') -> Contract:
         """Crée un contrat IB pour un ETF"""
         contract = Contract()

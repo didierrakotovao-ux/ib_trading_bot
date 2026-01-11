@@ -29,7 +29,7 @@ class MomentumStrategy(Strategy):
         et la fourniture des données à scorer seront implémentées ici.
     """
     def __init__(self, market_data: MarketDataProvider, capital=10000, max_stocks=5):
-        self.scoring = MLScoring(model_path="models/momentum_model.pkl")
+        self.scoring = MLScoring(model_path="models/momentum_model_sc.pkl")
         self.market_data = market_data
         self.lookback_days = 350
         self.score_threshold = 65
@@ -100,7 +100,7 @@ class MomentumStrategy(Strategy):
             entryorder.orderType = "STP LMT"
             entryorder.totalQuantity = qty
             entryorder.lmtPrice = round(last_close * 0.99, 2)  # Limite à 1% sous le close
-            entryorder.auxPrice = round(last_close * 1.01, 2)  # Stop à 0.5% sous le close
+            entryorder.auxPrice = round(last_close * 1.01, 2)  # Stop trigger à 1% au-dessus du close
             entryorder.transmit = False
             entryorder.eTradeOnly = False
             entryorder.firmQuoteOnly = False
@@ -111,14 +111,13 @@ class MomentumStrategy(Strategy):
             slorder = Order()
             slorder.action = "SELL"
             slorder.orderType = "TRAIL"
-            # slorder.auxPrice = round(last_close * 0.90, 2)  # Trailing stop à 10% sous le prix
             slorder.totalQuantity = qty
             slorder.parentId = parent_id
-            slorder.transmit = False
+            slorder.transmit = True
             slorder.eTradeOnly = False
             slorder.firmQuoteOnly = False
             slorder.orderId = stop_id
-            slorder.trailingPercent = 5.0  # Trailing de 10%
+            slorder.trailingPercent = 5.0  # Trailing de 5%
             slorder.tif = "GTC"  # Good Till Cancelled
                             
             order_params.append({
@@ -126,7 +125,7 @@ class MomentumStrategy(Strategy):
                 'entry_order': entryorder,
                 'stop_order': slorder
             })
-            self.market_data._next_req_id += 2  # Incrémente l'ID pour les prochains ordres
+            # Note: _next_req_id est incrémenté automatiquement par placeOrder
         return order_params
 
     def set_symbols_to_analyse(self, symbols: list):

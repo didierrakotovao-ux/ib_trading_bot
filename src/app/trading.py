@@ -16,7 +16,7 @@ class Trading:
         6-écrit le journal de performance
     """
     def __init__(self):
-        self.market_data_provider = MarketDataProvider(port=7497, client_id=1)
+        self.market_data_provider = MarketDataProvider(port=4002, client_id=1)
         # , AdDivergenceStrategy(self.market_data_provider)
         self.strategies = [MomentumStrategy(self.market_data_provider)]
         self.orders = []
@@ -88,10 +88,10 @@ class Trading:
         """
         try:
             trade_date = datetime.now()
-            
+
             symbolList: list = []
             symbolToTrade: list = []
-            self.market_data_provider.connect()
+            # Connexion gérée par le main, pas de double connect ici
             for strategy in self.strategies:
                 print(f"  Strategie: {strategy.name}...")
                 scan_sub = strategy.scanner_filters()
@@ -113,8 +113,10 @@ class Trading:
             return symbolList
 
         except Exception as e:
-            self.market_data_provider.disconnect()
+            # Disconnect géré par le main dans finally
             print(f"Erreur lors du trading: {e}")
+            import traceback
+            traceback.print_exc()
 
     def sync_positions_with_ib(self):
         """
