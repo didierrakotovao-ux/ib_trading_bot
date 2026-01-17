@@ -12,3 +12,11 @@
 
 # Ignore Python cache directories
 __pycache__/
+nul
+tmpclaude-0f7b-cwd
+tmpclaude-699c-cwd
+tmpclaude-997c-cwd
+tmpclaude-2150-cwd
+tmpclaude-7550-cwd
+tmpclaude-ae65-cwd
+.claude/settings.local.json
