@@ -4,13 +4,14 @@ L'idée: laisser courir les profits tant que le momentum est fort, puis activer 
 dès que des signes d'essoufflement sont détectés.
 """
 import backtrader as bt
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import numpy as np
 
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 from src.app.strategies.addivergence import AdDivergenceStrategy
+from src.app.database.trade_journal import TradeJournal, TradeMode
 from market_data_mock import MarketDataMock
 
 
@@ -67,10 +68,12 @@ class ExhaustionStopBTWrapper(bt.Strategy):
         self.stop_activated = {}         # Si le stop a été activé
         self.exhaustion_detected = {}    # Si l'essoufflement a été détecté
 
-        # Journal de trading détaillé
+        # Journal de trading en BD
         self.trade_entries = {}
-        self.journal_filename = None
-        self._init_trading_journal()
+        self.strategy_name = "ExhaustionStop"
+        self.trade_journal = TradeJournal()
+        # Effacer les trades backtest existants pour cette stratégie
+        self.trade_journal.clear_backtest_trades(self.strategy_name)
 
         # Stats d'essoufflement
         self.exhaustion_stats = {
@@ -90,26 +93,8 @@ class ExhaustionStopBTWrapper(bt.Strategy):
             f.write(f"  - rsi_extreme: {self.p.rsi_extreme}\n")
             f.write(f"  - min_bars_before_check: {self.p.min_bars_before_check}\n")
 
-    def _init_trading_journal(self):
-        """Initialise le fichier journal de trading."""
-        import csv
-        journal_date = datetime.now().strftime("%Y%m%d_%H%M%S")
-        self.journal_filename = f"trading_journal_exhaustion_{journal_date}.csv"
-        with open(self.journal_filename, mode='w', newline='', encoding='utf-8') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow([
-                'symbole', 'date_entree', 'quantite', 'prix_entree',
-                'date_sortie', 'prix_sortie', 'cause_sortie',
-                'pnl_brut', 'commission', 'pnl_net', 'scoring',
-                'bars_held', 'exhaustion_signals'
-            ])
-        print(f"[JOURNAL] Fichier créé: {self.journal_filename}")
-
     def _log_trade_journal(self, symbol, entry_date, qty, entry_price, exit_date, exit_price, cause, pnl_brut, bars_held=0, exhaustion_signals=""):
-        """Écrit une ligne dans le journal de trading."""
-        import csv
-        scoring_name = self.strategy.scoring.name if hasattr(self.strategy, 'scoring') else 'N/A'
-
+        """Enregistre un trade dans le journal BD."""
         # Calculer les commissions (0.1% à l'achat + 0.1% à la vente)
         commission_rate = 0.001
         commission_entree = entry_price * qty * commission_rate
@@ -117,14 +102,24 @@ class ExhaustionStopBTWrapper(bt.Strategy):
         total_commission = commission_entree + commission_sortie
         pnl_net = pnl_brut - total_commission
 
-        with open(self.journal_filename, mode='a', newline='', encoding='utf-8') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow([
-                symbol, entry_date, qty, round(entry_price, 2),
-                exit_date, round(exit_price, 2), cause,
-                round(pnl_brut, 2), round(total_commission, 2), round(pnl_net, 2),
-                scoring_name, bars_held, exhaustion_signals
-            ])
+        self.trade_journal.log_trade(
+            trade_mode=TradeMode.BACKTEST,
+            strategy_name=self.strategy_name,
+            symbol=symbol,
+            date_entree=entry_date,
+            prix_entree=entry_price,
+            quantite=qty,
+            date_sortie=exit_date,
+            prix_sortie=exit_price,
+            cause_sortie=cause,
+            pnl_brut=round(pnl_brut, 2),
+            commission=round(total_commission, 2),
+            pnl_net=round(pnl_net, 2),
+            bars_held=bars_held,
+            exhaustion_signals=exhaustion_signals,
+            backtest_start_date=self.start_date,
+            backtest_end_date=self.end_date
+        )
 
     def _preload_cache(self, dataframes):
         """Pré-charge les DataFrames dans le cache du MarketDataMock."""
@@ -150,10 +145,12 @@ class ExhaustionStopBTWrapper(bt.Strategy):
         Returns:
             tuple: (is_exhausted: bool, signals: list of str)
         """
-        if len(df) < 30:
+        if len(df) < 20:
+            self.log_diag(f"[DETECT] {symbol}: Pas assez de données ({len(df)} < 20)")
             return False, []
 
         signals = []
+        debug_info = []
 
         # 1. MACD histogram décroissant
         try:
@@ -169,10 +166,12 @@ class ExhaustionStopBTWrapper(bt.Strategy):
 
         if len(macd_hist.dropna()) >= self.p.macd_lookback:
             recent_macd = macd_hist.iloc[-self.p.macd_lookback:]
-            if recent_macd.diff().mean() < 0:
+            macd_diff_mean = recent_macd.diff().mean()
+            debug_info.append(f"MACD_diff_mean={macd_diff_mean:.4f}")
+            if macd_diff_mean < 0:
                 signals.append("MACD_DECLINING")
 
-        # 2. RSI en zone extrême
+        # 2. RSI en zone extrême (abaissé à 65 pour plus de sensibilité)
         try:
             import pandas_ta as ta
             rsi = ta.rsi(df['close'], length=14)
@@ -183,8 +182,11 @@ class ExhaustionStopBTWrapper(bt.Strategy):
             rs = gain / (loss + 1e-6)
             rsi = 100 - (100 / (1 + rs))
 
-        if len(rsi.dropna()) > 0 and rsi.iloc[-1] > self.p.rsi_extreme:
-            signals.append(f"RSI_EXTREME_{rsi.iloc[-1]:.0f}")
+        if len(rsi.dropna()) > 0:
+            rsi_val = rsi.iloc[-1]
+            debug_info.append(f"RSI={rsi_val:.1f}")
+            if rsi_val > self.p.rsi_extreme:
+                signals.append(f"RSI_EXTREME_{rsi_val:.0f}")
 
         # 3. Volume ratio décroissant
         sma20_vol = df['volume'].rolling(20).mean()
@@ -194,7 +196,8 @@ class ExhaustionStopBTWrapper(bt.Strategy):
             recent_vol = vol_ratio.iloc[-self.p.volume_lookback:]
             avg_recent = recent_vol.iloc[-1]
             avg_prior = recent_vol.iloc[:-1].mean()
-            if avg_recent < avg_prior * 0.8:  # Volume 20% plus bas
+            debug_info.append(f"VOL_ratio={avg_recent:.2f}/{avg_prior:.2f}")
+            if avg_recent < avg_prior * 0.9:  # Ajusté: 10% plus bas (était 20%)
                 signals.append("VOLUME_DECLINING")
 
         # 4. ADX décroissant (tendance qui faiblit)
@@ -207,17 +210,33 @@ class ExhaustionStopBTWrapper(bt.Strategy):
 
         if adx is not None and len(adx.dropna()) >= self.p.adx_lookback:
             recent_adx = adx.iloc[-self.p.adx_lookback:]
-            if recent_adx.diff().mean() < 0:
+            adx_diff_mean = recent_adx.diff().mean()
+            debug_info.append(f"ADX_diff_mean={adx_diff_mean:.4f}")
+            if adx_diff_mean < 0:
                 signals.append("ADX_DECLINING")
 
-        # 5. Rendement qui ralentit (return_5d < return_10d/2)
+        # 5. Rendement qui ralentit (ajusté: return_5d < return_10d * 0.7)
         if len(df) >= 10:
             return_5d = (df['close'].iloc[-1] / df['close'].iloc[-5] - 1)
             return_10d = (df['close'].iloc[-1] / df['close'].iloc[-10] - 1)
-            if return_5d < return_10d / 2 and return_10d > 0:
+            debug_info.append(f"R5d={return_5d:.3f}/R10d={return_10d:.3f}")
+            if return_5d < return_10d * 0.7 and return_10d > 0:  # Ajusté (était /2)
                 signals.append("MOMENTUM_SLOWING")
 
+        # 6. NOUVEAU: Prix proche du haut récent mais momentum faible
+        if len(df) >= 20:
+            high_20d = df['high'].iloc[-20:].max()
+            current_close = df['close'].iloc[-1]
+            pct_from_high = (high_20d - current_close) / high_20d
+            debug_info.append(f"PctFromHigh={pct_from_high:.3f}")
+            if pct_from_high > 0.02 and pct_from_high < 0.08:  # Entre -2% et -8% du haut
+                signals.append("NEAR_HIGH_WEAKENING")
+
         is_exhausted = len(signals) >= self.p.exhaustion_threshold
+
+        # Log détaillé pour debugging
+        self.log_diag(f"[DETECT] {symbol}: {' | '.join(debug_info)}")
+        self.log_diag(f"[DETECT] {symbol}: Signaux={signals} ({len(signals)}/{self.p.exhaustion_threshold})")
 
         return is_exhausted, signals
 
@@ -297,6 +316,7 @@ class ExhaustionStopBTWrapper(bt.Strategy):
         if current_date < self.start_date.date() or current_date > self.end_date.date():
             return
         
+        # Vérifier l'essoufflement pour les positions ouvertes
         for symbol in self.last_entry_prices.keys():
             data = self._get_data(symbol)
             if data is None:
@@ -307,11 +327,12 @@ class ExhaustionStopBTWrapper(bt.Strategy):
             if current_bar - entry_bar < self.p.min_bars_before_check:
                 continue
 
-            # Récupérer le DataFrame historique
+            # Récupérer le DataFrame historique (45 jours calendaires = ~30 jours de bourse)
+            start_date_hist = current_date - timedelta(days=45)
             df = self.market_data.get_historical_data(
                 symbol,
-                end_date=current_date,
-                lookback_days=30
+                start_date_hist,
+                current_date
             )
             if df is None or len(df) < 20:
                 continue
@@ -390,7 +411,7 @@ class ExhaustionStopBTWrapper(bt.Strategy):
             self.orders_by_symbol.pop(symbol, None)
 
     def stop(self):
-        """Appelé à la fin du backtest - affiche les statistiques d'essoufflement."""
+        """Appelé à la fin du backtest - affiche les statistiques."""
         print("\n" + "=" * 60)
         print("STATISTIQUES ESSOUFFLEMENT")
         print("=" * 60)
@@ -414,4 +435,22 @@ class ExhaustionStopBTWrapper(bt.Strategy):
             for sig, count in sorted(signal_counts.items(), key=lambda x: -x[1]):
                 print(f"  - {sig}: {count}")
 
+        # Afficher le résumé depuis la BD
+        print("\n" + "-" * 60)
+        print("RÉSUMÉ BD")
+        print("-" * 60)
+        summary = self.trade_journal.get_performance_summary(
+            trade_mode=TradeMode.BACKTEST,
+            strategy_name=self.strategy_name
+        )
+        if "error" not in summary:
+            print(f"Trades: {summary['total_trades']} (W:{summary['winning_trades']} / L:{summary['losing_trades']})")
+            print(f"Win Rate: {summary['win_rate']:.1f}%")
+            print(f"PnL Net Total: {summary['total_pnl_net']:,.2f}$")
+            print(f"PnL Net Moyen: {summary['avg_pnl_net']:,.2f}$")
+            print(f"Max Win: {summary['max_win']:,.2f}$ | Max Loss: {summary['max_loss']:,.2f}$")
+
         print("=" * 60)
+
+        # Fermer la connexion BD
+        self.trade_journal.close()
