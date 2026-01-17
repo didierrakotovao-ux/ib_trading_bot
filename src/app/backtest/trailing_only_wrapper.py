@@ -9,8 +9,8 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 from src.app.strategies.addivergence import AdDivergenceStrategy
+from src.app.database.trade_journal import TradeJournal, TradeMode
 from market_data_mock import MarketDataMock
-from order_translator import OrderTranslator
 
 
 class TrailingOnlyBTWrapper(bt.Strategy):
@@ -48,10 +48,12 @@ class TrailingOnlyBTWrapper(bt.Strategy):
         self.last_entry_prices = {}
         self.pending_stops = {}
 
-        # Journal de trading détaillé
+        # Journal de trading en BD
         self.trade_entries = {}
-        self.journal_filename = None
-        self._init_trading_journal()
+        self.strategy_name = "TrailingOnly"
+        self.trade_journal = TradeJournal()
+        # Effacer les trades backtest existants pour cette stratégie
+        self.trade_journal.clear_backtest_trades(self.strategy_name)
 
         # Préparation du fichier de diagnostic
         diag_date = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -59,25 +61,8 @@ class TrailingOnlyBTWrapper(bt.Strategy):
         with open(self.diag_filename, "w") as f:
             f.write(f"--- Début du diagnostic TrailingOnly ({diag_date}) ---\n")
 
-    def _init_trading_journal(self):
-        """Initialise le fichier journal de trading."""
-        import csv
-        journal_date = datetime.now().strftime("%Y%m%d_%H%M%S")
-        self.journal_filename = f"trading_journal_trailing_{journal_date}.csv"
-        with open(self.journal_filename, mode='w', newline='', encoding='utf-8') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow([
-                'symbole', 'date_entree', 'quantite', 'prix_entree',
-                'date_sortie', 'prix_sortie', 'cause_sortie',
-                'pnl_brut', 'commission', 'pnl_net', 'scoring'
-            ])
-        print(f"[JOURNAL] Fichier créé: {self.journal_filename}")
-
-    def _log_trade_journal(self, symbol, entry_date, qty, entry_price, exit_date, exit_price, cause, pnl_brut):
-        """Écrit une ligne dans le journal de trading."""
-        import csv
-        scoring_name = self.strategy.scoring.name if hasattr(self.strategy, 'scoring') else 'N/A'
-
+    def _log_trade_journal(self, symbol, entry_date, qty, entry_price, exit_date, exit_price, cause, pnl_brut, bars_held=0):
+        """Enregistre un trade dans le journal BD."""
         # Calculer les commissions (0.1% à l'achat + 0.1% à la vente)
         commission_rate = 0.001
         commission_entree = entry_price * qty * commission_rate
@@ -85,14 +70,23 @@ class TrailingOnlyBTWrapper(bt.Strategy):
         total_commission = commission_entree + commission_sortie
         pnl_net = pnl_brut - total_commission
 
-        with open(self.journal_filename, mode='a', newline='', encoding='utf-8') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow([
-                symbol, entry_date, qty, round(entry_price, 2),
-                exit_date, round(exit_price, 2), cause,
-                round(pnl_brut, 2), round(total_commission, 2), round(pnl_net, 2),
-                scoring_name
-            ])
+        self.trade_journal.log_trade(
+            trade_mode=TradeMode.BACKTEST,
+            strategy_name=self.strategy_name,
+            symbol=symbol,
+            date_entree=entry_date,
+            prix_entree=entry_price,
+            quantite=qty,
+            date_sortie=exit_date,
+            prix_sortie=exit_price,
+            cause_sortie=cause,
+            pnl_brut=round(pnl_brut, 2),
+            commission=round(total_commission, 2),
+            pnl_net=round(pnl_net, 2),
+            bars_held=bars_held,
+            backtest_start_date=self.start_date,
+            backtest_end_date=self.end_date
+        )
 
     def _preload_cache(self, dataframes):
         """Pré-charge les DataFrames dans le cache du MarketDataMock."""
@@ -123,7 +117,8 @@ class TrailingOnlyBTWrapper(bt.Strategy):
                 self.trade_entries[symbol] = {
                     'date_entree': order.data.datetime.datetime(0),
                     'prix_entree': order.executed.price,
-                    'quantite': abs(order.executed.size)
+                    'quantite': abs(order.executed.size),
+                    'bar_entree': len(self)
                 }
 
                 # Placer uniquement le trailing stop (PAS de TP)
@@ -150,9 +145,11 @@ class TrailingOnlyBTWrapper(bt.Strategy):
                 pnl = (order.executed.price - last_entry_price) * abs(order.executed.size)
                 order_type = 'TRAILING_STOP'
 
-                # Écrire dans le journal de trading
+                # Calculer bars_held et écrire dans le journal
+                bars_held = 0
                 if symbol in self.trade_entries:
                     entry_info = self.trade_entries[symbol]
+                    bars_held = len(self) - entry_info.get('bar_entree', len(self))
                     self._log_trade_journal(
                         symbol=symbol,
                         entry_date=entry_info['date_entree'],
@@ -161,13 +158,14 @@ class TrailingOnlyBTWrapper(bt.Strategy):
                         exit_date=order.data.datetime.datetime(0),
                         exit_price=order.executed.price,
                         cause=order_type,
-                        pnl_brut=pnl
+                        pnl_brut=pnl,
+                        bars_held=bars_held
                     )
                     del self.trade_entries[symbol]
 
                 self.pending_stops[symbol] = None
                 del self.last_entry_prices[symbol]
-                self.log_diag(f"[CLEANUP] Position fermée pour {symbol} via {order_type}, PnL: {pnl:.2f}")
+                self.log_diag(f"[CLEANUP] Position fermée pour {symbol} via {order_type}, PnL: {pnl:.2f}, Bars: {bars_held}")
 
             self.pending_order_bundles[symbol] = None
 
@@ -229,3 +227,26 @@ class TrailingOnlyBTWrapper(bt.Strategy):
         if trade.isclosed:
             symbol = trade.data._name
             self.orders_by_symbol.pop(symbol, None)
+
+    def stop(self):
+        """Appelé à la fin du backtest - affiche le résumé."""
+        print("\n" + "=" * 60)
+        print("RÉSUMÉ BD - TrailingOnly")
+        print("=" * 60)
+        summary = self.trade_journal.get_performance_summary(
+            trade_mode=TradeMode.BACKTEST,
+            strategy_name=self.strategy_name
+        )
+        if "error" not in summary:
+            print(f"Trades: {summary['total_trades']} (W:{summary['winning_trades']} / L:{summary['losing_trades']})")
+            print(f"Win Rate: {summary['win_rate']:.1f}%")
+            print(f"PnL Net Total: {summary['total_pnl_net']:,.2f}$")
+            print(f"PnL Net Moyen: {summary['avg_pnl_net']:,.2f}$")
+            print(f"Max Win: {summary['max_win']:,.2f}$ | Max Loss: {summary['max_loss']:,.2f}$")
+        else:
+            print(summary.get("error", "Erreur inconnue"))
+
+        print("=" * 60)
+
+        # Fermer la connexion BD
+        self.trade_journal.close()

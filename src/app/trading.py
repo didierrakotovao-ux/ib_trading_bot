@@ -16,7 +16,7 @@ class Trading:
         6-écrit le journal de performance
     """
     def __init__(self):
-        self.market_data_provider = MarketDataProvider(port=4002, client_id=1)
+        self.market_data_provider = MarketDataProvider(port=7497, client_id=1)
         # , AdDivergenceStrategy(self.market_data_provider)
         self.strategies = [MomentumStrategy(self.market_data_provider)]
         self.orders = []
