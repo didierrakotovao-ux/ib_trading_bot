@@ -107,90 +107,108 @@ class MLMomentumPredictor:
     def create_features(self, df: pd.DataFrame) -> pd.DataFrame:
         """
         Crée les features supplémentaires pour le ML.
+        
+        IMPORTANT: Toutes les features utilisent UNIQUEMENT des données historiques
+        (jusqu'à la date t) pour éviter le lookahead bias. Chaque prédiction est faite
+        pour un (symbole, date) spécifique.
 
         Args:
             df: DataFrame brut
 
         Returns:
-            DataFrame enrichi avec les features
+            DataFrame enrichi avec les features (une ligne = une prédiction pour un symbole à une date)
         """
         df = df.copy()
+        
+        # S'assurer que les données sont triées par symbole et date
+        df = df.sort_values(['symbol', 'date']).reset_index(drop=True)
 
-        # Grouper par symbole pour les calculs
-        for symbol in df['symbol'].unique():
-            mask = df['symbol'] == symbol
-            symbol_data = df.loc[mask].copy()
+        # --- Features calculées depuis les données existantes (pas de dépendance temporelle) ---
+        
+        # MACD Histogram
+        df['macd_hist'] = df['macd'] - df['macd_signal']
 
-            # --- Features calculées depuis les données existantes ---
+        # Position dans les Bandes de Bollinger (0 = bas, 1 = haut)
+        bb_range = df['bb_high'] - df['bb_low']
+        df['bb_position'] = np.where(
+            bb_range > 0,
+            (df['close'] - df['bb_low']) / bb_range,
+            0.5
+        )
 
-            # MACD Histogram
-            df.loc[mask, 'macd_hist'] = symbol_data['macd'] - symbol_data['macd_signal']
+        # RSI centré (momentum)
+        df['rsi_momentum'] = df['rsi'] - 50
 
-            # Position dans les Bandes de Bollinger (0 = bas, 1 = haut)
-            bb_range = symbol_data['bb_high'] - symbol_data['bb_low']
-            df.loc[mask, 'bb_position'] = np.where(
-                bb_range > 0,
-                (symbol_data['close'] - symbol_data['bb_low']) / bb_range,
-                0.5
-            )
+        # Volume ratio
+        df['volume_ratio'] = np.where(
+            df['sma20_volume'] > 0,
+            df['volume'] / df['sma20_volume'],
+            1.0
+        )
 
-            # RSI centré (momentum)
-            df.loc[mask, 'rsi_momentum'] = symbol_data['rsi'] - 50
+        # Trend strength (ADX avec direction basée sur MACD)
+        df['trend_strength'] = df['adx'] * np.sign(df['macd'])
 
-            # Volume ratio
-            df.loc[mask, 'volume_ratio'] = np.where(
-                symbol_data['sma20_volume'] > 0,
-                symbol_data['volume'] / symbol_data['sma20_volume'],
-                1.0
-            )
+        # --- Features de momentum historique (GROUPBY pour calculer par symbole) ---
+        # Utilisation de groupby pour plus de clarté et d'efficacité
+        
+        # Rendements passés (utilise les données AVANT la date t)
+        df['return_5d'] = df.groupby('symbol')['close'].pct_change(5)
+        df['return_10d'] = df.groupby('symbol')['close'].pct_change(10)
+        df['return_20d'] = df.groupby('symbol')['close'].pct_change(20)
 
-            # Trend strength (ADX avec direction basée sur MACD)
-            df.loc[mask, 'trend_strength'] = symbol_data['adx'] * np.sign(symbol_data['macd'])
+        # Volatilité (rolling window sur les données AVANT la date t)
+        df['volatility_10d'] = df.groupby('symbol')['close'].transform(
+            lambda x: x.pct_change().rolling(10).std()
+        )
 
-            # --- Features de momentum historique ---
-
-            # Rendements passés
-            df.loc[mask, 'return_5d'] = symbol_data['close'].pct_change(5)
-            df.loc[mask, 'return_10d'] = symbol_data['close'].pct_change(10)
-            df.loc[mask, 'return_20d'] = symbol_data['close'].pct_change(20)
-
-            # Volatilité
-            df.loc[mask, 'volatility_10d'] = symbol_data['close'].pct_change().rolling(10).std()
-
-            # Position vs plus haut 52 semaines
-            high_52w = symbol_data['high'].rolling(252, min_periods=50).max()
-            df.loc[mask, 'high_52w_pct'] = symbol_data['close'] / high_52w
+        # Position vs plus haut 52 semaines (rolling max sur les données AVANT la date t)
+        df['high_52w'] = df.groupby('symbol')['high'].transform(
+            lambda x: x.rolling(252, min_periods=50).max()
+        )
+        df['high_52w_pct'] = df['close'] / df['high_52w']
+        df = df.drop(columns=['high_52w'])  # Supprimer la colonne temporaire
 
         return df
 
     def create_labels(self, df: pd.DataFrame) -> pd.DataFrame:
         """
         Crée les labels (target) : le stock a-t-il atteint +5% dans les N prochains jours ?
+        
+        ATTENTION: Cette fonction utilise des données FUTURES (shift négatif) pour créer les labels.
+        C'est NORMAL pour l'entraînement car on doit connaître le résultat réel.
+        Ces labels ne doivent JAMAIS être utilisés comme features pour éviter le lookahead bias.
+        
+        Chaque label correspond à un (symbole, date) spécifique et indique si ce symbole
+        a effectivement monté de 5% dans les N jours APRÈS cette date.
 
         Args:
             df: DataFrame avec features
 
         Returns:
-            DataFrame avec colonne 'target'
+            DataFrame avec colonne 'target' (une ligne = un label pour un symbole à une date)
         """
         df = df.copy()
-        df['target'] = 0
-
-        for symbol in df['symbol'].unique():
-            mask = df['symbol'] == symbol
-            symbol_data = df.loc[mask].copy()
-
-            # Pour chaque jour, regarder le max des N prochains jours
-            future_max = symbol_data['high'].shift(-1).rolling(
+        
+        # S'assurer que les données sont triées par symbole et date
+        df = df.sort_values(['symbol', 'date']).reset_index(drop=True)
+        
+        # Calculer le max futur PAR SYMBOLE en utilisant groupby
+        # Chaque ligne aura le label: "ce symbole à cette date va-t-il monter de 5%?"
+        def calculate_future_return(group):
+            # Pour chaque date, regarder le max des N prochains jours
+            future_max = group['high'].shift(-1).rolling(
                 window=self.prediction_horizon,
                 min_periods=1
             ).max().shift(-self.prediction_horizon + 1)
-
+            
             # Calculer le rendement max potentiel
-            max_return = (future_max - symbol_data['close']) / symbol_data['close']
-
+            max_return = (future_max - group['close']) / group['close']
+            
             # Label = 1 si le rendement max >= target
-            df.loc[mask, 'target'] = (max_return >= self.target_return).astype(int)
+            return (max_return >= self.target_return).astype(int)
+        
+        df['target'] = df.groupby('symbol', group_keys=False).apply(calculate_future_return).values
 
         return df
 
@@ -232,45 +250,46 @@ class MLMomentumPredictor:
             Dictionnaire avec les métriques
         """
         # Split train/test
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.2, random_state=42, stratify=y
-        )
+        split_ratio = 0.8
+        split_index = int(len(X) * split_ratio)
+
+        X_train = X[:split_index]
+        X_test = X[split_index:]
+        y_train = y[:split_index]
+        y_test = y[split_index:]
+
+        print(f"[INFO] Taille train: {len(X_train)} observations")
+        print(f"[INFO] Taille test: {len(X_test)} observations")
+        print(f"[INFO] Distribution train - Classe 0: {sum(y_train==0)}, Classe 1: {sum(y_train==1)}")
+        print(f"[INFO] Distribution test - Classe 0: {sum(y_test==0)}, Classe 1: {sum(y_test==1)}")
 
         # Normalisation
         X_train_scaled = self.scaler.fit_transform(X_train)
         X_test_scaled = self.scaler.transform(X_test)
 
-        # Créer le modèle
-        if HAS_XGBOOST:
-            print("[INFO] Utilisation de XGBoost")
-            self.model = xgb.XGBClassifier(
-                n_estimators=200,
-                max_depth=6,
-                learning_rate=0.1,
-                subsample=0.8,
-                colsample_bytree=0.8,
-                scale_pos_weight=len(y_train[y_train==0]) / len(y_train[y_train==1]),  # Balance classes
-                random_state=42,
-                eval_metric='auc',
-                early_stopping_rounds=20
-            )
-            self.model.fit(
-                X_train_scaled, y_train,
-                eval_set=[(X_test_scaled, y_test)],
-                verbose=False
-            )
-        else:
-            print("[INFO] Utilisation de RandomForest (XGBoost non installé)")
-            self.model = RandomForestClassifier(
-                n_estimators=200,
-                max_depth=10,
-                min_samples_split=10,
-                class_weight='balanced',
-                random_state=42,
-                n_jobs=-1
-            )
-            self.model.fit(X_train_scaled, y_train)
+        print("\n[INFO] Utilisation de XGBoost avec split temporel")
 
+        # Calcul du scale_pos_weight pour équilibrer les classes
+        scale_weight = len(y_train[y_train==0]) / len(y_train[y_train==1])
+        print(f"[INFO] Scale pos weight: {scale_weight:.2f}")
+
+        self.model = xgb.XGBClassifier(
+            n_estimators=200,
+            max_depth=6,
+            learning_rate=0.1,
+            subsample=0.8,
+            colsample_bytree=0.8,
+            scale_pos_weight=scale_weight,
+            random_state=42,
+            eval_metric='auc',
+            early_stopping_rounds=20
+        )
+
+        self.model.fit(
+            X_train_scaled, y_train,
+            eval_set=[(X_test_scaled, y_test)],
+            verbose=True  # Changé à True pour voir la progression
+        )
         # Évaluation
         y_pred = self.model.predict(X_test_scaled)
         y_proba = self.model.predict_proba(X_test_scaled)[:, 1]
@@ -291,10 +310,7 @@ class MLMomentumPredictor:
         print(f"  FN={cm[1,0]:,}  TP={cm[1,1]:,}")
 
         # Feature importance
-        if HAS_XGBOOST:
-            importance = self.model.feature_importances_
-        else:
-            importance = self.model.feature_importances_
+        importance = self.model.feature_importances_
 
         self.feature_importance = pd.DataFrame({
             'feature': feature_names,
