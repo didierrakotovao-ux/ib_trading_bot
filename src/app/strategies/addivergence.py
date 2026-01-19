@@ -35,6 +35,7 @@ class AdDivergenceStrategy(Strategy):
         self.score_threshold = 65
         self.capital = capital  # Montant total dédié à la stratégie
         self.max_stocks = max_stocks  # Nombre max de stocks à trader
+        self.max_exposure = 0.6  # Limiter l'exposition à 60% du capital (réduit le drawdown)
 
     def scanner_filters(self) -> ScannerSubscription:
         scan_sub = ScannerSubscription()
@@ -76,7 +77,8 @@ class AdDivergenceStrategy(Strategy):
         n = len(self.symbolsToTrade)
         if n == 0:
             return []
-        capital_per_stock = self.capital / n
+        # Limiter l'exposition totale (ex: 60% du capital au lieu de 100%)
+        capital_per_stock = (self.capital * self.max_exposure) / n
         order_params = []
         # S'assurer que la connexion est prête et récupérer le vrai nextValidId
         if hasattr(self.market_data, '_next_req_id'):

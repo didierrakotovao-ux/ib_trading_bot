@@ -3,7 +3,7 @@ Wrapper Backtrader avec uniquement Trailing Stop (pas de Take Profit).
 La position reste ouverte tant que le trailing stop n'est pas touché.
 """
 import backtrader as bt
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 import sys
 import os
@@ -22,6 +22,7 @@ class TrailingOnlyBTWrapper(bt.Strategy):
         capital=100000,
         max_stocks=5,
         trailing_percent=5.0,  # Trailing stop à 5%
+        max_loss_percent=10.0,  # Stop loss fixe maximum à -10% (protection contre les gaps)
         dataframes=None  # DataFrames pré-chargés depuis SQLite
     )
 
@@ -121,17 +122,31 @@ class TrailingOnlyBTWrapper(bt.Strategy):
                     'bar_entree': len(self)
                 }
 
-                # Placer uniquement le trailing stop (PAS de TP)
+                # Placer le trailing stop ET un stop loss fixe maximum
                 data = self._get_data(symbol)
                 if data is not None:
+                    # Trailing stop (suit le prix à la hausse)
                     stop_order = self.sell(
                         data=data,
                         size=abs(order.executed.size),
                         exectype=bt.Order.StopTrail,
                         trailpercent=self.p.trailing_percent / 100.0
                     )
-                    self.pending_stops[symbol] = {"stop_order": stop_order}
-                    self.log_diag(f"[BT] Trailing stop {self.p.trailing_percent}% placé pour {symbol}")
+                    
+                    # Stop loss fixe (protection contre les grosses pertes / gaps)
+                    max_loss_price = order.executed.price * (1 - self.p.max_loss_percent / 100.0)
+                    fixed_stop_order = self.sell(
+                        data=data,
+                        size=abs(order.executed.size),
+                        exectype=bt.Order.Stop,
+                        price=max_loss_price
+                    )
+                    
+                    self.pending_stops[symbol] = {
+                        "stop_order": stop_order,
+                        "fixed_stop_order": fixed_stop_order
+                    }
+                    self.log_diag(f"[BT] Trailing stop {self.p.trailing_percent}% + Stop loss fixe à {max_loss_price:.2f} (-{self.p.max_loss_percent}%) placés pour {symbol}")
 
             elif order.issell():
                 self.orders_by_symbol[symbol] = None
@@ -143,7 +158,19 @@ class TrailingOnlyBTWrapper(bt.Strategy):
 
                 last_entry_price = self.last_entry_prices[symbol]
                 pnl = (order.executed.price - last_entry_price) * abs(order.executed.size)
-                order_type = 'TRAILING_STOP'
+                
+                # Déterminer le type de sortie (trailing ou stop loss fixe)
+                if pnl < 0 and abs(pnl / (last_entry_price * abs(order.executed.size))) >= (self.p.max_loss_percent / 100.0 * 0.95):
+                    order_type = 'STOP_LOSS_FIXED'
+                else:
+                    order_type = 'TRAILING_STOP'
+                
+                # Annuler l'autre ordre stop pour éviter les doublons
+                if symbol in self.pending_stops and self.pending_stops[symbol]:
+                    for stop_key in ['stop_order', 'fixed_stop_order']:
+                        other_stop = self.pending_stops[symbol].get(stop_key)
+                        if other_stop and other_stop != order and other_stop.status == bt.Order.Submitted:
+                            self.cancel(other_stop)
 
                 # Calculer bars_held et écrire dans le journal
                 bars_held = 0
@@ -163,9 +190,17 @@ class TrailingOnlyBTWrapper(bt.Strategy):
                     )
                     del self.trade_entries[symbol]
 
-                self.pending_stops[symbol] = None
-                del self.last_entry_prices[symbol]
-                self.log_diag(f"[CLEANUP] Position fermée pour {symbol} via {order_type}, PnL: {pnl:.2f}, Bars: {bars_held}")
+                # Nettoyage complet de tous les dictionnaires pour permettre une réentrée
+                if symbol in self.pending_stops:
+                    del self.pending_stops[symbol]
+                if symbol in self.last_entry_prices:
+                    del self.last_entry_prices[symbol]
+                if symbol in self.orders_by_symbol:
+                    del self.orders_by_symbol[symbol]
+                if symbol in self.pending_order_bundles:
+                    del self.pending_order_bundles[symbol]
+                    
+                self.log_diag(f"[CLEANUP] Position fermée pour {symbol} via {order_type}, PnL: {pnl:.2f}, Bars: {bars_held}, tous les trackers nettoyés")
 
             self.pending_order_bundles[symbol] = None
 
@@ -184,38 +219,59 @@ class TrailingOnlyBTWrapper(bt.Strategy):
         symbols_to_trade = self.strategy.get_symbols(current_date)
         self.log_diag(f"{current_date} Symboles sélectionnés: {symbols_to_trade}")
 
+        # FILTRER les symboles déjà en position AVANT de générer les ordres
+        symbols_available = []
+        for symbol in symbols_to_trade:
+            data = self._get_data(symbol)
+            if not data:
+                continue
+                
+            pos = self.getposition(data)
+            
+            # Vérifier si position déjà ouverte ou ordres en attente
+            has_position = pos.size != 0
+            has_pending_order = symbol in self.orders_by_symbol and self.orders_by_symbol[symbol] is not None
+            has_pending_stop = symbol in self.pending_stops and self.pending_stops[symbol] is not None
+            
+            if has_position or has_pending_order or has_pending_stop:
+                self.log_diag(f"[FILTER] {symbol} ignoré (position={has_position}, order={has_pending_order}, stop={has_pending_stop})")
+                continue
+                
+            symbols_available.append(symbol)
+        
+        if not symbols_available:
+            self.log_diag(f"[FILTER] Aucun symbole disponible pour trader ce jour")
+            return
+        
+        # Mettre à jour la liste des symboles à trader (APRÈS filtrage)
+        self.strategy.symbolsToTrade = symbols_available
+        self.log_diag(f"[FILTER] Symboles disponibles après filtrage: {symbols_available}")
+        
+        # Générer les ordres UNIQUEMENT pour les symboles disponibles
         order_bundles = self.strategy.get_order_params()
 
         for bundle in order_bundles:
             symbol = bundle["symbol"]
             data = self._get_data(symbol)
             if not data:
+                self.log_diag(f"[ERROR] Data non trouvée pour {symbol}")
                 continue
 
+            # Double vérification (normalement déjà filtré, mais par sécurité)
             pos = self.getposition(data)
-
-            if pos.size > 0:
-                self.log_diag(f"[CONTROL] Position déjà ouverte sur {symbol}")
-                continue
-            if pos.size < 0:
-                self.log_diag(f"[ERROR] Position short sur {symbol}")
+            if pos.size != 0:
+                self.log_diag(f"[WARNING] {symbol} a une position mais n'aurait pas dû passer le filtre, skip")
                 continue
 
-            if pos.size == 0 and self.orders_by_symbol.get(symbol) is None:
-                # Annuler les stops orphelins
-                if symbol in self.pending_stops and self.pending_stops[symbol] is not None:
-                    stop = self.pending_stops[symbol].get("stop_order")
-                    if stop is not None and stop.status not in [stop.Completed, stop.Canceled]:
-                        self.broker.cancel(stop)
-                    self.pending_stops[symbol] = None
+            # Placer l'ordre d'entrée (market order)
+            entry_order = self.buy(data=data, size=bundle["entry_order"].totalQuantity)
 
-                # Ordre d'entrée simple (market order)
-                entry_order = self.buy(data=data, size=bundle["entry_order"].totalQuantity)
-
-                if entry_order is not None:
-                    self.log_diag(f"[BT] Entry order pour {symbol}")
-                    self.orders_by_symbol[symbol] = {"entry": entry_order}
-                    self.pending_order_bundles[symbol] = bundle
+            if entry_order is not None:
+                self.log_diag(f"[BT] Entry order placé pour {symbol}, qty={bundle['entry_order'].totalQuantity}")
+                self.orders_by_symbol[symbol] = {"entry": entry_order}
+                self.pending_order_bundles[symbol] = bundle
+            else:
+                self.log_diag(f"[ERROR] Échec de placement d'ordre pour {symbol}")
 
     def _get_data(self, symbol):
         for d in self.datas:
@@ -229,7 +285,71 @@ class TrailingOnlyBTWrapper(bt.Strategy):
             self.orders_by_symbol.pop(symbol, None)
 
     def stop(self):
-        """Appelé à la fin du backtest - affiche le résumé."""
+        """Appelé à la fin du backtest - ferme toutes les positions ouvertes et affiche le résumé."""
+        
+        # Fermer toutes les positions ouvertes à la fin du backtest
+        print("\n[INFO] Clôture des positions ouvertes en fin de backtest...")
+        closed_count = 0
+        missing_entries = 0
+        
+        for data in self.datas:
+            symbol = data._name
+            pos = self.getposition(data)
+            
+            if pos.size > 0:
+                # Position longue ouverte - forcer la vente
+                exit_price = data.close[0]
+                exit_date = data.datetime.datetime(0)
+                
+                if symbol in self.trade_entries:
+                    entry_info = self.trade_entries[symbol]
+                    pnl_brut = (exit_price - entry_info['prix_entree']) * entry_info['quantite']
+                    bars_held = len(self) - entry_info.get('bar_entree', len(self))
+                    
+                    self._log_trade_journal(
+                        symbol=symbol,
+                        entry_date=entry_info['date_entree'],
+                        qty=entry_info['quantite'],
+                        entry_price=entry_info['prix_entree'],
+                        exit_date=exit_date,
+                        exit_price=exit_price,
+                        cause='END_OF_BACKTEST',
+                        pnl_brut=pnl_brut,
+                        bars_held=bars_held
+                    )
+                    print(f"  {symbol}: Fermé à {exit_price:.2f} (Entrée: {entry_info['prix_entree']:.2f}, PnL: {pnl_brut:+.2f}$, Bars: {bars_held})")
+                    closed_count += 1
+                else:
+                    # Position sans trace d'entrée (erreur de tracking)
+                    # On estime avec le prix moyen de la position
+                    avg_price = pos.price if hasattr(pos, 'price') else exit_price
+                    pnl_brut = (exit_price - avg_price) * pos.size
+                    
+                    print(f"  [WARNING] {symbol}: Position sans entry info (size={pos.size}, avg_price={avg_price:.2f})")
+                    print(f"            Fermé à {exit_price:.2f} (PnL estimé: {pnl_brut:+.2f}$)")
+                    
+                    # Logger quand même avec date estimée
+                    self._log_trade_journal(
+                        symbol=symbol,
+                        entry_date=exit_date - timedelta(days=5),  # Date estimée
+                        qty=pos.size,
+                        entry_price=avg_price,
+                        exit_date=exit_date,
+                        exit_price=exit_price,
+                        cause='END_OF_BACKTEST_NO_ENTRY_INFO',
+                        pnl_brut=pnl_brut,
+                        bars_held=0
+                    )
+                    missing_entries += 1
+                
+                # Annuler les ordres stops en attente
+                if symbol in self.pending_stops and self.pending_stops[symbol]:
+                    for stop_order in self.pending_stops[symbol].values():
+                        if stop_order and stop_order.status not in [bt.Order.Completed, bt.Order.Canceled]:
+                            self.cancel(stop_order)
+        
+        print(f"\n[INFO] Positions fermées: {closed_count} (dont {missing_entries} sans entry info)")
+        
         print("\n" + "=" * 60)
         print("RÉSUMÉ BD - TrailingOnly")
         print("=" * 60)

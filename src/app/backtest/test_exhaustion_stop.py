@@ -11,8 +11,8 @@ from exhaustion_stop_wrapper import ExhaustionStopBTWrapper
 
 if __name__ == "__main__":
     # Période de backtest
-    start_date = datetime(2025, 2, 1)
-    end_date = datetime(2025, 3, 30)
+    start_date = datetime(2020, 2, 18)
+    end_date = datetime(2020, 3, 27)
 
     print("=" * 60)
     print("BACKTEST - EXHAUSTION STOP (stop après essoufflement)")
