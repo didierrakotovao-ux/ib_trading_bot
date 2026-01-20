@@ -4,6 +4,11 @@ from screener.providers.market_data_provider import MarketDataProvider
 from strategies.addivergence import AdDivergenceStrategy
 from position_manager import PositionManager
 
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+from src.app.database.trade_journal import TradeJournal, TradeMode
+
 
 class Trading:
     """
@@ -15,13 +20,27 @@ class Trading:
         5-gère les positions ouvertes et le suivi des ordres
         6-écrit le journal de performance
     """
-    def __init__(self):
-        self.market_data_provider = MarketDataProvider(port=7497, client_id=1)
+    def __init__(self, port=7497, client_id=1, total_capital=100000, max_positions=5):
+        self.port = port
+        self.total_capital = total_capital
+        self.max_positions = max_positions
+        self.capital_per_position = total_capital / max_positions  # Max 1/5 du capital par position
+
+        self.market_data_provider = MarketDataProvider(port=port, client_id=client_id)
         # , AdDivergenceStrategy(self.market_data_provider)
-        self.strategies = [MomentumStrategy(self.market_data_provider)]
+        self.strategies = [MomentumStrategy(self.market_data_provider, capital=total_capital, max_stocks=max_positions)]
         self.orders = []
         self.position_manager = PositionManager()
         self.order_callbacks = []  # Liste de callbacks à appeler sur exécution d'ordre
+
+        # Journal de trading en BD
+        self.trade_journal = TradeJournal()
+        # Détermine le mode: port 7497 = paper, sinon live
+        self.trade_mode = TradeMode.PAPER if port == 7497 else TradeMode.LIVE
+        self.trade_ids = {}  # Mapping symbol -> trade_id pour mettre à jour à la sortie
+
+        print(f"[TRADING] Capital total: {total_capital:,.0f}$, Max positions: {max_positions}, Capital/position: {self.capital_per_position:,.0f}$")
+        print(f"[JOURNAL] Mode de trading: {self.trade_mode.value}")
 
     def register_order_callback(self, callback):
         """
@@ -30,10 +49,11 @@ class Trading:
         """
         self.order_callbacks.append(callback)
 
-    def on_order_executed(self, symbol, order, status, fill_price, fill_qty, fill_time):
+    def on_order_executed(self, symbol, order, status, fill_price, fill_qty, fill_time, strategy_name="Momentum"):
         """
         Appelle tous les callbacks enregistrés lors de l'exécution d'un ordre.
         Ajoute la position dans le PositionManager uniquement si l'ordre d'entrée (BUY) est exécuté.
+        Journalise le trade dans la base de données.
         """
         # Ajout automatique de la position uniquement si l'ordre d'entrée est exécuté
         if order.action == "BUY" and status.lower() == "filled":
@@ -43,22 +63,86 @@ class Trading:
                 entry_price=fill_price,
                 entry_time=fill_time
             )
+            # Journaliser l'entrée en BD
+            trade_id = self.trade_journal.log_trade(
+                trade_mode=self.trade_mode,
+                strategy_name=strategy_name,
+                symbol=symbol,
+                date_entree=fill_time or datetime.now(),
+                prix_entree=fill_price,
+                quantite=fill_qty
+            )
+            self.trade_ids[symbol] = trade_id
+            print(f"[JOURNAL] Entrée enregistrée: {symbol} @ {fill_price} (ID: {trade_id})")
+
         for cb in self.order_callbacks:
             cb(symbol, order, status, fill_price, fill_qty, fill_time)
+
+    def get_capital_used(self):
+        """
+        Calcule le capital actuellement utilisé par les positions ouvertes.
+        """
+        capital_used = 0
+        for pos in self.position_manager.get_open_positions():
+            capital_used += pos.entry_price * pos.qty
+        return capital_used
+
+    def get_available_capital(self):
+        """
+        Retourne le capital disponible pour de nouvelles positions.
+        """
+        return self.total_capital - self.get_capital_used()
+
+    def can_open_position(self, price, qty):
+        """
+        Vérifie si on peut ouvrir une nouvelle position.
+        - Ne dépasse pas le max de positions
+        - Le capital est suffisant
+        """
+        open_positions = len(self.position_manager.get_open_positions())
+        if open_positions >= self.max_positions:
+            return False, f"Max positions atteint ({self.max_positions})"
+
+        position_cost = price * qty
+        available = self.get_available_capital()
+        if position_cost > available:
+            return False, f"Capital insuffisant ({position_cost:,.0f}$ requis, {available:,.0f}$ disponible)"
+
+        return True, "OK"
 
     def place_order(self, contract, order):
         """
         Reçoit un contrat et un ordre généré par la stratégie et les transmet au provider via placeOrder.
-        Appelle le callback sur exécution d'ordre (à compléter selon le retour du provider).
+        Vérifie le capital disponible avant de placer un ordre d'achat.
         """
         symbol = getattr(contract, 'symbol', None)
-        if order.action == "BUY" and symbol and self.position_manager.has_open_position(symbol):
-            print(f"[Trading] Position déjà ouverte sur {symbol}, ordre ignoré.")
-            return None
+
+        if order.action == "BUY":
+            # Vérifier si position déjà ouverte
+            if symbol and self.position_manager.has_open_position(symbol):
+                print(f"[Trading] Position déjà ouverte sur {symbol}, ordre ignoré.")
+                return None
+
+            # Estimer le coût de la position (utiliser le dernier prix connu ou une estimation)
+            lmt_price = getattr(order, 'lmtPrice', None)
+
+            # Vérifier que lmtPrice est un prix valide (pas UNSET_DOUBLE de ibapi = 1.7976931348623157e+308)
+            # Un prix d'action réaliste est < 100,000$
+            if lmt_price and 0 < lmt_price < 100000:
+                estimated_price = lmt_price
+            else:
+                # Pour les ordres market, estimer à partir du capital par position
+                estimated_price = self.capital_per_position / order.totalQuantity
+
+            can_open, reason = self.can_open_position(estimated_price, order.totalQuantity)
+            if not can_open:
+                print(f"[Trading] Ordre refusé pour {symbol}: {reason}")
+                return None
+
+        print(f"[IB ORDER] Placing order for {symbol} {order.action} {order.totalQuantity} @ {order.orderType}")
         result = self.market_data_provider.placeOrder(contract, order)
         self.orders.append((contract, order))
-        # Exemple d'appel du callback (à adapter selon le retour réel du provider)
-        # self.on_order_executed(symbol, order, status, fill_price, fill_qty, fill_time)
+        print(f"[IB ORDER] Result: {result}")
         return result
 
     def update_orders(self):
@@ -73,11 +157,45 @@ class Trading:
         """
         return self.position_manager.get_open_positions()
 
-    def close_position(self, symbol, exit_price, exit_time=None):
+    def close_position(self, symbol, exit_price, exit_time=None, cause_sortie="MANUAL"):
         """
-        Ferme une position existante et met à jour le P&L
+        Ferme une position existante, met à jour le P&L et journalise la sortie.
         """
-        return self.position_manager.close_position(symbol, exit_price, exit_time)
+        position = self.position_manager.close_position(symbol, exit_price, exit_time)
+
+        if position and symbol in self.trade_ids:
+            # Calculer les commissions et PnL
+            commission_rate = 0.001  # 0.1%
+            commission = (position.entry_price * position.qty + exit_price * position.qty) * commission_rate
+            pnl_brut = position.pnl
+            pnl_net = pnl_brut - commission
+
+            # Mettre à jour le trade en BD avec les infos de sortie
+            self.trade_journal.connect()
+            cursor = self.trade_journal.conn.cursor()
+            cursor.execute("""
+                UPDATE trades SET
+                    date_sortie = ?,
+                    prix_sortie = ?,
+                    cause_sortie = ?,
+                    pnl_brut = ?,
+                    commission = ?,
+                    pnl_net = ?
+                WHERE id = ?
+            """, (
+                (exit_time or datetime.now()).strftime('%Y-%m-%d %H:%M:%S'),
+                exit_price,
+                cause_sortie,
+                round(pnl_brut, 2),
+                round(commission, 2),
+                round(pnl_net, 2),
+                self.trade_ids[symbol]
+            ))
+            self.trade_journal.conn.commit()
+            print(f"[JOURNAL] Sortie enregistrée: {symbol} @ {exit_price}, PnL: {pnl_net:.2f}$ ({cause_sortie})")
+            del self.trade_ids[symbol]
+
+        return position
 
     def init_trade(self):
         """
@@ -102,10 +220,17 @@ class Trading:
                     symbolToTrade.append(symbol)
                 for orders in strategy.get_order_params():
                     contrat = self.market_data_provider.create_contract(orders['symbol'])
-                    self.place_order(contrat, orders['entry_order'])
-                    self.place_order(contrat, orders['stop_order'])
-                    if 'take_profit_order' in orders:
-                        self.place_order(contrat, orders['take_profit_order'])
+                    # Placer l'ordre d'entrée
+                    entry_result = self.place_order(contrat, orders['entry_order'])
+                    # Si l'entrée n'est pas refusée (None = refusé par notre vérification de capital)
+                    # Note: placeOrder de IB peut retourner None même si l'ordre est accepté
+                    if entry_result is not None or orders['entry_order'].action == "BUY":
+                        # Vérifier que l'entrée n'a pas été refusée par can_open_position
+                        # En vérifiant si l'ordre est dans self.orders
+                        if (contrat, orders['entry_order']) in self.orders:
+                            self.place_order(contrat, orders['stop_order'])
+                            if 'take_profit_order' in orders:
+                                self.place_order(contrat, orders['take_profit_order'])
 
             for symbol in symbolToTrade:
                 print(f"  Stocks a trader: {symbol}")
@@ -144,10 +269,41 @@ class Trading:
                 )
         print(f"Positions synchronisées depuis IB: {[p.symbol for p in self.position_manager.get_open_positions()]}" )
 
+    def show_performance_summary(self, strategy_name: str = None):
+        """
+        Affiche le résumé de performance pour le mode actuel.
+        """
+        summary = self.trade_journal.get_performance_summary(
+            trade_mode=self.trade_mode,
+            strategy_name=strategy_name
+        )
+
+        print("\n" + "=" * 60)
+        print(f"RÉSUMÉ PERFORMANCE - {self.trade_mode.value.upper()}")
+        print("=" * 60)
+
+        if "error" in summary:
+            print(summary["error"])
+        else:
+            print(f"Trades: {summary['total_trades']} (W:{summary['winning_trades']} / L:{summary['losing_trades']})")
+            print(f"Win Rate: {summary['win_rate']:.1f}%")
+            print(f"PnL Net Total: {summary['total_pnl_net']:,.2f}$")
+            print(f"PnL Net Moyen: {summary['avg_pnl_net']:,.2f}$")
+            print(f"Max Win: {summary['max_win']:,.2f}$ | Max Loss: {summary['max_loss']:,.2f}$")
+            print(f"Commissions: {summary['total_commission']:,.2f}$")
+
+        print("=" * 60 + "\n")
+
     def close(self):
         """
-        Déconnecte proprement le MarketDataProvider (IB) et arrête le thread associé.
+        Déconnecte proprement le MarketDataProvider (IB), ferme le journal et arrête le thread associé.
         """
+        # Afficher le résumé avant de fermer
+        self.show_performance_summary()
+
+        # Fermer le journal
+        self.trade_journal.close()
+
         if self.market_data_provider.is_connected():
             self.market_data_provider.disconnect()
         print("Déconnexion propre IB terminée.")
@@ -155,8 +311,25 @@ class Trading:
 
 
 if __name__ == "__main__":
-    client_id = 11  # À ajuster si besoin
-    trading = Trading()
+    # Configuration
+    # Port 7497 = Paper Trading (TWS), Port 7496 = Live Trading (TWS)
+    # Port 4002 = Paper Trading (Gateway), Port 4001 = Live Trading (Gateway)
+    PAPER_PORT = 7497
+    LIVE_PORT = 7496
+    CLIENT_ID = 11
+
+    # Capital et gestion des positions
+    TOTAL_CAPITAL = 100000  # Capital total disponible
+    MAX_POSITIONS = 5       # Max 5 positions (chaque position = 1/5 du capital)
+
+    # Utiliser paper trading par défaut
+    trading = Trading(
+        port=PAPER_PORT,
+        client_id=CLIENT_ID,
+        total_capital=TOTAL_CAPITAL,
+        max_positions=MAX_POSITIONS
+    )
+
     try:
         print("[TRADING] Connexion à IB...")
         connected = trading.market_data_provider.connect()
@@ -166,10 +339,10 @@ if __name__ == "__main__":
             exit(1)
         trading.sync_positions_with_ib()
         trading.init_trade()
-        pass
+
     except KeyboardInterrupt:
-        print("Arrêt demandé par l'utilisateur (Ctrl+C)")        
+        print("\nArrêt demandé par l'utilisateur (Ctrl+C)")
+
     finally:
-        print("[TRADING] Déconnexion propre...")
-        trading.market_data_provider.disconnect()
-        print("[TRADING] Déconnecté.")
+        print("[TRADING] Fermeture...")
+        trading.close()

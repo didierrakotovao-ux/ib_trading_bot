@@ -22,7 +22,6 @@ class TrailingOnlyBTWrapper(bt.Strategy):
         capital=100000,
         max_stocks=5,
         trailing_percent=5.0,  # Trailing stop à 5%
-        max_loss_percent=10.0,  # Stop loss fixe maximum à -10% (protection contre les gaps)
         dataframes=None  # DataFrames pré-chargés depuis SQLite
     )
 
@@ -122,31 +121,19 @@ class TrailingOnlyBTWrapper(bt.Strategy):
                     'bar_entree': len(self)
                 }
 
-                # Placer le trailing stop ET un stop loss fixe maximum
+                # Placer le trailing stop uniquement
                 data = self._get_data(symbol)
                 if data is not None:
-                    # Trailing stop (suit le prix à la hausse)
+                    # Trailing stop (suit le prix à la hausse, perte max = trailing_percent)
                     stop_order = self.sell(
                         data=data,
                         size=abs(order.executed.size),
                         exectype=bt.Order.StopTrail,
                         trailpercent=self.p.trailing_percent / 100.0
                     )
-                    
-                    # Stop loss fixe (protection contre les grosses pertes / gaps)
-                    max_loss_price = order.executed.price * (1 - self.p.max_loss_percent / 100.0)
-                    fixed_stop_order = self.sell(
-                        data=data,
-                        size=abs(order.executed.size),
-                        exectype=bt.Order.Stop,
-                        price=max_loss_price
-                    )
-                    
-                    self.pending_stops[symbol] = {
-                        "stop_order": stop_order,
-                        "fixed_stop_order": fixed_stop_order
-                    }
-                    self.log_diag(f"[BT] Trailing stop {self.p.trailing_percent}% + Stop loss fixe à {max_loss_price:.2f} (-{self.p.max_loss_percent}%) placés pour {symbol}")
+
+                    self.pending_stops[symbol] = stop_order
+                    self.log_diag(f"[BT] Trailing stop {self.p.trailing_percent}% placé pour {symbol}")
 
             elif order.issell():
                 self.orders_by_symbol[symbol] = None
@@ -158,19 +145,11 @@ class TrailingOnlyBTWrapper(bt.Strategy):
 
                 last_entry_price = self.last_entry_prices[symbol]
                 pnl = (order.executed.price - last_entry_price) * abs(order.executed.size)
-                
-                # Déterminer le type de sortie (trailing ou stop loss fixe)
-                if pnl < 0 and abs(pnl / (last_entry_price * abs(order.executed.size))) >= (self.p.max_loss_percent / 100.0 * 0.95):
-                    order_type = 'STOP_LOSS_FIXED'
-                else:
-                    order_type = 'TRAILING_STOP'
-                
-                # Annuler l'autre ordre stop pour éviter les doublons
-                if symbol in self.pending_stops and self.pending_stops[symbol]:
-                    for stop_key in ['stop_order', 'fixed_stop_order']:
-                        other_stop = self.pending_stops[symbol].get(stop_key)
-                        if other_stop and other_stop != order and other_stop.status == bt.Order.Submitted:
-                            self.cancel(other_stop)
+                order_type = 'TRAILING_STOP'
+
+                # Nettoyer le pending stop
+                if symbol in self.pending_stops:
+                    self.pending_stops[symbol] = None
 
                 # Calculer bars_held et écrire dans le journal
                 bars_held = 0
@@ -286,26 +265,33 @@ class TrailingOnlyBTWrapper(bt.Strategy):
 
     def stop(self):
         """Appelé à la fin du backtest - ferme toutes les positions ouvertes et affiche le résumé."""
-        
+
         # Fermer toutes les positions ouvertes à la fin du backtest
         print("\n[INFO] Clôture des positions ouvertes en fin de backtest...")
         closed_count = 0
         missing_entries = 0
-        
+
+        # Debug: afficher l'état des trackers
+        print(f"[DEBUG] trade_entries: {list(self.trade_entries.keys())}")
+        print(f"[DEBUG] pending_stops: {list(self.pending_stops.keys())}")
+
         for data in self.datas:
             symbol = data._name
             pos = self.getposition(data)
-            
-            if pos.size > 0:
-                # Position longue ouverte - forcer la vente
+
+            # Vérifier toute position non nulle (long ou short)
+            if pos.size != 0:
                 exit_price = data.close[0]
                 exit_date = data.datetime.datetime(0)
-                
+                qty = abs(pos.size)
+
+                print(f"[DEBUG] Position ouverte trouvée: {symbol}, size={pos.size}, price={pos.price:.2f}")
+
                 if symbol in self.trade_entries:
                     entry_info = self.trade_entries[symbol]
                     pnl_brut = (exit_price - entry_info['prix_entree']) * entry_info['quantite']
                     bars_held = len(self) - entry_info.get('bar_entree', len(self))
-                    
+
                     self._log_trade_journal(
                         symbol=symbol,
                         entry_date=entry_info['date_entree'],
@@ -320,19 +306,23 @@ class TrailingOnlyBTWrapper(bt.Strategy):
                     print(f"  {symbol}: Fermé à {exit_price:.2f} (Entrée: {entry_info['prix_entree']:.2f}, PnL: {pnl_brut:+.2f}$, Bars: {bars_held})")
                     closed_count += 1
                 else:
-                    # Position sans trace d'entrée (erreur de tracking)
-                    # On estime avec le prix moyen de la position
-                    avg_price = pos.price if hasattr(pos, 'price') else exit_price
-                    pnl_brut = (exit_price - avg_price) * pos.size
-                    
-                    print(f"  [WARNING] {symbol}: Position sans entry info (size={pos.size}, avg_price={avg_price:.2f})")
+                    # Position sans trace d'entrée - utiliser le prix moyen de Backtrader
+                    avg_price = pos.price if pos.price > 0 else exit_price
+                    # PnL correct selon le type de position
+                    if pos.size > 0:  # LONG
+                        pnl_brut = (exit_price - avg_price) * qty
+                    else:  # SHORT (ne devrait pas arriver mais calculer correctement)
+                        pnl_brut = (avg_price - exit_price) * qty
+
+                    position_type = "LONG" if pos.size > 0 else "SHORT"
+                    print(f"  [WARNING] {symbol}: Position {position_type} sans entry info (size={pos.size}, avg_price={avg_price:.2f})")
                     print(f"            Fermé à {exit_price:.2f} (PnL estimé: {pnl_brut:+.2f}$)")
-                    
-                    # Logger quand même avec date estimée
+
+                    # Logger avec les infos disponibles de Backtrader
                     self._log_trade_journal(
                         symbol=symbol,
                         entry_date=exit_date - timedelta(days=5),  # Date estimée
-                        qty=pos.size,
+                        qty=qty,
                         entry_price=avg_price,
                         exit_date=exit_date,
                         exit_price=exit_price,
@@ -340,14 +330,15 @@ class TrailingOnlyBTWrapper(bt.Strategy):
                         pnl_brut=pnl_brut,
                         bars_held=0
                     )
+                    closed_count += 1
                     missing_entries += 1
-                
-                # Annuler les ordres stops en attente
+
+                # Annuler le trailing stop en attente
                 if symbol in self.pending_stops and self.pending_stops[symbol]:
-                    for stop_order in self.pending_stops[symbol].values():
-                        if stop_order and stop_order.status not in [bt.Order.Completed, bt.Order.Canceled]:
-                            self.cancel(stop_order)
-        
+                    stop_order = self.pending_stops[symbol]
+                    if stop_order.status not in [bt.Order.Completed, bt.Order.Canceled]:
+                        self.cancel(stop_order)
+
         print(f"\n[INFO] Positions fermées: {closed_count} (dont {missing_entries} sans entry info)")
         
         print("\n" + "=" * 60)

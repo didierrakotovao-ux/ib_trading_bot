@@ -77,8 +77,8 @@ class AdDivergenceStrategy(Strategy):
         n = len(self.symbolsToTrade)
         if n == 0:
             return []
-        # Limiter l'exposition totale (ex: 60% du capital au lieu de 100%)
-        capital_per_stock = (self.capital * self.max_exposure) / n
+        # Chaque position = max 1/5 du capital (max_stocks positions), avec exposition limitée
+        capital_per_stock = (self.capital * self.max_exposure) / self.max_stocks
         order_params = []
         # S'assurer que la connexion est prête et récupérer le vrai nextValidId
         if hasattr(self.market_data, '_next_req_id'):
@@ -91,46 +91,51 @@ class AdDivergenceStrategy(Strategy):
             df = self.symbolsData[symbol]
             last_close = df['close'].iloc[-1]
             qty = int(capital_per_stock / last_close)
+
+            # Vérifier si le capital est suffisant
+            if qty <= 0:
+                print(f"[ORDER PARAMS] Capital insuffisant pour {symbol} (close={last_close}, capital_per_stock={capital_per_stock})")
+                continue
+
             print(f"[ORDER PARAMS] Préparation des ordres pour {symbol} avec close={last_close} et capital par stock={capital_per_stock} et quantité={qty}  ")
             parent_id = next(order_id_gen)
             stop_id = next(order_id_gen)
             tp_id = next(order_id_gen)
 
-            # Parent: ordre d'entrée
+            # Ordre d'entrée (Limit order avec prix légèrement au-dessus pour exécution rapide)
+            entry_price = round(last_close * 1.005, 2)  # 0.5% au-dessus du close pour assurer le fill
             entryorder = Order()
             entryorder.action = "BUY"
-            entryorder.orderType = "STP LMT"
+            entryorder.orderType = "LMT"
+            entryorder.lmtPrice = entry_price
             entryorder.totalQuantity = qty
-            entryorder.lmtPrice = round(last_close * 0.99, 2)  # Limite à 1% sous le close
-            entryorder.auxPrice = round(last_close * 1.01, 2)  # Stop à 0.5% sous le close
-            entryorder.transmit = False
+            entryorder.transmit = False  # Ne pas transmettre - attendre les children
             entryorder.eTradeOnly = False
             entryorder.firmQuoteOnly = False
             entryorder.orderId = parent_id
             entryorder.tif = "GTC"  # Good Till Cancelled
 
-            # Child 1: Stop loss suiveur
+            # Trailing stop (child order - lié au parent via parentId)
             slorder = Order()
             slorder.action = "SELL"
             slorder.orderType = "TRAIL"
-            # slorder.auxPrice = round(last_close * 0.90, 2)  # Trailing stop à 10% sous le prix
             slorder.totalQuantity = qty
-            slorder.parentId = parent_id
-            slorder.transmit = False
+            slorder.parentId = parent_id  # Lié à l'ordre d'entrée
+            slorder.transmit = False  # Pas le dernier child
             slorder.eTradeOnly = False
             slorder.firmQuoteOnly = False
             slorder.orderId = stop_id
-            slorder.trailingPercent = 5.0  # Trailing de 10%
+            slorder.trailingPercent = 5.0  # Trailing de 5%
             slorder.tif = "GTC"  # Good Till Cancelled
 
-            # Child 2: Take profit
+            # Take profit (child order - lié au parent via parentId)
             tporder = Order()
             tporder.action = "SELL"
             tporder.orderType = "LMT"
-            tporder.lmtPrice = round(last_close * 1.10, 2)  # Take profit à 20% au-dessus du close
+            tporder.lmtPrice = round(last_close * 1.10, 2)  # Take profit à 10% au-dessus du close
             tporder.totalQuantity = qty
-            tporder.parentId = parent_id
-            tporder.transmit = True  # Le dernier transmet l'ensemble
+            tporder.parentId = parent_id  # Lié à l'ordre d'entrée
+            tporder.transmit = True  # Dernier child - transmet le bracket complet
             tporder.eTradeOnly = False
             tporder.firmQuoteOnly = False
             tporder.orderId = tp_id
