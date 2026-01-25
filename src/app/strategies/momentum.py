@@ -28,13 +28,26 @@ class MomentumStrategy(Strategy):
         la création du contrat d'ordre (entrée et sortie) 
         et la fourniture des données à scorer seront implémentées ici.
     """
-    def __init__(self, market_data: MarketDataProvider, capital=10000, max_stocks=5):
+    def __init__(self, market_data: MarketDataProvider, capital=10000, max_stocks=5,
+                 use_wyckoff=True, wyckoff_weight=0.4):
+        """
+        Initialise la stratégie Momentum avec scoring ML et optionnellement Wyckoff.
+
+        Args:
+            market_data: Fournisseur de données de marché
+            capital: Capital total dédié à la stratégie
+            max_stocks: Nombre maximum de positions simultanées
+            use_wyckoff: Activer l'analyse Wyckoff effort/result (défaut: True)
+            wyckoff_weight: Poids de Wyckoff dans le score combiné (0-1, défaut: 0.4)
+        """
         self.scoring = MLScoring(model_path="models/momentum_model.pkl")
         self.market_data = market_data
         self.lookback_days = 350
         self.score_threshold = 65
         self.capital = capital  # Montant total dédié à la stratégie
         self.max_stocks = max_stocks  # Nombre max de stocks à trader
+        self.use_wyckoff = use_wyckoff  # Utiliser l'analyse Wyckoff
+        self.wyckoff_weight = wyckoff_weight  # Poids du score Wyckoff
 
     def scanner_filters(self) -> ScannerSubscription:
         scan_sub = ScannerSubscription()
@@ -48,20 +61,47 @@ class MomentumStrategy(Strategy):
         return scan_sub
     
     def get_symbols(self, trade_date) -> list: # type: ignore
-        """Retourne la liste des symboles à trader (max_stocks), en excluant les ETFs à effet de levier."""
+        """
+        Retourne la liste des symboles à trader (max_stocks).
+
+        Si use_wyckoff=True, utilise le score combiné ML + Wyckoff.
+        Sinon, utilise uniquement le score ML.
+
+        Returns:
+            Liste des symboles sélectionnés pour trading
+        """
         scored_symbols = []
         for symbol in self.symbolsToAnalyse:
             start_date = trade_date - timedelta(days=self.lookback_days)
             data = self.market_data.get_historical_data(symbol, start_date, trade_date, interval="1d")
             if data is not None:
-                score = self.scoring.score(data)
-                if score >= self.score_threshold:
-                    scored_symbols.append((symbol, score, data))
+                if self.use_wyckoff:
+                    # Utiliser le score combiné ML + Wyckoff
+                    analysis = self.scoring.get_combined_analysis(data)
+                    score = analysis.get('combined_score', 0)
+                    wyckoff_phase = analysis.get('wyckoff_analysis', {}).get('phase', 'N/A')
+
+                    # Filtrer les phases défavorables (MARKDOWN, DISTRIBUTION)
+                    if wyckoff_phase in ['MARKDOWN', 'DISTRIBUTION']:
+                        print(f"[WYCKOFF] {symbol} ignoré - phase {wyckoff_phase}")
+                        continue
+
+                    if score >= self.score_threshold:
+                        scored_symbols.append((symbol, score, data, analysis))
+                        print(f"[WYCKOFF] {symbol}: Score={score}, Phase={wyckoff_phase}, "
+                              f"Confiance={analysis.get('confidence', 'N/A')}")
+                else:
+                    # Utiliser uniquement le score ML
+                    score = self.scoring.score(data)
+                    if score >= self.score_threshold:
+                        scored_symbols.append((symbol, score, data, None))
+
         # Trier par score décroissant et ne garder que max_stocks
         scored_symbols.sort(key=lambda x: x[1], reverse=True)
         selected = scored_symbols[:self.max_stocks]
         self.symbolsToTrade = [s[0] for s in selected]
         self.symbolsData = {s[0]: s[2] for s in selected}  # stocke les dataframes pour chaque symbole
+        self.symbolsAnalysis = {s[0]: s[3] for s in selected}  # stocke l'analyse Wyckoff
         return self.symbolsToTrade
 
     def get_order_params(self):
@@ -136,4 +176,51 @@ class MomentumStrategy(Strategy):
 
     def set_symbols_to_analyse(self, symbols: list):
         """Définit la liste des symboles analysés"""
-        self.symbolsToAnalyse= symbols
+        self.symbolsToAnalyse = symbols
+
+    def get_symbol_analysis(self, symbol: str) -> dict:
+        """
+        Retourne l'analyse complète (ML + Wyckoff) pour un symbole.
+
+        Args:
+            symbol: Symbole à analyser
+
+        Returns:
+            Dictionnaire avec analyse complète ou None
+        """
+        if hasattr(self, 'symbolsAnalysis') and symbol in self.symbolsAnalysis:
+            return self.symbolsAnalysis[symbol]
+        return None
+
+    def get_wyckoff_summary(self) -> str:
+        """
+        Retourne un résumé des analyses Wyckoff pour tous les symboles sélectionnés.
+
+        Returns:
+            Résumé formaté des analyses Wyckoff
+        """
+        if not hasattr(self, 'symbolsAnalysis') or not self.symbolsAnalysis:
+            return "Aucune analyse Wyckoff disponible"
+
+        lines = ["=" * 60, "RÉSUMÉ ANALYSE WYCKOFF EFFORT/RESULT", "=" * 60]
+
+        for symbol, analysis in self.symbolsAnalysis.items():
+            if analysis:
+                ml_score = analysis.get('ml_analysis', {}).get('score', 0)
+                wy_score = analysis.get('wyckoff_analysis', {}).get('score', 0)
+                combined = analysis.get('combined_score', 0)
+                phase = analysis.get('wyckoff_analysis', {}).get('phase', 'N/A')
+                signal = analysis.get('combined_signal', 'N/A')
+                confidence = analysis.get('confidence', 'N/A')
+
+                lines.append(f"\n{symbol}:")
+                lines.append(f"  Score ML: {ml_score} | Score Wyckoff: {wy_score} | Combiné: {combined}")
+                lines.append(f"  Phase: {phase} | Signal: {signal} | Confiance: {confidence}")
+
+                # Métriques Wyckoff détaillées
+                if 'wyckoff_details' in analysis and 'metrics' in analysis['wyckoff_details']:
+                    m = analysis['wyckoff_details']['metrics']
+                    lines.append(f"  Effort/Result: {m.get('effort_result_ratio', 'N/A')} ({m.get('effort_interpretation', '')})")
+                    lines.append(f"  Smart Money Flow: {m.get('smart_money_flow', 'N/A')}")
+
+        return "\n".join(lines)

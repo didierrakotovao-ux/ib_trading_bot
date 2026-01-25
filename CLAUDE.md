@@ -157,6 +157,55 @@ Calculées dans `ml_scoring.py._create_features()`:
 - Score 40-59: HOLD
 - Score <40: AVOID
 
+## Wyckoff Effort/Result Analysis
+
+Intégration des principes Wyckoff pour analyser la relation effort (volume) vs résultat (prix).
+
+### Wyckoff Features (5 indicateurs)
+
+| Feature | Description |
+|---------|-------------|
+| `effort_result_ratio` | Volume normalisé / spread normalisé. Élevé = absorption (accumulation/distribution) |
+| `volume_spread_analysis` | Spread × volume × direction. Mesure la force du mouvement |
+| `wyckoff_accumulation` | Détecte les phases d'absorption (fort volume, range étroit) |
+| `effort_result_divergence` | Divergence entre direction prix et volume sur 5 jours |
+| `smart_money_flow` | Flux cumulatif basé sur position du close dans le range |
+
+### Phases Wyckoff Détectées
+
+| Phase | Description | Action |
+|-------|-------------|--------|
+| ACCUMULATION | Smart money achète discrètement | Préparer achat |
+| DISTRIBUTION | Smart money vend discrètement | Éviter/sortir |
+| MARKUP | Tendance haussière confirmée | Acheter/tenir |
+| MARKDOWN | Tendance baissière confirmée | Éviter |
+| RANGING | Pas de direction claire | Attendre |
+
+### Utilisation
+
+```python
+# Analyse Wyckoff seule
+wyckoff = scoring.get_wyckoff_analysis(df)
+print(wyckoff['phase'])  # ACCUMULATION, DISTRIBUTION, etc.
+
+# Analyse combinée ML + Wyckoff (60% ML, 40% Wyckoff)
+combined = scoring.get_combined_analysis(df)
+print(combined['combined_score'])  # 0-100
+print(combined['confidence'])  # HIGH si ML et Wyckoff concordent
+```
+
+### Configuration Stratégie
+
+```python
+# Activer Wyckoff dans MomentumStrategy
+strategy = MomentumStrategy(
+    market_data=provider,
+    capital=100000,
+    use_wyckoff=True,      # Activer analyse Wyckoff
+    wyckoff_weight=0.4     # 40% du score combiné
+)
+```
+
 ## Trade Lifecycle
 
 ```
