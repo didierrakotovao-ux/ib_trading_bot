@@ -29,13 +29,12 @@ class MLScoring(Scoring):
         'return_10d', 'return_20d', 'volatility_10d', 'high_52w_pct',
     ]
 
-    # Features Wyckoff effort/result (nouvelles - pas utilisées par le modèle ML existant)
+    # Features Wyckoff simplifiées - basées sur série temporelle de volume
     WYCKOFF_COLUMNS = [
-        'effort_result_ratio',       # Efficacité du mouvement prix vs volume
-        'volume_spread_analysis',    # Spread vs volume (VSA classique)
-        'wyckoff_accumulation',      # Détection d'absorption (fort vol, range étroit)
-        'effort_result_divergence',  # Divergence effort/résultat sur 5 jours
-        'smart_money_flow',          # Flux cumulatif de pression acheteuse
+        'volume_above_sma20',        # Boolean: volume > SMA20
+        'volume_streak',             # Nombre de jours consécutifs avec volume > SMA20
+        'volume_consistency_10d',    # Coefficient de variation du volume sur 10 jours
+        'sustained_accumulation',    # Score d'accumulation soutenue (0-1)
     ]
 
     def __init__(self, model_path: str = "models/momentum_model.pkl"):
@@ -183,12 +182,9 @@ class MLScoring(Scoring):
 
     def _create_wyckoff_features(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-        Calcule les features Wyckoff basées sur le principe effort vs résultat.
+        Calcule les features Wyckoff simplifiées basées sur série temporelle de volume.
 
-        Principe Wyckoff:
-        - Effort = Volume (l'énergie mise dans le mouvement)
-        - Result = Variation de prix (le résultat de cet effort)
-        - Divergence effort/résultat = signal de retournement potentiel
+        Principe: volume constant au-dessus de SMA20 pendant N jours = accumulation institutionnelle
 
         Args:
             df: DataFrame avec données OHLCV et indicateurs de base
@@ -198,85 +194,43 @@ class MLScoring(Scoring):
         """
         df = df.copy()
 
-        # --- 1. Effort/Result Ratio ---
-        # Mesure l'efficacité: grand mouvement de prix avec peu de volume = efficace
-        # Petit mouvement avec beaucoup de volume = épuisement
-        spread = df['high'] - df['low']  # Range du jour (résultat)
-        avg_spread = spread.rolling(20).mean()
-        spread_normalized = spread / (avg_spread + 1e-6)
+        # --- 1. Volume au-dessus de SMA20 (booléen) ---
+        df['volume_above_sma20'] = (df['volume'] > df['sma20_volume']).astype(int)
 
-        # Effort/Result: si ratio élevé, le volume produit peu de mouvement (absorption)
-        # Si ratio faible, peu de volume produit grand mouvement (mouvement efficace)
-        df['effort_result_ratio'] = df['volume_ratio'] / (spread_normalized + 1e-6)
+        # --- 2. Streak de jours consécutifs avec volume > SMA20 ---
+        # Calcule le nombre de jours consécutifs où le volume est au-dessus de SMA20
+        def calculate_streak(series):
+            """Calcule la série de streaks consécutifs."""
+            streak = pd.Series(0, index=series.index)
+            current_streak = 0
+            for i in range(len(series)):
+                if series.iloc[i] == 1:
+                    current_streak += 1
+                else:
+                    current_streak = 0
+                streak.iloc[i] = current_streak
+            return streak
 
-        # --- 2. Volume Spread Analysis (VSA) ---
-        # Analyse classique Wyckoff/VSA: compare le spread au volume
-        # - Wide spread + high volume = mouvement significatif (continuation)
-        # - Narrow spread + high volume = absorption (accumulation/distribution)
-        # - Wide spread + low volume = mouvement faible (potentiel piège)
-        # Score VSA: spread_normalized * volume_ratio_direction
-        price_direction = np.sign(df['close'] - df['open'])
-        df['volume_spread_analysis'] = spread_normalized * df['volume_ratio'] * price_direction
+        df['volume_streak'] = calculate_streak(df['volume_above_sma20'])
 
-        # --- 3. Wyckoff Accumulation Detection ---
-        # Détecte les phases d'absorption: fort volume avec range étroit
-        # Indique que l'offre est absorbée sans faire bouger le prix
-        atr_14 = spread.rolling(14).mean()  # Proxy pour ATR
-        is_narrow_range = spread < (atr_14 * 0.7)  # Range < 70% de la moyenne
-        is_high_volume = df['volume_ratio'] > 1.2  # Volume > 120% de la moyenne
+        # --- 3. Consistance du volume sur 10 jours ---
+        # Coefficient de variation (CV) = std / mean
+        # CV faible = volume constant (institutionnel)
+        # CV élevé = volume erratique (retail, spéculatif)
+        volume_mean_10d = df['volume'].rolling(10).mean()
+        volume_std_10d = df['volume'].rolling(10).std()
+        df['volume_consistency_10d'] = volume_std_10d / (volume_mean_10d + 1e-6)
 
-        # Score d'accumulation: 0 à 1
-        # Plus le volume est élevé avec un range étroit, plus le score est élevé
-        accumulation_score = np.where(
-            is_narrow_range,
-            np.minimum(df['volume_ratio'] / 2, 1.0),  # Cap à 1.0
-            0.0
-        )
-        df['wyckoff_accumulation'] = accumulation_score
+        # --- 4. Score d'accumulation soutenue ---
+        # Combinaison: streak élevé + volume constant = forte probabilité d'accumulation
+        # Score de 0 à 1
+        #   - streak >= 10 jours : contribution max
+        #   - CV < 0.3 (30%) : volume très constant
+        streak_score = np.minimum(df['volume_streak'] / 10.0, 1.0)  # Max à 10 jours
+        consistency_score = np.maximum(1.0 - df['volume_consistency_10d'], 0.0)  # Plus CV est bas, plus le score est haut
+        consistency_score = np.minimum(consistency_score / 0.7, 1.0)  # Normaliser
 
-        # --- 4. Effort/Result Divergence (multi-jours) ---
-        # Compare la direction du mouvement prix vs la tendance du volume sur 5 jours
-        # Divergence = volume augmente mais prix stagne (ou vice versa)
-        price_change_5d = df['close'].pct_change(5)
-        volume_change_5d = df['volume'].pct_change(5)
-
-        # Normaliser les changements
-        price_dir = np.sign(price_change_5d)
-        volume_dir = np.sign(volume_change_5d)
-
-        # Divergence: -1 (bearish), 0 (neutre), +1 (bullish)
-        # Volume monte + prix monte = confirmation bullish (+1)
-        # Volume monte + prix baisse = absorption bearish (potentiel spring, +0.5)
-        # Volume baisse + prix monte = mouvement faible (bearish, -0.5)
-        # Volume baisse + prix baisse = fin de distribution (-1)
-        df['effort_result_divergence'] = np.where(
-            (volume_dir > 0) & (price_dir > 0), 1.0,      # Bullish confirmation
-            np.where(
-                (volume_dir > 0) & (price_dir < 0), 0.5,  # Potential spring/accumulation
-                np.where(
-                    (volume_dir < 0) & (price_dir > 0), -0.5,  # Weak rally
-                    np.where(
-                        (volume_dir < 0) & (price_dir < 0), -1.0,  # Distribution ending
-                        0.0  # Neutre
-                    )
-                )
-            )
-        )
-
-        # --- 5. Smart Money Flow ---
-        # Indicateur cumulatif de pression acheteuse basé sur position du close dans le range
-        # Inspiré du Chaikin Money Flow mais simplifié
-        # Close près du high avec fort volume = smart money achète
-        # Close près du low avec fort volume = smart money vend
-        clv = np.where(
-            spread > 0,
-            ((df['close'] - df['low']) - (df['high'] - df['close'])) / spread,
-            0.0
-        )  # Close Location Value: -1 (close=low) à +1 (close=high)
-
-        # Money Flow = CLV * Volume, puis moyenne sur 10 jours
-        money_flow = clv * df['volume']
-        df['smart_money_flow'] = money_flow.rolling(10).sum() / (df['volume'].rolling(10).sum() + 1e-6)
+        df['sustained_accumulation'] = streak_score * consistency_score
 
         return df
 
@@ -371,13 +325,9 @@ class MLScoring(Scoring):
 
     def get_wyckoff_analysis(self, df: pd.DataFrame) -> dict:
         """
-        Analyse Wyckoff effort vs résultat.
+        Analyse Wyckoff simplifiée basée sur série temporelle de volume.
 
-        Retourne une analyse détaillée des signaux Wyckoff:
-        - Effort/Result ratio et interprétation
-        - Phase détectée (accumulation, distribution, markup, markdown)
-        - Qualité du mouvement actuel
-        - Signal composite Wyckoff
+        Principe: volume constant au-dessus de SMA20 pendant N jours = accumulation institutionnelle
 
         Args:
             df: DataFrame avec données OHLCV (minimum 60 jours)
@@ -397,95 +347,98 @@ class MLScoring(Scoring):
                 return {'error': 'Données Wyckoff invalides', 'wyckoff_score': 0}
 
             last = df_clean.iloc[-1]
-            last_5 = df_clean.tail(5)
 
-            # Extraire les métriques Wyckoff
-            effort_result = float(last.get('effort_result_ratio', 1.0))
-            vsa = float(last.get('volume_spread_analysis', 0))
-            accumulation = float(last.get('wyckoff_accumulation', 0))
-            divergence = float(last.get('effort_result_divergence', 0))
-            smart_money = float(last.get('smart_money_flow', 0))
+            # Extraire les métriques Wyckoff simplifiées
+            volume_above = int(last.get('volume_above_sma20', 0))
+            streak = int(last.get('volume_streak', 0))
+            consistency = float(last.get('volume_consistency_10d', 1.0))
+            sustained_acc = float(last.get('sustained_accumulation', 0))
 
-            # --- Interprétation ---
-
-            # 1. Effort/Result Interpretation
-            if effort_result > 2.0:
-                effort_interpretation = "ABSORPTION"  # Fort volume, peu de mouvement
-                effort_quality = "Accumulation/Distribution probable"
-            elif effort_result < 0.5:
-                effort_interpretation = "EFFICIENT"  # Mouvement efficace
-                effort_quality = "Mouvement fort avec peu de résistance"
+            # --- Interprétation du streak ---
+            if streak >= 10:
+                streak_interpretation = "STRONG_ACCUMULATION"
+                streak_quality = "10+ jours de volume soutenu - accumulation institutionnelle probable"
+            elif streak >= 7:
+                streak_interpretation = "MODERATE_ACCUMULATION"
+                streak_quality = "7-9 jours de volume soutenu - intérêt institutionnel"
+            elif streak >= 5:
+                streak_interpretation = "BUILDING"
+                streak_quality = "5-6 jours de volume soutenu - début d'accumulation"
+            elif streak >= 3:
+                streak_interpretation = "EARLY_SIGNAL"
+                streak_quality = "3-4 jours de volume soutenu - signal précoce"
             else:
-                effort_interpretation = "NORMAL"
-                effort_quality = "Mouvement proportionnel au volume"
+                streak_interpretation = "NO_SIGNAL"
+                streak_quality = "Pas de streak significatif"
 
-            # 2. VSA Interpretation
-            if vsa > 1.5:
-                vsa_interpretation = "BULLISH_EXPANSION"
-                vsa_quality = "Fort mouvement haussier confirmé par volume"
-            elif vsa < -1.5:
-                vsa_interpretation = "BEARISH_EXPANSION"
-                vsa_quality = "Fort mouvement baissier confirmé par volume"
-            elif abs(vsa) < 0.3:
-                vsa_interpretation = "CONSOLIDATION"
-                vsa_quality = "Mouvement faible, consolidation"
+            # --- Interprétation de la consistance ---
+            # CV < 0.3 = très constant, CV > 0.5 = erratique
+            if consistency < 0.25:
+                consistency_interpretation = "VERY_CONSISTENT"
+                consistency_quality = "Volume très stable - comportement institutionnel"
+            elif consistency < 0.35:
+                consistency_interpretation = "CONSISTENT"
+                consistency_quality = "Volume stable - accumulation ordonnée"
+            elif consistency < 0.50:
+                consistency_interpretation = "MODERATE"
+                consistency_quality = "Volume modérément variable"
             else:
-                vsa_interpretation = "MODERATE"
-                vsa_quality = "Mouvement modéré"
+                consistency_interpretation = "ERRATIC"
+                consistency_quality = "Volume erratique - spéculation retail probable"
 
-            # 3. Phase Detection (basée sur moyenne 5 jours)
-            avg_accumulation = float(last_5['wyckoff_accumulation'].mean())
-            avg_divergence = float(last_5['effort_result_divergence'].mean())
-            avg_smart_money = float(last_5['smart_money_flow'].mean())
+            # --- Phase Detection ---
+            # Basée sur streak + consistance + tendance prix
+            price_trend_20d = float(df_clean['close'].iloc[-1] / df_clean['close'].iloc[-20] - 1) if len(df_clean) >= 20 else 0
 
-            if avg_accumulation > 0.3 and avg_smart_money > 0.2:
-                phase = "ACCUMULATION"
-                phase_description = "Phase d'accumulation: smart money achète discrètement"
-            elif avg_accumulation > 0.3 and avg_smart_money < -0.2:
-                phase = "DISTRIBUTION"
-                phase_description = "Phase de distribution: smart money vend discrètement"
-            elif avg_divergence > 0.5 and avg_smart_money > 0:
+            if streak >= 7 and consistency < 0.4 and price_trend_20d > 0.02:
                 phase = "MARKUP"
-                phase_description = "Phase de hausse: tendance haussière confirmée"
-            elif avg_divergence < -0.5 and avg_smart_money < 0:
+                phase_description = "Hausse confirmée avec volume institutionnel soutenu"
+            elif streak >= 7 and consistency < 0.4 and price_trend_20d < -0.02:
                 phase = "MARKDOWN"
-                phase_description = "Phase de baisse: tendance baissière confirmée"
+                phase_description = "Baisse avec volume soutenu - distribution ou capitulation"
+            elif streak >= 5 and consistency < 0.4 and abs(price_trend_20d) <= 0.02:
+                phase = "ACCUMULATION"
+                phase_description = "Volume soutenu en range - accumulation probable"
+            elif streak < 3 and consistency > 0.5:
+                phase = "DISTRIBUTION"
+                phase_description = "Volume erratique - possible distribution"
             else:
                 phase = "RANGING"
-                phase_description = "Phase de range: pas de direction claire"
+                phase_description = "Pas de signal clair"
 
-            # 4. Signal Composite Wyckoff (0-100)
-            # Pondération des facteurs pour un score bullish
-            wyckoff_score = 50  # Neutre par défaut
+            # --- Score Wyckoff Simplifié (0-100) ---
+            wyckoff_score = 50  # Base neutre
 
-            # Smart money flow (+/- 20 points)
-            wyckoff_score += smart_money * 20
+            # Contribution du streak (max +30 points)
+            streak_contribution = min(streak * 3, 30)
+            wyckoff_score += streak_contribution
 
-            # Divergence effort/résultat (+/- 15 points)
-            wyckoff_score += divergence * 15
-
-            # VSA (+/- 10 points)
-            if vsa > 0:
-                wyckoff_score += min(vsa * 5, 10)
+            # Contribution de la consistance (max +20 points)
+            # Plus CV est bas, plus on ajoute de points
+            if consistency < 0.5:
+                consistency_contribution = (0.5 - consistency) * 40  # 0 à 20 points
+                wyckoff_score += consistency_contribution
             else:
-                wyckoff_score += max(vsa * 5, -10)
+                wyckoff_score -= 10  # Pénalité pour volume erratique
 
-            # Bonus accumulation avec smart money positif (+10 points)
-            if accumulation > 0.5 and smart_money > 0:
-                wyckoff_score += 10
+            # Bonus si aujourd'hui volume > SMA20
+            if volume_above:
+                wyckoff_score += 5
 
-            # Malus absorption avec smart money négatif (-10 points)
-            if accumulation > 0.5 and smart_money < 0:
-                wyckoff_score -= 10
+            # Ajustement basé sur tendance prix
+            if price_trend_20d > 0.05:
+                wyckoff_score += 5  # Tendance haussière
+            elif price_trend_20d < -0.05:
+                wyckoff_score -= 10  # Tendance baissière
 
             wyckoff_score = max(0, min(100, int(wyckoff_score)))
 
-            # Signal final
-            if wyckoff_score >= 65:
+            # --- Signal final ---
+            if wyckoff_score >= 70:
                 wyckoff_signal = "BUY"
-            elif wyckoff_score >= 50:
+            elif wyckoff_score >= 55:
                 wyckoff_signal = "HOLD"
-            elif wyckoff_score >= 35:
+            elif wyckoff_score >= 40:
                 wyckoff_signal = "CAUTION"
             else:
                 wyckoff_signal = "AVOID"
@@ -496,21 +449,16 @@ class MLScoring(Scoring):
                 'phase': phase,
                 'phase_description': phase_description,
                 'metrics': {
-                    'effort_result_ratio': round(effort_result, 2),
-                    'effort_interpretation': effort_interpretation,
-                    'effort_quality': effort_quality,
-                    'volume_spread_analysis': round(vsa, 2),
-                    'vsa_interpretation': vsa_interpretation,
-                    'vsa_quality': vsa_quality,
-                    'wyckoff_accumulation': round(accumulation, 2),
-                    'effort_result_divergence': round(divergence, 2),
-                    'smart_money_flow': round(smart_money, 3),
+                    'volume_streak': streak,
+                    'streak_interpretation': streak_interpretation,
+                    'streak_quality': streak_quality,
+                    'volume_consistency_10d': round(consistency, 3),
+                    'consistency_interpretation': consistency_interpretation,
+                    'consistency_quality': consistency_quality,
+                    'volume_above_sma20_today': bool(volume_above),
+                    'sustained_accumulation_score': round(sustained_acc, 2),
+                    'price_trend_20d': round(price_trend_20d * 100, 2),  # En pourcentage
                 },
-                'averages_5d': {
-                    'accumulation': round(avg_accumulation, 2),
-                    'divergence': round(avg_divergence, 2),
-                    'smart_money': round(avg_smart_money, 3),
-                }
             }
 
         except Exception as e:
@@ -590,7 +538,7 @@ if __name__ == "__main__":
     scoring = MLScoring(model_path="models/momentum_model.pkl")
 
     print("\n" + "=" * 70)
-    print("TEST MLScoring + Analyse Wyckoff Effort/Result")
+    print("TEST MLScoring + Analyse Wyckoff Volume Streak")
     print("=" * 70)
 
     for symbol in symbols_to_test:
@@ -611,17 +559,16 @@ if __name__ == "__main__":
             print(f"\n{symbol}:")
             print(f"  ML Score: {combined['ml_analysis']['score']} -> {combined['ml_analysis']['signal']}")
             print(f"  Wyckoff Score: {combined['wyckoff_analysis']['score']} -> {combined['wyckoff_analysis']['signal']}")
-            print(f"  Phase Wyckoff: {combined['wyckoff_analysis']['phase']}")
-            print(f"  Score Combiné: {combined['combined_score']} -> {combined['combined_signal']}")
-            print(f"  Confiance: {combined['confidence']} ({combined['confidence_note']})")
+            print(f"  Phase: {combined['wyckoff_analysis']['phase']}")
+            print(f"  Combined: {combined['combined_score']} -> {combined['combined_signal']}")
+            print(f"  Confidence: {combined['confidence']}")
 
-            # Détails Wyckoff
+            # Détails Wyckoff Volume Streak
             if 'wyckoff_details' in combined and 'metrics' in combined['wyckoff_details']:
-                metrics = combined['wyckoff_details']['metrics']
-                print(f"  Métriques Wyckoff:")
-                print(f"    - Effort/Result: {metrics['effort_result_ratio']} ({metrics['effort_interpretation']})")
-                print(f"    - VSA: {metrics['volume_spread_analysis']} ({metrics['vsa_interpretation']})")
-                print(f"    - Smart Money Flow: {metrics['smart_money_flow']}")
+                m = combined['wyckoff_details']['metrics']
+                print(f"  Volume Streak: {m.get('volume_streak', 0)} jours ({m.get('streak_interpretation', 'N/A')})")
+                print(f"  Consistency: {m.get('volume_consistency_10d', 0):.3f} ({m.get('consistency_interpretation', 'N/A')})")
+                print(f"  Price Trend 20d: {m.get('price_trend_20d', 0):.2f}%")
         else:
             print(f"{symbol}: Pas de données")
 
