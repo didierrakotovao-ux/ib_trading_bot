@@ -1,0 +1,375 @@
+"""
+Journal de trading pour Paper/Live trading.
+Peut être exécuté indépendamment pour synchroniser les trades depuis IB.
+Usage: python live_journal.py [sync|show|summary]
+"""
+from datetime import datetime, timedelta
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
+from src.app.database.trade_journal import TradeJournal, TradeMode
+from src.app.screener.providers.market_data_provider import MarketDataProvider
+
+
+class LiveJournal:
+    """
+    Gère la journalisation des trades paper/live.
+    Peut synchroniser avec IB et afficher les résultats.
+    """
+
+    def __init__(self, port=7497, client_id=99):
+        """
+        Initialise le journal.
+
+        Args:
+            port: Port IB (7497=paper TWS, 7496=live TWS, 4002=paper Gateway)
+            client_id: ID client IB (utiliser un ID différent de trading.py)
+        """
+        self.port = port
+        self.client_id = client_id
+        self.trade_mode = TradeMode.PAPER if port == 7497 else TradeMode.LIVE
+        self.trade_journal = TradeJournal()
+        self.market_data_provider = None
+
+        print(f"[JOURNAL] Mode: {self.trade_mode.value}")
+
+    def connect_ib(self) -> bool:
+        """Connecte à IB pour récupérer les exécutions."""
+        print(f"[JOURNAL] Connexion à IB (port {self.port}, client_id {self.client_id})...")
+        self.market_data_provider = MarketDataProvider(port=self.port, client_id=self.client_id)
+        connected = self.market_data_provider.connect()
+        if connected:
+            print("[JOURNAL] Connecté à IB")
+        else:
+            print("[JOURNAL] Échec de connexion à IB")
+        return connected
+
+    def disconnect_ib(self):
+        """Déconnecte d'IB."""
+        if self.market_data_provider and self.market_data_provider.is_connected():
+            self.market_data_provider.disconnect()
+            print("[JOURNAL] Déconnecté d'IB")
+
+    def sync_from_ib(self):
+        """
+        Synchronise les exécutions depuis IB vers le journal.
+        Agrège les fills partiels automatiquement.
+        """
+        if not self.market_data_provider or not self.market_data_provider.is_connected():
+            if not self.connect_ib():
+                return
+
+        print("[SYNC] Récupération des exécutions depuis IB...")
+        executions = self.market_data_provider.req_executions()
+
+        if not executions:
+            print("[SYNC] Aucune exécution trouvée dans cette session IB")
+            return
+
+        print(f"[SYNC] {len(executions)} exécutions brutes trouvées")
+
+        # Agréger les fills partiels par symbole et side
+        aggregated = {}
+        for ex in executions:
+            symbol = ex['symbol']
+            side = ex['side']
+            key = f"{symbol}_{side}"
+
+            if key not in aggregated:
+                aggregated[key] = {
+                    'symbol': symbol,
+                    'side': side,
+                    'total_shares': 0,
+                    'total_value': 0,
+                    'time': ex['time'],
+                    'executions': []
+                }
+
+            aggregated[key]['total_shares'] += ex['shares']
+            aggregated[key]['total_value'] += ex['shares'] * ex['price']
+            aggregated[key]['executions'].append(ex)
+
+        # Convertir en trades agrégés
+        by_symbol = {}
+        for key, data in aggregated.items():
+            symbol = data['symbol']
+            avg_price = data['total_value'] / data['total_shares'] if data['total_shares'] > 0 else 0
+
+            if symbol not in by_symbol:
+                by_symbol[symbol] = {'buys': [], 'sells': []}
+
+            agg_execution = {
+                'symbol': symbol,
+                'side': data['side'],
+                'shares': data['total_shares'],
+                'price': avg_price,
+                'time': data['time']
+            }
+
+            if data['side'] == 'BOT':
+                by_symbol[symbol]['buys'].append(agg_execution)
+            else:
+                by_symbol[symbol]['sells'].append(agg_execution)
+
+        print(f"[SYNC] {len(aggregated)} trades agrégés")
+
+        # Traiter chaque symbole
+        self.trade_journal.connect()
+        cursor = self.trade_journal.conn.cursor()
+
+        for symbol, trades in by_symbol.items():
+            print(f"[SYNC] {symbol}: {len(trades['buys'])} BUY, {len(trades['sells'])} SELL")
+
+            # Traiter les BUY (entrées)
+            for buy in trades['buys']:
+                try:
+                    fill_time = datetime.strptime(buy['time'], "%Y%m%d %H:%M:%S")
+                except:
+                    fill_time = datetime.now()
+
+                date_str = fill_time.strftime('%Y-%m-%d')
+
+                # Vérifier si déjà dans le journal
+                cursor.execute('''
+                    SELECT id FROM trades
+                    WHERE symbol = ? AND trade_mode = ? AND date(date_entree) = ?
+                    AND ABS(quantite - ?) < 10
+                ''', (symbol, self.trade_mode.value, date_str, buy['shares']))
+
+                existing = cursor.fetchone()
+
+                if not existing:
+                    trade_id = self.trade_journal.log_trade(
+                        trade_mode=self.trade_mode,
+                        strategy_name="Momentum",
+                        symbol=symbol,
+                        date_entree=fill_time,
+                        prix_entree=buy['price'],
+                        quantite=buy['shares']
+                    )
+                    print(f"  [+] Entrée ajoutée: {symbol} {buy['shares']} @ {buy['price']:.2f} (ID: {trade_id})")
+                else:
+                    print(f"  [=] Entrée existante: {symbol} (ID: {existing[0]})")
+
+            # Traiter les SELL (sorties)
+            for sell in trades['sells']:
+                try:
+                    fill_time = datetime.strptime(sell['time'], "%Y%m%d %H:%M:%S")
+                except:
+                    fill_time = datetime.now()
+
+                # Chercher une entrée ouverte pour ce symbole
+                cursor.execute('''
+                    SELECT id, prix_entree, quantite FROM trades
+                    WHERE symbol = ? AND trade_mode = ? AND date_sortie IS NULL
+                    ORDER BY date_entree DESC LIMIT 1
+                ''', (symbol, self.trade_mode.value))
+
+                entry = cursor.fetchone()
+
+                if entry:
+                    trade_id, entry_price, qty = entry
+                    pnl_brut = (sell['price'] - entry_price) * qty
+                    commission = (entry_price * qty + sell['price'] * qty) * 0.001
+                    pnl_net = pnl_brut - commission
+
+                    cursor.execute('''
+                        UPDATE trades SET
+                            date_sortie = ?,
+                            prix_sortie = ?,
+                            cause_sortie = ?,
+                            pnl_brut = ?,
+                            commission = ?,
+                            pnl_net = ?
+                        WHERE id = ?
+                    ''', (
+                        fill_time.strftime('%Y-%m-%d %H:%M:%S'),
+                        sell['price'],
+                        'TRAILING_STOP',
+                        round(pnl_brut, 2),
+                        round(commission, 2),
+                        round(pnl_net, 2),
+                        trade_id
+                    ))
+                    self.trade_journal.conn.commit()
+                    print(f"  [+] Sortie ajoutée: {symbol} @ {sell['price']:.2f}, PnL: {pnl_net:.2f}$")
+                else:
+                    print(f"  [!] SELL orphelin: {symbol} @ {sell['price']:.2f} (pas d'entrée ouverte)")
+
+        print("[SYNC] Synchronisation terminée")
+
+    def show_trades(self, days: int = 7):
+        """Affiche les trades des X derniers jours."""
+        self.trade_journal.connect()
+        cursor = self.trade_journal.conn.cursor()
+
+        date_limit = (datetime.now() - timedelta(days=days)).strftime('%Y-%m-%d')
+
+        cursor.execute('''
+            SELECT id, symbol, date_entree, prix_entree, quantite,
+                   date_sortie, prix_sortie, cause_sortie, pnl_net
+            FROM trades
+            WHERE trade_mode = ? AND date_entree >= ?
+            ORDER BY date_entree DESC
+        ''', (self.trade_mode.value, date_limit))
+
+        rows = cursor.fetchall()
+
+        print()
+        print(f"{'='*70}")
+        print(f"TRADES {self.trade_mode.value.upper()} - {days} derniers jours")
+        print(f"{'='*70}")
+
+        if not rows:
+            print("Aucun trade trouvé")
+            return
+
+        total_pnl = 0
+        open_trades = 0
+        closed_trades = 0
+
+        for row in rows:
+            id, symbol, date_e, prix_e, qty, date_s, prix_s, cause, pnl = row
+
+            status = "OUVERT" if not date_s else "FERMÉ"
+            pnl_str = f"PnL: {pnl:+.2f}$" if pnl else ""
+
+            print(f"{symbol:6} | {date_e[:16]} | {qty:5} @ {prix_e:8.2f} | {status:6} {pnl_str}")
+
+            if date_s:
+                closed_trades += 1
+                total_pnl += pnl if pnl else 0
+            else:
+                open_trades += 1
+
+        print(f"{'='*70}")
+        print(f"Trades fermés: {closed_trades} | Trades ouverts: {open_trades} | PnL Total: {total_pnl:+.2f}$")
+
+    def show_summary(self):
+        """Affiche le résumé de performance."""
+        summary = self.trade_journal.get_performance_summary(
+            trade_mode=self.trade_mode
+        )
+
+        print()
+        print("=" * 60)
+        print(f"RÉSUMÉ PERFORMANCE - {self.trade_mode.value.upper()}")
+        print("=" * 60)
+
+        if "error" in summary:
+            print(summary["error"])
+        else:
+            print(f"Trades: {summary['total_trades']} (W:{summary['winning_trades']} / L:{summary['losing_trades']})")
+            print(f"Win Rate: {summary['win_rate']:.1f}%")
+            print(f"PnL Net Total: {summary['total_pnl_net']:,.2f}$")
+            print(f"PnL Net Moyen: {summary['avg_pnl_net']:,.2f}$")
+            print(f"Max Win: {summary['max_win']:,.2f}$ | Max Loss: {summary['max_loss']:,.2f}$")
+            print(f"Commissions: {summary['total_commission']:,.2f}$")
+
+        print("=" * 60)
+
+    def add_manual_entry(self, symbol: str, qty: int, price: float, date: datetime = None):
+        """Ajoute manuellement une entrée de trade."""
+        trade_id = self.trade_journal.log_trade(
+            trade_mode=self.trade_mode,
+            strategy_name="Manual",
+            symbol=symbol.upper(),
+            date_entree=date or datetime.now(),
+            prix_entree=price,
+            quantite=qty
+        )
+        print(f"[JOURNAL] Entrée manuelle ajoutée: {symbol} {qty} @ {price} (ID: {trade_id})")
+        return trade_id
+
+    def add_manual_exit(self, symbol: str, price: float, cause: str = "MANUAL", date: datetime = None):
+        """Ajoute manuellement une sortie de trade."""
+        self.trade_journal.connect()
+        cursor = self.trade_journal.conn.cursor()
+
+        # Trouver l'entrée ouverte
+        cursor.execute('''
+            SELECT id, prix_entree, quantite FROM trades
+            WHERE symbol = ? AND trade_mode = ? AND date_sortie IS NULL
+            ORDER BY date_entree DESC LIMIT 1
+        ''', (symbol.upper(), self.trade_mode.value))
+
+        entry = cursor.fetchone()
+
+        if not entry:
+            print(f"[JOURNAL] Aucune entrée ouverte trouvée pour {symbol}")
+            return None
+
+        trade_id, entry_price, qty = entry
+        exit_time = date or datetime.now()
+        pnl_brut = (price - entry_price) * qty
+        commission = (entry_price * qty + price * qty) * 0.001
+        pnl_net = pnl_brut - commission
+
+        cursor.execute('''
+            UPDATE trades SET
+                date_sortie = ?,
+                prix_sortie = ?,
+                cause_sortie = ?,
+                pnl_brut = ?,
+                commission = ?,
+                pnl_net = ?
+            WHERE id = ?
+        ''', (
+            exit_time.strftime('%Y-%m-%d %H:%M:%S'),
+            price,
+            cause,
+            round(pnl_brut, 2),
+            round(commission, 2),
+            round(pnl_net, 2),
+            trade_id
+        ))
+        self.trade_journal.conn.commit()
+        print(f"[JOURNAL] Sortie ajoutée: {symbol} @ {price}, PnL: {pnl_net:.2f}$ (ID: {trade_id})")
+        return trade_id
+
+    def close(self):
+        """Ferme les connexions."""
+        self.disconnect_ib()
+        self.trade_journal.close()
+
+
+def main():
+    """Point d'entrée principal."""
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Journal de trading Paper/Live")
+    parser.add_argument('action', nargs='?', default='show',
+                        choices=['sync', 'show', 'summary', 'all'],
+                        help='Action à effectuer (default: show)')
+    parser.add_argument('--port', type=int, default=7497,
+                        help='Port IB (7497=paper, 7496=live)')
+    parser.add_argument('--days', type=int, default=7,
+                        help='Nombre de jours à afficher')
+
+    args = parser.parse_args()
+
+    journal = LiveJournal(port=args.port)
+
+    try:
+        if args.action == 'sync':
+            journal.sync_from_ib()
+            journal.show_summary()
+        elif args.action == 'show':
+            journal.show_trades(days=args.days)
+        elif args.action == 'summary':
+            journal.show_summary()
+        elif args.action == 'all':
+            journal.sync_from_ib()
+            journal.show_trades(days=args.days)
+            journal.show_summary()
+
+    except KeyboardInterrupt:
+        print("\nInterrompu par l'utilisateur")
+
+    finally:
+        journal.close()
+
+
+if __name__ == "__main__":
+    main()

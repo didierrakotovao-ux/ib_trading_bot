@@ -11,6 +11,7 @@ from ibapi.wrapper import EWrapper
 from ibapi.contract import Contract
 from ibapi.order import Order
 from ibapi.scanner import ScannerSubscription
+from ibapi.execution import ExecutionFilter
 from collections import defaultdict
 import threading
 import time
@@ -39,6 +40,14 @@ class MarketDataProvider(EWrapper, EClient):
         self.history_buf = defaultdict(list)
         self.req_map = {}
         self.history_done = {}
+
+        # Pour le suivi des ordres et callbacks
+        self.order_callbacks = []  # Callbacks à appeler sur exécution
+        self.placed_orders = {}  # orderId -> {contract, order} pour tracking
+
+        # Pour la récupération des exécutions historiques
+        self.executions = []
+        self.executions_done = False
 
     # --- Gestion des positions IB ---
     def req_ib_positions(self):
@@ -270,10 +279,27 @@ class MarketDataProvider(EWrapper, EClient):
         """Callback IB pour les erreurs."""
         print(f"[IB ERROR] reqId={reqId} code={errorCode} msg={errorString}")
 
+    def register_order_callback(self, callback):
+        """
+        Enregistre un callback à appeler lors de l'exécution d'un ordre.
+        Le callback doit accepter: (symbol, action, status, fill_price, fill_qty, fill_time)
+        """
+        self.order_callbacks.append(callback)
+
     def placeOrder(self, contract:Contract, order:Order):
-        """Override pour loguer les ordres placés."""
-        print(f"[IB ORDER] Placing order for {contract.symbol} {order.action} {order.totalQuantity} @ {order.orderType}")
-        super().placeOrder(order.orderId if hasattr(order, 'orderId') else self._next_req_id, contract, order)
+        """Override pour loguer les ordres placés et les tracker."""
+        order_id = order.orderId if hasattr(order, 'orderId') and order.orderId else self._next_req_id
+        print(f"[IB ORDER] Placing order for {contract.symbol} {order.action} {order.totalQuantity} @ {order.orderType} (orderId={order_id})")
+
+        # Tracker l'ordre pour pouvoir l'identifier dans les callbacks
+        self.placed_orders[order_id] = {
+            'contract': contract,
+            'order': order,
+            'symbol': contract.symbol,
+            'action': order.action
+        }
+
+        super().placeOrder(order_id, contract, order)
         self._next_req_id += 1
 
     def orderStatus(self, orderId, status, filled, remaining, avgFillPrice,
@@ -295,6 +321,7 @@ class MarketDataProvider(EWrapper, EClient):
         """Callback IB pour les détails d'exécution."""
         print(f"[EXEC DETAILS] orderId={execution.orderId} symbol={contract.symbol} side={execution.side} "
               f"shares={execution.shares} price={execution.price} time={execution.time}")
+
         # Stocker les exécutions pour utilisation ultérieure
         if not hasattr(self, 'executions'):
             self.executions = []
@@ -307,6 +334,64 @@ class MarketDataProvider(EWrapper, EClient):
             'time': execution.time,
             'execId': execution.execId
         })
+
+        # Notifier les callbacks enregistrés
+        # Convertir side IB (BOT/SLD) en action (BUY/SELL)
+        action = "BUY" if execution.side == "BOT" else "SELL"
+
+        # Parser le temps d'exécution
+        try:
+            fill_time = datetime.strptime(execution.time, "%Y%m%d %H:%M:%S")
+        except:
+            fill_time = datetime.now()
+
+        for callback in self.order_callbacks:
+            try:
+                callback(
+                    symbol=contract.symbol,
+                    action=action,
+                    status="filled",
+                    fill_price=execution.price,
+                    fill_qty=execution.shares,
+                    fill_time=fill_time
+                )
+            except Exception as e:
+                print(f"[ERROR] Callback error: {e}")
+
+    def execDetailsEnd(self, reqId):
+        """Callback IB signalant la fin de la liste des exécutions."""
+        print(f"[EXEC DETAILS END] reqId={reqId}, {len(self.executions)} exécutions reçues")
+        self.executions_done = True
+
+    def req_executions(self, client_id: int = None) -> list:
+        """
+        Demande l'historique des exécutions à IB pour la session courante.
+        Retourne la liste des exécutions.
+        """
+        self.executions = []
+        self.executions_done = False
+
+        # Créer un filtre (vide = toutes les exécutions de la session)
+        exec_filter = ExecutionFilter()
+        if client_id:
+            exec_filter.clientId = client_id
+
+        req_id = self._next_req_id
+        self._next_req_id += 1
+
+        print(f"[IB] Demande des exécutions (reqId={req_id})...")
+        self.reqExecutions(req_id, exec_filter)
+
+        # Attendre la réponse
+        timeout = 10
+        start = time.time()
+        while not self.executions_done and (time.time() - start) < timeout:
+            time.sleep(0.1)
+
+        if not self.executions_done:
+            print("[WARNING] Timeout en attendant les exécutions")
+
+        return self.executions
 
     def create_contract(self, ticker: str, sec_type: str = 'STK', exchange: str = 'SMART', currency: str = 'USD') -> Contract:
         """Crée un contrat IB pour un ETF"""
