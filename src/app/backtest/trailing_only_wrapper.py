@@ -8,7 +8,7 @@ from datetime import date, datetime, timedelta
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
-from src.app.strategies.addivergence import AdDivergenceStrategy
+from src.app.strategies.momentum import MomentumStrategy
 from src.app.database.trade_journal import TradeJournal, TradeMode
 from market_data_mock import MarketDataMock
 
@@ -37,10 +37,12 @@ class TrailingOnlyBTWrapper(bt.Strategy):
             self._preload_cache(self.p.dataframes)
 
         # Stratégie métier
-        self.strategy = AdDivergenceStrategy(
+        self.strategy = MomentumStrategy(
             market_data=self.market_data,
             capital=self.p.capital,
-            max_stocks=self.p.max_stocks
+            max_stocks=self.p.max_stocks,
+            use_wyckoff=True,      # Enable Wyckoff (default)
+            wyckoff_weight=0.4     # 40% weight in combined score            
         )
 
         self.orders_by_symbol = {}

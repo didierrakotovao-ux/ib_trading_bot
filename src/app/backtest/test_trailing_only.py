@@ -10,8 +10,8 @@ from trailing_only_wrapper import TrailingOnlyBTWrapper
 
 if __name__ == "__main__":
     # Période de backtest
-    start_date = datetime(2020, 2, 18)
-    end_date = datetime(2020, 3, 25)
+    start_date = datetime(2020, 2, 15)
+    end_date = datetime(2020, 3, 17)
 
     print("=" * 60)
     print("BACKTEST - TRAILING STOP ONLY (pas de TP)")
