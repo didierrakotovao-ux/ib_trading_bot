@@ -20,15 +20,22 @@ class Trading:
         5-gère les positions ouvertes et le suivi des ordres
         6-écrit le journal de performance
     """
-    def __init__(self, port=7497, client_id=1, total_capital=100000, max_positions=5):
+    def __init__(self, port=7497, client_id=1, total_capital=100000, max_positions=5,
+                 use_trailing_stop=False, trailing_percent=5.0):
         self.port = port
         self.total_capital = total_capital
         self.max_positions = max_positions
         self.capital_per_position = total_capital / max_positions  # Max 1/5 du capital par position
+        self.use_trailing_stop = use_trailing_stop
 
         self.market_data_provider = MarketDataProvider(port=port, client_id=client_id)
-        # , AdDivergenceStrategy(self.market_data_provider)
-        self.strategies = [MomentumStrategy(self.market_data_provider, capital=total_capital, max_stocks=max_positions)]
+        self.strategies = [MomentumStrategy(
+            self.market_data_provider,
+            capital=total_capital,
+            max_stocks=max_positions,
+            use_trailing_stop=use_trailing_stop,
+            trailing_percent=trailing_percent
+        )]
         self.orders = []
         self.position_manager = PositionManager()
         self.order_callbacks = []  # Liste de callbacks à appeler sur exécution d'ordre
@@ -41,6 +48,7 @@ class Trading:
         self.trade_ids = {}  # Mapping symbol -> trade_id pour mettre à jour à la sortie
 
         print(f"[TRADING] Capital total: {total_capital:,.0f}$, Max positions: {max_positions}, Capital/position: {self.capital_per_position:,.0f}$")
+        print(f"[TRADING] Trailing stop: {'Activé (' + str(trailing_percent) + '%)' if use_trailing_stop else 'Désactivé (gestion manuelle)'}")
         print(f"[JOURNAL] Mode de trading: {self.trade_mode.value}")
 
     def setup_order_callbacks(self):
@@ -262,7 +270,9 @@ class Trading:
                         # Vérifier que l'entrée n'a pas été refusée par can_open_position
                         # En vérifiant si l'ordre est dans self.orders
                         if (contrat, orders['entry_order']) in self.orders:
-                            self.place_order(contrat, orders['stop_order'])
+                            # Placer le stop seulement s'il est configuré
+                            if 'stop_order' in orders:
+                                self.place_order(contrat, orders['stop_order'])
                             if 'take_profit_order' in orders:
                                 self.place_order(contrat, orders['take_profit_order'])
 

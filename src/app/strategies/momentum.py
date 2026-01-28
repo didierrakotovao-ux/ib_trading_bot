@@ -28,13 +28,16 @@ class MomentumStrategy(Strategy):
         la création du contrat d'ordre (entrée et sortie) 
         et la fourniture des données à scorer seront implémentées ici.
     """
-    def __init__(self, market_data: MarketDataProvider, capital=10000, max_stocks=5):
+    def __init__(self, market_data: MarketDataProvider, capital=10000, max_stocks=5,
+                 use_trailing_stop=False, trailing_percent=5.0):
         self.scoring = MLScoring(model_path="models/momentum_model.pkl")
         self.market_data = market_data
         self.lookback_days = 350
         self.score_threshold = 65
         self.capital = capital  # Montant total dédié à la stratégie
         self.max_stocks = max_stocks  # Nombre max de stocks à trader
+        self.use_trailing_stop = use_trailing_stop  # Si True, place un trailing stop automatique
+        self.trailing_percent = trailing_percent  # Pourcentage du trailing stop
 
     def scanner_filters(self) -> ScannerSubscription:
         scan_sub = ScannerSubscription()
@@ -107,30 +110,41 @@ class MomentumStrategy(Strategy):
             entryorder.orderType = "LMT"
             entryorder.lmtPrice = entry_price
             entryorder.totalQuantity = qty
-            entryorder.transmit = False  # Ne pas transmettre - attendre le child
             entryorder.eTradeOnly = False
             entryorder.firmQuoteOnly = False
             entryorder.orderId = parent_id
             entryorder.tif = "GTC"  # Good Till Cancelled
 
-            # Trailing stop (child order - lié au parent via parentId)
-            slorder = Order()
-            slorder.action = "SELL"
-            slorder.orderType = "TRAIL"
-            slorder.totalQuantity = qty
-            slorder.parentId = parent_id  # Lié à l'ordre d'entrée
-            slorder.transmit = True  # Transmet le bracket complet
-            slorder.eTradeOnly = False
-            slorder.firmQuoteOnly = False
-            slorder.orderId = stop_id
-            slorder.trailingPercent = 5.0  # Trailing de 5%
-            slorder.tif = "GTC"  # Good Till Cancelled
-                            
-            order_params.append({
+            # Construire le dict de retour
+            order_dict = {
                 'symbol': symbol,
-                'entry_order': entryorder,
-                'stop_order': slorder
-            })
+                'entry_order': entryorder
+            }
+
+            if self.use_trailing_stop:
+                # Trailing stop activé - bracket order
+                entryorder.transmit = False  # Attendre le child
+
+                slorder = Order()
+                slorder.action = "SELL"
+                slorder.orderType = "TRAIL"
+                slorder.totalQuantity = qty
+                slorder.parentId = parent_id  # Lié à l'ordre d'entrée
+                slorder.transmit = True  # Transmet le bracket complet
+                slorder.eTradeOnly = False
+                slorder.firmQuoteOnly = False
+                slorder.orderId = stop_id
+                slorder.trailingPercent = self.trailing_percent
+                slorder.tif = "GTC"
+
+                order_dict['stop_order'] = slorder
+                print(f"[ORDER PARAMS] Trailing stop {self.trailing_percent}% activé pour {symbol}")
+            else:
+                # Pas de trailing stop - ordre simple
+                entryorder.transmit = True  # Transmettre immédiatement
+                print(f"[ORDER PARAMS] Pas de trailing stop pour {symbol} (gestion manuelle)")
+
+            order_params.append(order_dict)
             # Note: _next_req_id est incrémenté automatiquement par placeOrder
         return order_params
 
