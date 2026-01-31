@@ -1,9 +1,12 @@
 from datetime import datetime, timedelta
+import numpy as np
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 from src.app.ml.ml_scoring import MLScoring
+from src.app.ml.ml_smooth_scoring import SmoothMLScoring
 from src.app.ml.addivergencescoring import AdDivergenceScoring
+from src.app.strategies.momentum_filters import MomentumFilters
 from src.app.screener.providers.market_data_provider import MarketDataProvider
 from src.app.strategies.strategy import Strategy
 from ibapi.scanner import ScannerSubscription
@@ -29,15 +32,26 @@ class MomentumStrategy(Strategy):
         et la fourniture des données à scorer seront implémentées ici.
     """
     def __init__(self, market_data: MarketDataProvider, capital=10000, max_stocks=5,
-                 use_trailing_stop=False, trailing_percent=5.0):
-        self.scoring = MLScoring(model_path="models/momentum_model.pkl")
+                 use_trailing_stop=False, trailing_percent=5.0,
+                 scoring_type="ml",
+                 momentum_top_pct=0.3, fip_threshold=0.0,
+                 use_seasonal_threshold=True):
+        if scoring_type == "smooth_ml":
+            self.scoring = SmoothMLScoring(model_path="models/smooth_momentum_model.pkl")
+        else:
+            self.scoring = MLScoring(model_path="models/momentum_model.pkl")
         self.market_data = market_data
-        self.lookback_days = 350
-        self.score_threshold = 65
-        self.capital = capital  # Montant total dédié à la stratégie
-        self.max_stocks = max_stocks  # Nombre max de stocks à trader
-        self.use_trailing_stop = use_trailing_stop  # Si True, place un trailing stop automatique
-        self.trailing_percent = trailing_percent  # Pourcentage du trailing stop
+        self.lookback_days = 400  # ~252 jours de trading + marge pour les features
+        self.score_threshold = 65  # Seuil par défaut (peut être overridé par saisonnalité)
+        self.capital = capital
+        self.max_stocks = max_stocks
+        self.use_trailing_stop = use_trailing_stop
+        self.trailing_percent = trailing_percent
+
+        # Filtres Gray & Vogel
+        self.momentum_top_pct = momentum_top_pct  # Top 30% par momentum 12-1
+        self.fip_threshold = fip_threshold          # FIP < 0 = bon momentum smooth
+        self.use_seasonal_threshold = use_seasonal_threshold  # Seuil dynamique par mois
 
     def scanner_filters(self) -> ScannerSubscription:
         scan_sub = ScannerSubscription()
@@ -51,20 +65,82 @@ class MomentumStrategy(Strategy):
         return scan_sub
     
     def get_symbols(self, trade_date) -> list: # type: ignore
-        """Retourne la liste des symboles à trader (max_stocks), en excluant les ETFs à effet de levier."""
-        scored_symbols = []
+        """
+        Pipeline de sélection basé sur Quantitative Momentum (Gray & Vogel):
+        1. Récupérer les données historiques
+        2. Pré-filtre: Momentum 12-1 mois (top 30%)
+        3. Pré-filtre: Frog-in-the-Pan FIP < 0
+        4. Scoring ML sur les candidats restants
+        5. Seuil dynamique selon la saisonnalité
+        6. Top max_stocks par score
+        """
+        # Étape 1: Récupérer les données pour tous les symboles
+        all_candidates = []
+        nan_count = 0
         for symbol in self.symbolsToAnalyse:
             start_date = trade_date - timedelta(days=self.lookback_days)
             data = self.market_data.get_historical_data(symbol, start_date, trade_date, interval="1d")
-            if data is not None:
+            if data is not None and len(data) >= 60:
+                momentum_12_1 = MomentumFilters.calc_momentum_12_1(data)
+                if np.isnan(momentum_12_1):
+                    nan_count += 1
+                all_candidates.append((symbol, momentum_12_1, data))
+
+        valid_count = len(all_candidates) - nan_count
+        if all_candidates:
+            sample = all_candidates[0]
+            print(f"[PIPELINE] {len(all_candidates)} symboles ({valid_count} valides, {nan_count} NaN momentum)")
+            print(f"[PIPELINE] Exemple: {sample[0]} → {len(sample[2])} barres, mom_12_1={sample[1]}")
+        else:
+            print(f"[PIPELINE] 0 symboles avec données suffisantes")
+
+        # Étape 2: Filtre momentum 12-1 (top 30%)
+        momentum_filtered = MomentumFilters.filter_top_momentum(
+            all_candidates, self.momentum_top_pct)
+        print(f"[PIPELINE] {len(momentum_filtered)} symboles après filtre momentum 12-1 (top {self.momentum_top_pct*100:.0f}%)")
+
+        # Étape 3: Filtre FIP
+        fip_filtered = []
+        for symbol, mom, data in momentum_filtered:
+            fip = MomentumFilters.calc_fip(data)
+            if not np.isnan(fip) and fip < self.fip_threshold:
+                fip_filtered.append((symbol, mom, fip, data))
+                print(f"  [FIP] {symbol}: mom_12_1={mom:.2%}, FIP={fip:.4f} ✓")
+            else:
+                fip_val = f"{fip:.4f}" if not np.isnan(fip) else "N/A"
+                print(f"  [FIP] {symbol}: mom_12_1={mom:.2%}, FIP={fip_val} ✗")
+
+        print(f"[PIPELINE] {len(fip_filtered)} symboles après filtre FIP (< {self.fip_threshold})")
+
+        # Étape 4: Scoring ML sur les candidats restants
+        # Déterminer le seuil selon la saisonnalité
+        if self.use_seasonal_threshold:
+            month = trade_date.month if hasattr(trade_date, 'month') else trade_date.month
+            threshold = MomentumFilters.get_score_threshold(month)
+            print(f"[PIPELINE] Seuil saisonnier: {threshold} (mois {month})")
+        else:
+            threshold = self.score_threshold
+
+        scored_symbols = []
+        for symbol, mom, fip, data in fip_filtered:
+            if isinstance(self.scoring, SmoothMLScoring):
+                score = self.scoring.score(data, symbol=symbol)
+            else:
                 score = self.scoring.score(data)
-                if score >= self.score_threshold:
-                    scored_symbols.append((symbol, score, data))
-        # Trier par score décroissant et ne garder que max_stocks
+
+            if score >= threshold:
+                scored_symbols.append((symbol, score, data))
+                print(f"  [SCORE] {symbol}: score={score} >= {threshold} ✓")
+            else:
+                print(f"  [SCORE] {symbol}: score={score} < {threshold} ✗")
+
+        print(f"[PIPELINE] {len(scored_symbols)} symboles après scoring ML (seuil={threshold})")
+
+        # Étape 5: Trier par score décroissant, garder top max_stocks
         scored_symbols.sort(key=lambda x: x[1], reverse=True)
         selected = scored_symbols[:self.max_stocks]
         self.symbolsToTrade = [s[0] for s in selected]
-        self.symbolsData = {s[0]: s[2] for s in selected}  # stocke les dataframes pour chaque symbole
+        self.symbolsData = {s[0]: s[2] for s in selected}
         return self.symbolsToTrade
 
     def get_order_params(self):
@@ -82,13 +158,6 @@ class MomentumStrategy(Strategy):
         # Chaque position = max 1/5 du capital (max_stocks positions)
         capital_per_stock = self.capital / self.max_stocks
         order_params = []
-        # S'assurer que la connexion est prête et récupérer le vrai nextValidId
-        if hasattr(self.market_data, '_next_req_id'):
-            start_id = self.market_data._next_req_id
-        else:
-            # Valeur de secours si jamais _next_req_id n'existe pas
-            start_id = 100000
-        order_id_gen = iter(range(start_id, start_id + 10000))
         for symbol in self.symbolsToTrade:
             df = self.symbolsData[symbol]
             last_close = df['close'].iloc[-1]
@@ -100,10 +169,9 @@ class MomentumStrategy(Strategy):
                 continue
 
             print(f"[ORDER PARAMS] Préparation des ordres pour {symbol} avec close={last_close} et capital par stock={capital_per_stock} et quantité={qty}  ")
-            parent_id = next(order_id_gen)
-            stop_id = next(order_id_gen)
 
             # Ordre d'entrée (Limit order avec prix légèrement au-dessus pour exécution rapide)
+            # Note: les orderId sont assignés par le MarketDataProvider lors du placeOrder
             entry_price = round(last_close * 1.005, 2)  # 0.5% au-dessus du close pour assurer le fill
             entryorder = Order()
             entryorder.action = "BUY"
@@ -112,7 +180,6 @@ class MomentumStrategy(Strategy):
             entryorder.totalQuantity = qty
             entryorder.eTradeOnly = False
             entryorder.firmQuoteOnly = False
-            entryorder.orderId = parent_id
             entryorder.tif = "GTC"  # Good Till Cancelled
 
             # Construire le dict de retour
@@ -129,11 +196,9 @@ class MomentumStrategy(Strategy):
                 slorder.action = "SELL"
                 slorder.orderType = "TRAIL"
                 slorder.totalQuantity = qty
-                slorder.parentId = parent_id  # Lié à l'ordre d'entrée
                 slorder.transmit = True  # Transmet le bracket complet
                 slorder.eTradeOnly = False
                 slorder.firmQuoteOnly = False
-                slorder.orderId = stop_id
                 slorder.trailingPercent = self.trailing_percent
                 slorder.tif = "GTC"
 

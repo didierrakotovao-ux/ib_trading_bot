@@ -27,14 +27,15 @@ class Trading:
         self.max_positions = max_positions
         self.capital_per_position = total_capital / max_positions  # Max 1/5 du capital par position
         self.use_trailing_stop = use_trailing_stop
-
+        self.trailing_percent = trailing_percent
         self.market_data_provider = MarketDataProvider(port=port, client_id=client_id)
         self.strategies = [MomentumStrategy(
             self.market_data_provider,
             capital=total_capital,
             max_stocks=max_positions,
             use_trailing_stop=use_trailing_stop,
-            trailing_percent=trailing_percent
+            trailing_percent=trailing_percent,
+            scoring_type="smooth_ml"
         )]
         self.orders = []
         self.position_manager = PositionManager()
@@ -141,10 +142,11 @@ class Trading:
 
         return True, "OK"
 
-    def place_order(self, contract, order):
+    def place_order(self, contract, order, parent_order_id=None):
         """
         Reçoit un contrat et un ordre généré par la stratégie et les transmet au provider via placeOrder.
         Vérifie le capital disponible avant de placer un ordre d'achat.
+        Retourne l'orderId assigné par le provider.
         """
         symbol = getattr(contract, 'symbol', None)
 
@@ -176,7 +178,7 @@ class Trading:
                 return None
 
         print(f"[IB ORDER] Placing order for {symbol} {order.action} {order.totalQuantity} @ {order.orderType}")
-        result = self.market_data_provider.placeOrder(contract, order)
+        order_id = self.market_data_provider.placeOrder(contract, order, parent_order_id=parent_order_id)
         self.orders.append((contract, order))
 
         # Marquer le symbole comme ayant un ordre en attente (pour les BUY)
@@ -184,8 +186,8 @@ class Trading:
             self.pending_orders.add(symbol)
             print(f"[Trading] {symbol} ajouté aux ordres en attente")
 
-        print(f"[IB ORDER] Result: {result}")
-        return result
+        print(f"[IB ORDER] orderId={order_id}")
+        return order_id
 
     def update_orders(self):
         """
@@ -263,18 +265,13 @@ class Trading:
                 for orders in strategy.get_order_params():
                     contrat = self.market_data_provider.create_contract(orders['symbol'])
                     # Placer l'ordre d'entrée
-                    entry_result = self.place_order(contrat, orders['entry_order'])
-                    # Si l'entrée n'est pas refusée (None = refusé par notre vérification de capital)
-                    # Note: placeOrder de IB peut retourner None même si l'ordre est accepté
-                    if entry_result is not None or orders['entry_order'].action == "BUY":
-                        # Vérifier que l'entrée n'a pas été refusée par can_open_position
-                        # En vérifiant si l'ordre est dans self.orders
-                        if (contrat, orders['entry_order']) in self.orders:
-                            # Placer le stop seulement s'il est configuré
-                            if 'stop_order' in orders:
-                                self.place_order(contrat, orders['stop_order'])
-                            if 'take_profit_order' in orders:
-                                self.place_order(contrat, orders['take_profit_order'])
+                    entry_order_id = self.place_order(contrat, orders['entry_order'])
+                    # Vérifier que l'entrée a été acceptée (dans self.orders)
+                    if (contrat, orders['entry_order']) in self.orders:
+                        # Placer le stop lié au parent si configuré
+                        if 'stop_order' in orders:
+                            self.place_order(contrat, orders['stop_order'],
+                                             parent_order_id=entry_order_id)
 
             for symbol in symbolToTrade:
                 print(f"  Stocks a trader: {symbol}")
@@ -300,6 +297,11 @@ class Trading:
             if not self.market_data_provider.connect():
                 print("[DEBUG] Impossible de se connecter à IB, synchronisation annulée.")
                 return
+            # Mettre à jour la référence dans les stratégies
+            for strategy in self.strategies:
+                strategy.market_data = self.market_data_provider
+            # Ré-enregistrer le callback de journalisation
+            self.setup_order_callbacks()
         ib_positions = self.market_data_provider.get_ib_positions()
         print(f"Positions IB récupérées: {ib_positions}")
         for pos in ib_positions:

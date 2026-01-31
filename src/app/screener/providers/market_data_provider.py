@@ -286,9 +286,19 @@ class MarketDataProvider(EWrapper, EClient):
         """
         self.order_callbacks.append(callback)
 
-    def placeOrder(self, contract:Contract, order:Order):
-        """Override pour loguer les ordres placés et les tracker."""
-        order_id = order.orderId if hasattr(order, 'orderId') and order.orderId else self._next_req_id
+    def placeOrder(self, contract:Contract, order:Order, parent_order_id:int = None):
+        """
+        Override pour loguer les ordres placés et les tracker.
+        Les orderId sont toujours assignés par le provider via _next_req_id.
+        Si parent_order_id est fourni, l'ordre est un child (bracket).
+        """
+        order_id = self._next_req_id
+        order.orderId = order_id
+
+        # Si c'est un child order (trailing stop), lier au parent
+        if parent_order_id is not None:
+            order.parentId = parent_order_id
+
         print(f"[IB ORDER] Placing order for {contract.symbol} {order.action} {order.totalQuantity} @ {order.orderType} (orderId={order_id})")
 
         # Tracker l'ordre pour pouvoir l'identifier dans les callbacks
@@ -301,6 +311,7 @@ class MarketDataProvider(EWrapper, EClient):
 
         super().placeOrder(order_id, contract, order)
         self._next_req_id += 1
+        return order_id
 
     def orderStatus(self, orderId, status, filled, remaining, avgFillPrice,
                     permId, parentId, lastFillPrice, clientId, whyHeld, mktCapPrice=0.0):

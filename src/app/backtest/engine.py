@@ -41,7 +41,7 @@ class BacktestEngine:
         conn = sqlite3.connect("trading_data.db")
 
         # Charger les données depuis (start_date - lookback_days) pour avoir assez d'historique pour le scoring
-        data_start_date = self.start_date - timedelta(days=self.lookback_days + 50)  # +50 pour marge de sécurité
+        data_start_date = self.start_date - timedelta(days=self.lookback_days + 100)  # +100 pour marge (252 jours trading = ~365 calendaires)
 
         query = """
             SELECT symbol, date, open, high, low, close, volume, adjusted_close
