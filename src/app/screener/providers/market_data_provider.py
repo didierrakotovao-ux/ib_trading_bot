@@ -417,6 +417,56 @@ class MarketDataProvider(EWrapper, EClient):
         contract.exchange = exchange
         contract.currency = currency
         return contract
+
+    # --- Prix en temps réel ---
+    def tickPrice(self, reqId, tickType, price, attrib):
+        """Callback IB pour les prix en temps réel."""
+        # tickType 4 = LAST, 1 = BID, 2 = ASK
+        if tickType in (1, 2, 4) and price > 0:
+            self._current_prices[reqId] = price
+            if tickType == 4:  # LAST price received, we're done
+                self._price_received[reqId] = True
+
+    def get_current_price(self, symbol: str, timeout: float = 5.0) -> float:
+        """
+        Récupère le prix actuel d'un symbole via IB.
+        Retourne le dernier prix tradé, ou 0 si échec.
+        """
+        if not self.is_connected():
+            print(f"[WARNING] Non connecté à IB pour get_current_price({symbol})")
+            return 0.0
+
+        if not hasattr(self, '_current_prices'):
+            self._current_prices = {}
+            self._price_received = {}
+
+        contract = self.create_contract(symbol)
+        req_id = self._next_req_id
+        self._next_req_id += 1
+
+        self._current_prices[req_id] = 0.0
+        self._price_received[req_id] = False
+
+        # Demander les données de marché (snapshot)
+        self.reqMktData(req_id, contract, "", True, False, [])
+
+        # Attendre le prix
+        start = time.time()
+        while not self._price_received.get(req_id, False) and (time.time() - start) < timeout:
+            time.sleep(0.1)
+
+        price = self._current_prices.get(req_id, 0.0)
+
+        # Annuler la souscription
+        self.cancelMktData(req_id)
+
+        # Cleanup
+        if req_id in self._current_prices:
+            del self._current_prices[req_id]
+        if req_id in self._price_received:
+            del self._price_received[req_id]
+
+        return price
     
     def force_close(self):
         """

@@ -263,11 +263,22 @@ class Trading:
                 for symbol in strategy.get_symbols(trade_date):
                     symbolToTrade.append(symbol)
                 for orders in strategy.get_order_params():
-                    contrat = self.market_data_provider.create_contract(orders['symbol'])
+                    symbol = orders['symbol']
+                    contrat = self.market_data_provider.create_contract(symbol)
+                    entry_order = orders['entry_order']
+
+                    # Convertir en ordre Market pour éviter les rejets IB sur prix limite
+                    # IB rejette les ordres LMT trop éloignés du prix actuel (>3-5%)
+                    if entry_order.orderType == "LMT":
+                        entry_order.orderType = "MKT"
+                        old_limit = entry_order.lmtPrice
+                        entry_order.lmtPrice = 0  # Pas de limite pour MKT
+                        print(f"[ORDER TYPE] {symbol}: LMT {old_limit:.2f}$ → MKT (exécution au marché)")
+
                     # Placer l'ordre d'entrée
-                    entry_order_id = self.place_order(contrat, orders['entry_order'])
+                    entry_order_id = self.place_order(contrat, entry_order)
                     # Vérifier que l'entrée a été acceptée (dans self.orders)
-                    if (contrat, orders['entry_order']) in self.orders:
+                    if (contrat, entry_order) in self.orders:
                         # Placer le stop lié au parent si configuré
                         if 'stop_order' in orders:
                             self.place_order(contrat, orders['stop_order'],
