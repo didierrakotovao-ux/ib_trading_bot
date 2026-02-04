@@ -379,6 +379,11 @@ class MarketDataProvider(EWrapper, EClient):
         Demande l'historique des exécutions à IB pour la session courante.
         Retourne la liste des exécutions.
         """
+        # Attendre que l'API soit prête avant de faire la requête
+        if not self.wait_until_ready():
+            print("[WARNING] IB API non prête pour req_executions")
+            return []
+
         self.executions = []
         self.executions_done = False
 

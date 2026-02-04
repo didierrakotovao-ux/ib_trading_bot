@@ -297,6 +297,10 @@ class Trading:
             if not self.market_data_provider.connect():
                 print("[DEBUG] Impossible de se connecter à IB, synchronisation annulée.")
                 return
+            # Attendre que l'API soit prête après reconnexion
+            if not self.market_data_provider.wait_until_ready(timeout=15):
+                print("[DEBUG] IB API non prête après reconnexion, synchronisation annulée.")
+                return
             # Mettre à jour la référence dans les stratégies
             for strategy in self.strategies:
                 strategy.market_data = self.market_data_provider
@@ -548,6 +552,14 @@ if __name__ == "__main__":
         if not connected:
             print("[TRADING] Échec de connexion, arrêt du script.")
             exit(1)
+
+        # Attendre que l'API IB soit prête (nextValidId reçu)
+        print("[TRADING] Attente de l'initialisation IB...")
+        if not trading.market_data_provider.wait_until_ready(timeout=15):
+            print("[TRADING] Timeout en attendant IB, arrêt du script.")
+            exit(1)
+        print("[TRADING] IB prêt")
+
         # Enregistrer le callback pour la journalisation des ordres
         trading.setup_order_callbacks()
         # Synchroniser les exécutions depuis IB (trades déjà exécutés)
