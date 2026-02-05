@@ -23,7 +23,10 @@ class TrailingOnlyBTWrapper(bt.Strategy):
         capital=100000,
         max_stocks=5,
         trailing_percent=5.0,  # Trailing stop à 5%
-        dataframes=None  # DataFrames pré-chargés depuis SQLite
+        dataframes=None,  # DataFrames pré-chargés depuis SQLite
+        scoring_type="smooth_ml",  # Type de scoring: "ml", "smooth_ml", "earnings_ml"
+        use_sue_filter=False,  # Filtre SUE (Novy-Marx)
+        sue_threshold=0.0  # Seuil SUE (SUE > sue_threshold)
     )
 
     def __init__(self, start_date, end_date, dataframes=None):
@@ -44,7 +47,9 @@ class TrailingOnlyBTWrapper(bt.Strategy):
             max_stocks=self.p.max_stocks,
             use_trailing_stop=True,
             trailing_percent=self.p.trailing_percent,
-            scoring_type="smooth_ml"
+            scoring_type=self.p.scoring_type,
+            use_sue_filter=self.p.use_sue_filter,
+            sue_threshold=self.p.sue_threshold
         )
 
         self.orders_by_symbol = {}
@@ -233,27 +238,39 @@ class TrailingOnlyBTWrapper(bt.Strategy):
         # Générer les ordres UNIQUEMENT pour les symboles disponibles
         order_bundles = self.strategy.get_order_params()
 
+        print(f"[DEBUG] Nombre de bundles à traiter: {len(order_bundles)}")
+        print(f"[DEBUG] Data feeds disponibles: {[d._name for d in self.datas[:10]]}...")
+
         for bundle in order_bundles:
             symbol = bundle["symbol"]
             data = self._get_data(symbol)
             if not data:
+                print(f"[ERROR] Data non trouvée pour {symbol}")
                 self.log_diag(f"[ERROR] Data non trouvée pour {symbol}")
                 continue
 
             # Double vérification (normalement déjà filtré, mais par sécurité)
             pos = self.getposition(data)
             if pos.size != 0:
+                print(f"[WARNING] {symbol} a position, skip")
                 self.log_diag(f"[WARNING] {symbol} a une position mais n'aurait pas dû passer le filtre, skip")
                 continue
 
             # Placer l'ordre d'entrée (market order)
-            entry_order = self.buy(data=data, size=bundle["entry_order"].totalQuantity)
+            qty = bundle["entry_order"].totalQuantity
+            cash = self.broker.get_cash()
+            price = data.close[0]
+            print(f"[DEBUG] Tentative achat {symbol}: qty={qty}, price={price:.2f}, cash={cash:.2f}")
+
+            entry_order = self.buy(data=data, size=qty)
 
             if entry_order is not None:
-                self.log_diag(f"[BT] Entry order placé pour {symbol}, qty={bundle['entry_order'].totalQuantity}")
+                print(f"[BT] Entry order placé pour {symbol}, qty={qty}")
+                self.log_diag(f"[BT] Entry order placé pour {symbol}, qty={qty}")
                 self.orders_by_symbol[symbol] = {"entry": entry_order}
                 self.pending_order_bundles[symbol] = bundle
             else:
+                print(f"[ERROR] Échec placement ordre pour {symbol} (buy returned None)")
                 self.log_diag(f"[ERROR] Échec de placement d'ordre pour {symbol}")
 
     def _get_data(self, symbol):

@@ -1,3 +1,4 @@
+import os
 import backtrader as bt
 import pandas as pd
 import yfinance as yf
@@ -20,7 +21,10 @@ class BacktestEngine:
         initial_cash=100000,
         commission=0.001,
         stake=100,
-        lookback_days=350  # Jours de données historiques pour le scoring
+        lookback_days=350,  # Jours de données historiques pour le scoring
+        scoring_type="smooth_ml",  # Type de scoring: "ml", "smooth_ml", "earnings_ml"
+        use_sue_filter=False,  # Filtre SUE (Novy-Marx)
+        sue_threshold=0.0  # Seuil SUE
     ):
         self.strategy_cls = strategy_cls
         self.start_date = start_date
@@ -29,6 +33,9 @@ class BacktestEngine:
         self.commission = commission
         self.stake = stake
         self.lookback_days = lookback_days
+        self.scoring_type = scoring_type
+        self.use_sue_filter = use_sue_filter
+        self.sue_threshold = sue_threshold
         self.market_data = MarketDataMock(None)
 
         # stdstats=False: pas d'observateurs par défaut
@@ -38,7 +45,9 @@ class BacktestEngine:
     # ------------------------------------------------------------------
     def _load_data(self):
         self.dataframes = {}
-        conn = sqlite3.connect("trading_data.db")
+        # Chemin absolu vers la BD (racine du projet)
+        db_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'trading_data.db')
+        conn = sqlite3.connect(db_path)
 
         # Charger les données depuis (start_date - lookback_days) pour avoir assez d'historique pour le scoring
         data_start_date = self.start_date - timedelta(days=self.lookback_days + 100)  # +100 pour marge (252 jours trading = ~365 calendaires)
@@ -109,7 +118,10 @@ class BacktestEngine:
             self.strategy_cls,
             start_date=self.start_date,
             end_date=self.end_date,
-            dataframes=self.dataframes  # Passer les DataFrames complets pour le cache
+            dataframes=self.dataframes,  # Passer les DataFrames complets pour le cache
+            scoring_type=self.scoring_type,
+            use_sue_filter=self.use_sue_filter,
+            sue_threshold=self.sue_threshold
         )
 
         results = self.cerebro.run()

@@ -5,7 +5,9 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 from src.app.ml.ml_scoring import MLScoring
 from src.app.ml.ml_smooth_scoring import SmoothMLScoring
+from src.app.ml.ml_earnings_scoring import EarningsMLScoring
 from src.app.ml.addivergencescoring import AdDivergenceScoring
+from src.app.ml.earnings_features import EarningsFeatures
 from src.app.strategies.momentum_filters import MomentumFilters
 from src.app.screener.providers.market_data_provider import MarketDataProvider
 from src.app.strategies.strategy import Strategy
@@ -35,11 +37,15 @@ class MomentumStrategy(Strategy):
                  use_trailing_stop=False, trailing_percent=5.0,
                  scoring_type="ml",
                  momentum_top_pct=0.3, fip_threshold=0.0,
-                 use_seasonal_threshold=True):
+                 use_seasonal_threshold=True,
+                 use_sue_filter=False, sue_threshold=0.0):
         if scoring_type == "smooth_ml":
             self.scoring = SmoothMLScoring(model_path="models/smooth_momentum_model.pkl")
+        elif scoring_type == "earnings_ml":
+            self.scoring = EarningsMLScoring(model_path="models/earnings_momentum_model.pkl")
         else:
             self.scoring = MLScoring(model_path="models/momentum_model.pkl")
+        self.scoring_type = scoring_type
         self.market_data = market_data
         self.lookback_days = 400  # ~252 jours de trading + marge pour les features
         self.score_threshold = 65  # Seuil par défaut (peut être overridé par saisonnalité)
@@ -52,6 +58,13 @@ class MomentumStrategy(Strategy):
         self.momentum_top_pct = momentum_top_pct  # Top 30% par momentum 12-1
         self.fip_threshold = fip_threshold          # FIP < 0 = bon momentum smooth
         self.use_seasonal_threshold = use_seasonal_threshold  # Seuil dynamique par mois
+
+        # Filtre SUE (Novy-Marx)
+        self.use_sue_filter = use_sue_filter  # Activer le filtre SUE
+        self.sue_threshold = sue_threshold     # SUE > sue_threshold (défaut: 0)
+        if use_sue_filter:
+            self.earnings_features = EarningsFeatures()
+            print(f"[PIPELINE] Filtre SUE activé (seuil > {sue_threshold})")
 
     def scanner_filters(self) -> ScannerSubscription:
         scan_sub = ScannerSubscription()
@@ -90,7 +103,7 @@ class MomentumStrategy(Strategy):
         if all_candidates:
             sample = all_candidates[0]
             print(f"[PIPELINE] {len(all_candidates)} symboles ({valid_count} valides, {nan_count} NaN momentum)")
-            print(f"[PIPELINE] Exemple: {sample[0]} → {len(sample[2])} barres, mom_12_1={sample[1]}")
+            print(f"[PIPELINE] Exemple: {sample[0]} -> {len(sample[2])} barres, mom_12_1={sample[1]}")
         else:
             print(f"[PIPELINE] 0 symboles avec données suffisantes")
 
@@ -105,12 +118,30 @@ class MomentumStrategy(Strategy):
             fip = MomentumFilters.calc_fip(data)
             if not np.isnan(fip) and fip < self.fip_threshold:
                 fip_filtered.append((symbol, mom, fip, data))
-                print(f"  [FIP] {symbol}: mom_12_1={mom:.2%}, FIP={fip:.4f} ✓")
+                print(f"  [FIP] {symbol}: mom_12_1={mom:.2%}, FIP={fip:.4f} [OK]")
             else:
                 fip_val = f"{fip:.4f}" if not np.isnan(fip) else "N/A"
-                print(f"  [FIP] {symbol}: mom_12_1={mom:.2%}, FIP={fip_val} ✗")
+                print(f"  [FIP] {symbol}: mom_12_1={mom:.2%}, FIP={fip_val} [X]")
 
         print(f"[PIPELINE] {len(fip_filtered)} symboles après filtre FIP (< {self.fip_threshold})")
+
+        # Étape 3b: Filtre SUE optionnel (Novy-Marx)
+        if self.use_sue_filter:
+            sue_filtered = []
+            for symbol, mom, fip, data in fip_filtered:
+                try:
+                    earnings = self.earnings_features.get_latest_earnings_features(symbol)
+                    sue = earnings.get('sue')
+                    if sue is not None and sue > self.sue_threshold:
+                        sue_filtered.append((symbol, mom, fip, data))
+                        print(f"  [SUE] {symbol}: SUE={sue:.2f}% > {self.sue_threshold} [OK]")
+                    else:
+                        sue_val = f"{sue:.2f}%" if sue is not None else "N/A"
+                        print(f"  [SUE] {symbol}: SUE={sue_val} [X]")
+                except Exception as e:
+                    print(f"  [SUE] {symbol}: Erreur ({e}) [X]")
+            print(f"[PIPELINE] {len(sue_filtered)} symboles après filtre SUE (> {self.sue_threshold})")
+            fip_filtered = sue_filtered
 
         # Étape 4: Scoring ML sur les candidats restants
         # Déterminer le seuil selon la saisonnalité
@@ -130,9 +161,9 @@ class MomentumStrategy(Strategy):
 
             if score >= threshold:
                 scored_symbols.append((symbol, score, data))
-                print(f"  [SCORE] {symbol}: score={score} >= {threshold} ✓")
+                print(f"  [SCORE] {symbol}: score={score} >= {threshold} [OK]")
             else:
-                print(f"  [SCORE] {symbol}: score={score} < {threshold} ✗")
+                print(f"  [SCORE] {symbol}: score={score} < {threshold} [X]")
 
         print(f"[PIPELINE] {len(scored_symbols)} symboles après scoring ML (seuil={threshold})")
 

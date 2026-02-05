@@ -3,6 +3,7 @@ from strategies.momentum import MomentumStrategy
 from screener.providers.market_data_provider import MarketDataProvider
 from strategies.addivergence import AdDivergenceStrategy
 from position_manager import PositionManager
+from ibapi.tag_value import TagValue
 
 import sys
 import os
@@ -267,13 +268,21 @@ class Trading:
                     contrat = self.market_data_provider.create_contract(symbol)
                     entry_order = orders['entry_order']
 
-                    # Convertir en ordre Market pour éviter les rejets IB sur prix limite
-                    # IB rejette les ordres LMT trop éloignés du prix actuel (>3-5%)
-                    if entry_order.orderType == "LMT":
-                        entry_order.orderType = "MKT"
-                        old_limit = entry_order.lmtPrice
-                        entry_order.lmtPrice = 0  # Pas de limite pour MKT
-                        print(f"[ORDER TYPE] {symbol}: LMT {old_limit:.2f}$ → MKT (exécution au marché)")
+                    # Utiliser l'algorithme VWAP d'IB pour une meilleure exécution
+                    # VWAP exécute l'ordre sur une période en suivant le volume du marché
+                    entry_order.orderType = "LMT"  # VWAP nécessite un prix limite
+                    entry_order.algoStrategy = "Vwap"
+                    entry_order.algoParams = []
+                    # Paramètres VWAP :
+                    # - maxPctVol : % max du volume du marché (0.1 = 10%)
+                    # - startTime/endTime : période d'exécution (vide = jusqu'à la clôture)
+                    # - allowPastEndTime : continuer après endTime si non rempli
+                    # - noTakeLiq : ne pas prendre de liquidité (plus passif)
+                    entry_order.algoParams.append(TagValue("maxPctVol", "0.2"))  # Max 20% du volume
+                    entry_order.algoParams.append(TagValue("noTakeLiq", "0"))    # Peut prendre liquidité
+                    entry_order.algoParams.append(TagValue("allowPastEndTime", "1"))  # Continuer si besoin
+
+                    print(f"[ORDER ALGO] {symbol}: VWAP avec limite {entry_order.lmtPrice:.2f}$ (maxPctVol=20%)")
 
                     # Placer l'ordre d'entrée
                     entry_order_id = self.place_order(contrat, entry_order)

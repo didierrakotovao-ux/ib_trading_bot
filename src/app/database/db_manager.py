@@ -244,7 +244,63 @@ class DatabaseManager:
                 last_updated DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         """)
-        
+
+        # Table pour les features calculées (ML + filtres Gray & Vogel)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS computed_features (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                symbol TEXT NOT NULL,
+                date DATE NOT NULL,
+
+                -- Features ML de base
+                rsi REAL,
+                macd REAL,
+                macd_signal REAL,
+                macd_hist REAL,
+                adx REAL,
+                bb_high REAL,
+                bb_low REAL,
+                bb_position REAL,
+                rsi_momentum REAL,
+                volume_ratio REAL,
+                trend_strength REAL,
+                return_5d REAL,
+                return_10d REAL,
+                return_20d REAL,
+                volatility_10d REAL,
+                high_52w_pct REAL,
+                hl_sma20vol REAL,
+                oc_sma20vol REAL,
+                pct_close REAL,
+
+                -- Features Smooth Momentum
+                smoothness_20d REAL,
+                smoothness_50d REAL,
+                month_sin REAL,
+                month_cos REAL,
+
+                -- Filtres Gray & Vogel
+                momentum_12_1 REAL,
+                fip REAL,
+
+                -- Score ML final
+                ml_score INTEGER,
+
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(symbol, date)
+            )
+        """)
+
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_features_symbol_date
+            ON computed_features(symbol, date DESC)
+        """)
+
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_features_date
+            ON computed_features(date DESC)
+        """)
+
         self.conn.commit()
         print("[OK] Tables de base de donnees initialisees")
     
@@ -623,6 +679,152 @@ class DatabaseManager:
             FROM trading_signals
             ORDER BY entry_date DESC
         """)
-        
+
         columns = [desc[0] for desc in cursor.description]
         return [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+    def save_computed_features(self, symbol: str, date: str, features: Dict[str, Any]) -> bool:
+        """
+        Sauvegarde les features calculées pour un symbole et une date.
+
+        Args:
+            symbol: Symbole de l'action
+            date: Date (format YYYY-MM-DD)
+            features: Dict contenant les features calculées
+
+        Returns:
+            True si succès, False sinon
+        """
+        self.connect()
+        if self.conn is None:
+            return False
+
+        cursor = self.conn.cursor()
+
+        # Liste des colonnes de features
+        feature_columns = [
+            'rsi', 'macd', 'macd_signal', 'macd_hist', 'adx',
+            'bb_high', 'bb_low', 'bb_position', 'rsi_momentum',
+            'volume_ratio', 'trend_strength', 'return_5d', 'return_10d',
+            'return_20d', 'volatility_10d', 'high_52w_pct', 'hl_sma20vol',
+            'oc_sma20vol', 'pct_close', 'smoothness_20d', 'smoothness_50d',
+            'month_sin', 'month_cos', 'momentum_12_1', 'fip', 'ml_score'
+        ]
+
+        # Construire les valeurs à insérer
+        values = [symbol, date]
+        for col in feature_columns:
+            values.append(features.get(col))
+
+        placeholders = ', '.join(['?'] * (len(feature_columns) + 2))
+        columns_str = 'symbol, date, ' + ', '.join(feature_columns)
+
+        try:
+            cursor.execute(f"""
+                INSERT OR REPLACE INTO computed_features ({columns_str})
+                VALUES ({placeholders})
+            """, values)
+            self.conn.commit()
+            return True
+        except Exception as e:
+            print(f"[ERROR] save_computed_features: {e}")
+            return False
+
+    def save_computed_features_bulk(self, df: pd.DataFrame) -> int:
+        """
+        Sauvegarde les features calculées en bulk depuis un DataFrame.
+
+        Args:
+            df: DataFrame avec colonnes symbol, date et les features
+
+        Returns:
+            Nombre de lignes insérées
+        """
+        self.connect()
+        if self.conn is None:
+            return 0
+
+        # Liste des colonnes de features
+        feature_columns = [
+            'symbol', 'date', 'rsi', 'macd', 'macd_signal', 'macd_hist', 'adx',
+            'bb_high', 'bb_low', 'bb_position', 'rsi_momentum',
+            'volume_ratio', 'trend_strength', 'return_5d', 'return_10d',
+            'return_20d', 'volatility_10d', 'high_52w_pct', 'hl_sma20vol',
+            'oc_sma20vol', 'pct_close', 'smoothness_20d', 'smoothness_50d',
+            'month_sin', 'month_cos', 'momentum_12_1', 'fip', 'ml_score'
+        ]
+
+        # Filtrer les colonnes présentes
+        available_columns = [c for c in feature_columns if c in df.columns]
+
+        if 'symbol' not in available_columns or 'date' not in available_columns:
+            print("[ERROR] DataFrame doit contenir 'symbol' et 'date'")
+            return 0
+
+        df_to_save = df[available_columns].copy()
+
+        try:
+            df_to_save.to_sql('computed_features', self.conn,
+                              if_exists='append', index=False,
+                              method='multi')
+            return len(df_to_save)
+        except Exception as e:
+            print(f"[ERROR] save_computed_features_bulk: {e}")
+            return 0
+
+    def get_computed_features(self, symbol: str, start_date: str = None,
+                              end_date: str = None) -> pd.DataFrame:
+        """
+        Récupère les features calculées pour un symbole.
+
+        Args:
+            symbol: Symbole de l'action
+            start_date: Date de début (optionnel)
+            end_date: Date de fin (optionnel)
+
+        Returns:
+            DataFrame avec les features
+        """
+        self.connect()
+        if self.conn is None:
+            return pd.DataFrame()
+
+        query = "SELECT * FROM computed_features WHERE symbol = ?"
+        params = [symbol]
+
+        if start_date:
+            query += " AND date >= ?"
+            params.append(start_date)
+        if end_date:
+            query += " AND date <= ?"
+            params.append(end_date)
+
+        query += " ORDER BY date"
+
+        return pd.read_sql_query(query, self.conn, params=params)
+
+    def get_latest_features_date(self, symbol: str = None) -> Optional[str]:
+        """
+        Récupère la date la plus récente des features calculées.
+
+        Args:
+            symbol: Symbole spécifique (optionnel, sinon global)
+
+        Returns:
+            Date au format YYYY-MM-DD ou None
+        """
+        self.connect()
+        if self.conn is None:
+            return None
+
+        cursor = self.conn.cursor()
+
+        if symbol:
+            cursor.execute("""
+                SELECT MAX(date) FROM computed_features WHERE symbol = ?
+            """, (symbol,))
+        else:
+            cursor.execute("SELECT MAX(date) FROM computed_features")
+
+        result = cursor.fetchone()
+        return result[0] if result and result[0] else None

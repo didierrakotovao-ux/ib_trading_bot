@@ -28,8 +28,10 @@ class SmoothMLScoring(Scoring):
         self.model = None
         self.scaler = None
         self.model_loaded = False
-        self.model_path = Path(model_path)
-        self.db_path = db_path
+        # Résoudre le chemin par rapport à la racine du projet
+        project_root = Path(__file__).parent.parent.parent.parent
+        self.model_path = project_root / model_path
+        self.db_path = str(project_root / db_path)
 
         # Colonnes chargées depuis le modèle
         self.feature_columns: List[str] = []
