@@ -99,7 +99,8 @@ def run_backtest(period_key: str, model_key: str) -> dict:
             initial_cash=100000,
             scoring_type=model['scoring_type'],
             use_sue_filter=model.get('use_earnings_filter', False),
-            sue_threshold=model.get('sue_threshold', 0.0)
+            sue_threshold=model.get('sue_threshold', 0.0),
+            max_symbols=200  # Limiter pour performance
         )
 
         results = engine.run()

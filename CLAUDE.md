@@ -18,6 +18,9 @@ pip install -r requirements.txt
 ### Data Import
 ```bash
 python src/app/database/import_yahoo_bulk.py
+python src/app/database/import_canada_full.py
+python src/app/database/import_nasdaq_full.py
+python src/app/database/update_historical_data.py
 ```
 
 ### Live Trading (requires IB Gateway/TWS on port 4002)

@@ -51,17 +51,20 @@ class LiveJournal:
             self.market_data_provider.disconnect()
             print("[JOURNAL] Déconnecté d'IB")
 
-    def sync_from_ib(self):
+    def sync_from_ib(self, since_days: int = 7):
         """
         Synchronise les exécutions depuis IB vers le journal.
         Agrège les fills partiels automatiquement.
+
+        Args:
+            since_days: Nombre de jours en arrière pour récupérer les exécutions
         """
         if not self.market_data_provider or not self.market_data_provider.is_connected():
             if not self.connect_ib():
                 return
 
-        print("[SYNC] Récupération des exécutions depuis IB...")
-        executions = self.market_data_provider.req_executions()
+        print(f"[SYNC] Récupération des exécutions depuis IB (derniers {since_days} jours)...")
+        executions = self.market_data_provider.req_executions(since_days=since_days)
 
         if not executions:
             print("[SYNC] Aucune exécution trouvée dans cette session IB")
@@ -328,6 +331,39 @@ class LiveJournal:
         print(f"[JOURNAL] Sortie ajoutée: {symbol} @ {price}, PnL: {pnl_net:.2f}$ (ID: {trade_id})")
         return trade_id
 
+    def reset_paper_trades(self, since_days: int = 7):
+        """
+        Efface les trades paper des derniers N jours et relance un sync.
+        Ne touche PAS aux trades plus anciens que la fenêtre since_days.
+
+        Args:
+            since_days: Nombre de jours en arrière pour le reset + re-sync
+        """
+        self.trade_journal.connect()
+        cursor = self.trade_journal.conn.cursor()
+
+        date_limit = (datetime.now() - timedelta(days=since_days)).strftime('%Y-%m-%d')
+
+        # Compter les trades paper dans la fenêtre
+        cursor.execute(
+            "SELECT COUNT(*) FROM trades WHERE trade_mode = ? AND date_entree >= ?",
+            (self.trade_mode.value, date_limit)
+        )
+        count = cursor.fetchone()[0]
+
+        # Supprimer uniquement les trades dans la fenêtre since_days
+        cursor.execute(
+            "DELETE FROM trades WHERE trade_mode = ? AND date_entree >= ?",
+            (self.trade_mode.value, date_limit)
+        )
+        self.trade_journal.conn.commit()
+
+        print(f"[RESET] {count} trades {self.trade_mode.value} supprimés (depuis {date_limit})")
+        print(f"[RESET] Re-synchronisation depuis IB (derniers {since_days} jours)...")
+
+        # Re-sync complet
+        self.sync_from_ib(since_days=since_days)
+
     def close(self):
         """Ferme les connexions."""
         self.disconnect_ib()
@@ -340,12 +376,14 @@ def main():
 
     parser = argparse.ArgumentParser(description="Journal de trading Paper/Live")
     parser.add_argument('action', nargs='?', default='show',
-                        choices=['sync', 'show', 'summary', 'all'],
+                        choices=['sync', 'show', 'summary', 'all', 'reset'],
                         help='Action à effectuer (default: show)')
     parser.add_argument('--port', type=int, default=7497,
                         help='Port IB (7497=paper, 7496=live)')
     parser.add_argument('--days', type=int, default=7,
                         help='Nombre de jours à afficher')
+    parser.add_argument('--since', type=int, default=7,
+                        help='Jours en arrière pour récupérer les exécutions IB (default: 7)')
 
     args = parser.parse_args()
 
@@ -353,15 +391,19 @@ def main():
 
     try:
         if args.action == 'sync':
-            journal.sync_from_ib()
+            journal.sync_from_ib(since_days=args.since)
             journal.show_summary()
         elif args.action == 'show':
             journal.show_trades(days=args.days)
         elif args.action == 'summary':
             journal.show_summary()
         elif args.action == 'all':
-            journal.sync_from_ib()
+            journal.sync_from_ib(since_days=args.since)
             journal.show_trades(days=args.days)
+            journal.show_summary()
+        elif args.action == 'reset':
+            journal.reset_paper_trades(since_days=args.since)
+            journal.show_trades(days=args.since)
             journal.show_summary()
 
     except KeyboardInterrupt:

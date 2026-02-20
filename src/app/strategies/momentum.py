@@ -38,9 +38,11 @@ class MomentumStrategy(Strategy):
                  scoring_type="ml",
                  momentum_top_pct=0.3, fip_threshold=0.0,
                  use_seasonal_threshold=True,
-                 use_sue_filter=False, sue_threshold=0.0):
+                 use_sue_filter=False, sue_threshold=0.0,
+                 db_path="trading_data.db"):
         if scoring_type == "smooth_ml":
-            self.scoring = SmoothMLScoring(model_path="models/smooth_momentum_model.pkl")
+            self.scoring = SmoothMLScoring(model_path="models/smooth_momentum_model.pkl",
+                                           db_path=db_path)
         elif scoring_type == "earnings_ml":
             self.scoring = EarningsMLScoring(model_path="models/earnings_momentum_model.pkl")
         else:
@@ -211,7 +213,7 @@ class MomentumStrategy(Strategy):
             entryorder.totalQuantity = qty
             entryorder.eTradeOnly = False
             entryorder.firmQuoteOnly = False
-            entryorder.tif = "GTC"  # Good Till Cancelled
+            entryorder.tif = "DAY"  # Good Till Cancelled
 
             # Construire le dict de retour
             order_dict = {

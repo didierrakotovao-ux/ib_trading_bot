@@ -26,7 +26,8 @@ class TrailingOnlyBTWrapper(bt.Strategy):
         dataframes=None,  # DataFrames pré-chargés depuis SQLite
         scoring_type="smooth_ml",  # Type de scoring: "ml", "smooth_ml", "earnings_ml"
         use_sue_filter=False,  # Filtre SUE (Novy-Marx)
-        sue_threshold=0.0  # Seuil SUE (SUE > sue_threshold)
+        sue_threshold=0.0,  # Seuil SUE (SUE > sue_threshold)
+        db_path=None  # Chemin DB (None = trading_data.db)
     )
 
     def __init__(self, start_date, end_date, dataframes=None):
@@ -40,6 +41,11 @@ class TrailingOnlyBTWrapper(bt.Strategy):
         if self.p.dataframes:
             self._preload_cache(self.p.dataframes)
 
+        # Résoudre db_path pour MomentumStrategy
+        db_path = "trading_data.db"
+        if self.p.db_path:
+            db_path = os.path.basename(self.p.db_path)
+
         # Stratégie métier
         self.strategy = MomentumStrategy(
             market_data=self.market_data,
@@ -49,7 +55,8 @@ class TrailingOnlyBTWrapper(bt.Strategy):
             trailing_percent=self.p.trailing_percent,
             scoring_type=self.p.scoring_type,
             use_sue_filter=self.p.use_sue_filter,
-            sue_threshold=self.p.sue_threshold
+            sue_threshold=self.p.sue_threshold,
+            db_path=db_path
         )
 
         self.orders_by_symbol = {}
@@ -116,6 +123,7 @@ class TrailingOnlyBTWrapper(bt.Strategy):
 
     def notify_order(self, order):
         symbol = order.data._name if hasattr(order, 'data') and order.data else 'N/A'
+        print(f"[NOTIFY] status={order.getstatusname()}, symbol={symbol}, isbuy={order.isbuy()}")
         self.log_diag(f"[notify_order] status={order.getstatusname()}, symbol={symbol}, isbuy={order.isbuy()}")
 
         if order.status in [order.Completed]:
@@ -192,15 +200,29 @@ class TrailingOnlyBTWrapper(bt.Strategy):
 
             self.pending_order_bundles[symbol] = None
 
+    def prenext(self):
+        """Appelé avant que tous les data feeds soient alignés - on trade quand même."""
+        self.next()
+
     def next(self):
         current_date = self.datas[0].datetime.date(0)
+        bar_num = len(self)
+        total_bars = len(self.datas[0])
 
         # Ne trader que dans la période spécifiée
         if current_date < self.start_date.date() or current_date > self.end_date.date():
             return
 
+        # Log seulement les jours de trading (pas tous les jours)
+        if bar_num % 20 == 0 or bar_num == total_bars:
+            print(f"[NEXT] Date={current_date}, Bar={bar_num}/{total_bars}")
         self.log_diag(f"Analyse pour la date {current_date}...")
         self.log_diag(f"[DIAG] Cash: {self.broker.get_cash():.2f} | Value: {self.broker.get_value():.2f}")
+
+        # Optimisation: ne pas chercher de nouvelles positions si on a déjà max_stocks
+        current_positions = sum(1 for d in self.datas if self.getposition(d).size != 0)
+        if current_positions >= self.p.max_stocks:
+            return
 
         symbols = [d._name for d in self.datas]
         self.strategy.set_symbols_to_analyse(symbols)
@@ -262,16 +284,22 @@ class TrailingOnlyBTWrapper(bt.Strategy):
             price = data.close[0]
             print(f"[DEBUG] Tentative achat {symbol}: qty={qty}, price={price:.2f}, cash={cash:.2f}")
 
-            entry_order = self.buy(data=data, size=qty)
+            try:
+                entry_order = self.buy(data=data, size=qty)
+                print(f"[DEBUG] buy() returned: {entry_order}")
 
-            if entry_order is not None:
-                print(f"[BT] Entry order placé pour {symbol}, qty={qty}")
-                self.log_diag(f"[BT] Entry order placé pour {symbol}, qty={qty}")
-                self.orders_by_symbol[symbol] = {"entry": entry_order}
-                self.pending_order_bundles[symbol] = bundle
-            else:
-                print(f"[ERROR] Échec placement ordre pour {symbol} (buy returned None)")
-                self.log_diag(f"[ERROR] Échec de placement d'ordre pour {symbol}")
+                if entry_order is not None:
+                    print(f"[BT] Entry order placé pour {symbol}, qty={qty}, ref={entry_order.ref}")
+                    self.log_diag(f"[BT] Entry order placé pour {symbol}, qty={qty}")
+                    self.orders_by_symbol[symbol] = {"entry": entry_order}
+                    self.pending_order_bundles[symbol] = bundle
+                else:
+                    print(f"[ERROR] Échec placement ordre pour {symbol} (buy returned None)")
+                    self.log_diag(f"[ERROR] Échec de placement d'ordre pour {symbol}")
+            except Exception as e:
+                print(f"[EXCEPTION] buy() failed for {symbol}: {e}")
+                import traceback
+                traceback.print_exc()
 
     def _get_data(self, symbol):
         for d in self.datas:

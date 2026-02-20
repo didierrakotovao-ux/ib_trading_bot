@@ -374,9 +374,14 @@ class MarketDataProvider(EWrapper, EClient):
         print(f"[EXEC DETAILS END] reqId={reqId}, {len(self.executions)} exécutions reçues")
         self.executions_done = True
 
-    def req_executions(self, client_id: int = None) -> list:
+    def req_executions(self, client_id: int = None, since_days: int = 7) -> list:
         """
-        Demande l'historique des exécutions à IB pour la session courante.
+        Demande l'historique des exécutions à IB.
+
+        Args:
+            client_id: Filtrer par client ID (optionnel)
+            since_days: Nombre de jours en arrière pour récupérer les exécutions (défaut: 7)
+
         Retourne la liste des exécutions.
         """
         # Attendre que l'API soit prête avant de faire la requête
@@ -387,10 +392,14 @@ class MarketDataProvider(EWrapper, EClient):
         self.executions = []
         self.executions_done = False
 
-        # Créer un filtre (vide = toutes les exécutions de la session)
+        # Créer un filtre avec date de début pour récupérer les exécutions multi-jours
         exec_filter = ExecutionFilter()
         if client_id:
             exec_filter.clientId = client_id
+
+        # Setter la date de début au format IB "yyyymmdd-hh:mm:ss"
+        start_date = datetime.now() - timedelta(days=since_days)
+        exec_filter.time = start_date.strftime("%Y%m%d-%H:%M:%S")
 
         req_id = self._next_req_id
         self._next_req_id += 1

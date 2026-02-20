@@ -24,7 +24,11 @@ class BacktestEngine:
         lookback_days=350,  # Jours de données historiques pour le scoring
         scoring_type="smooth_ml",  # Type de scoring: "ml", "smooth_ml", "earnings_ml"
         use_sue_filter=False,  # Filtre SUE (Novy-Marx)
-        sue_threshold=0.0  # Seuil SUE
+        sue_threshold=0.0,  # Seuil SUE
+        max_symbols=None,  # Limiter le nombre de symboles (None = tous)
+        db_path=None,  # Chemin DB (None = trading_data.db)
+        min_price=5.0,  # Prix minimum
+        min_volume=500000  # Volume minimum
     ):
         self.strategy_cls = strategy_cls
         self.start_date = start_date
@@ -36,7 +40,22 @@ class BacktestEngine:
         self.scoring_type = scoring_type
         self.use_sue_filter = use_sue_filter
         self.sue_threshold = sue_threshold
+        self.max_symbols = max_symbols
+        self.min_price = min_price
+        self.min_volume = min_volume
         self.market_data = MarketDataMock(None)
+
+        # Résoudre le chemin de la BD
+        if db_path:
+            if os.path.isabs(db_path):
+                self.db_path = db_path
+            else:
+                project_root = os.path.join(os.path.dirname(__file__), '..', '..', '..')
+                self.db_path = os.path.abspath(os.path.join(project_root, db_path))
+        else:
+            self.db_path = os.path.abspath(
+                os.path.join(os.path.dirname(__file__), '..', '..', '..', 'trading_data.db')
+            )
 
         # stdstats=False: pas d'observateurs par défaut
         # runonce=False: permet l'exécution même si les données ne sont pas synchronisées
@@ -45,9 +64,7 @@ class BacktestEngine:
     # ------------------------------------------------------------------
     def _load_data(self):
         self.dataframes = {}
-        # Chemin absolu vers la BD (racine du projet)
-        db_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'trading_data.db')
-        conn = sqlite3.connect(db_path)
+        conn = sqlite3.connect(self.db_path)
 
         # Charger les données depuis (start_date - lookback_days) pour avoir assez d'historique pour le scoring
         data_start_date = self.start_date - timedelta(days=self.lookback_days + 100)  # +100 pour marge (252 jours trading = ~365 calendaires)
@@ -56,15 +73,15 @@ class BacktestEngine:
             SELECT symbol, date, open, high, low, close, volume, adjusted_close
             FROM historical_data
             WHERE date BETWEEN ? AND ?
-            AND close >= 5.0
-            AND close <= 1000.0
-            AND volume >= 500000
+            AND close >= ?
+            AND volume >= ?
             ORDER BY symbol, date
         """
         df = pd.read_sql_query(
             query,
             conn,
-            params=(data_start_date.strftime('%Y-%m-%d'), self.end_date.strftime('%Y-%m-%d'))
+            params=(data_start_date.strftime('%Y-%m-%d'), self.end_date.strftime('%Y-%m-%d'),
+                    self.min_price, self.min_volume)
         )
         conn.close()
         if df.empty:
@@ -73,6 +90,13 @@ class BacktestEngine:
 
         print(f"[DATA] Chargement: {data_start_date.date()} -> {self.end_date.date()}")
         print(f"[DATA] {len(df)} lignes, {df['symbol'].nunique()} symboles")
+
+        # Limiter le nombre de symboles si spécifié
+        unique_symbols = df['symbol'].unique()
+        if self.max_symbols and len(unique_symbols) > self.max_symbols:
+            unique_symbols = unique_symbols[:self.max_symbols]
+            df = df[df['symbol'].isin(unique_symbols)]
+            print(f"[DATA] Limité à {self.max_symbols} symboles pour le test")
 
         # Stocker tous les DataFrames pour le cache
         symbols_added = 0
@@ -121,7 +145,8 @@ class BacktestEngine:
             dataframes=self.dataframes,  # Passer les DataFrames complets pour le cache
             scoring_type=self.scoring_type,
             use_sue_filter=self.use_sue_filter,
-            sue_threshold=self.sue_threshold
+            sue_threshold=self.sue_threshold,
+            db_path=self.db_path
         )
 
         results = self.cerebro.run()
