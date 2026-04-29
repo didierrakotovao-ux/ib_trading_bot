@@ -84,7 +84,9 @@ class ExhaustionStopBTWrapper(bt.Strategy):
 
         # Préparation du fichier de diagnostic
         diag_date = datetime.now().strftime("%Y%m%d_%H%M%S")
-        self.diag_filename = f"diagnostique_exhaustion_{diag_date}.txt"
+        resultats_dir = os.path.join(os.path.dirname(__file__), 'resultats')
+        os.makedirs(resultats_dir, exist_ok=True)
+        self.diag_filename = os.path.join(resultats_dir, f"diagnostique_exhaustion_{diag_date}.txt")
         with open(self.diag_filename, "w") as f:
             f.write(f"--- Début du diagnostic Exhaustion Stop ({diag_date}) ---\n")
             f.write(f"Paramètres:\n")

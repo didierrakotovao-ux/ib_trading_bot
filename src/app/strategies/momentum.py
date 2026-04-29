@@ -10,6 +10,7 @@ from src.app.ml.addivergencescoring import AdDivergenceScoring
 from src.app.ml.earnings_features import EarningsFeatures
 from src.app.strategies.momentum_filters import MomentumFilters
 from src.app.screener.providers.market_data_provider import MarketDataProvider
+from src.app.database.db_manager import DatabaseManager
 from src.app.strategies.strategy import Strategy
 from ibapi.scanner import ScannerSubscription
 from ibapi.order import Order
@@ -39,10 +40,11 @@ class MomentumStrategy(Strategy):
                  momentum_top_pct=0.3, fip_threshold=0.0,
                  use_seasonal_threshold=True,
                  use_sue_filter=False, sue_threshold=0.0,
-                 db_path="trading_data.db"):
+                 db_path="trading_data.db",
+                 smooth_model_path=None):
         if scoring_type == "smooth_ml":
-            self.scoring = SmoothMLScoring(model_path="models/smooth_momentum_model.pkl",
-                                           db_path=db_path)
+            _model_path = smooth_model_path or "models/smooth_momentum_model.pkl"
+            self.scoring = SmoothMLScoring(model_path=_model_path, db_path=db_path)
         elif scoring_type == "earnings_ml":
             self.scoring = EarningsMLScoring(model_path="models/earnings_momentum_model.pkl")
         else:
@@ -67,6 +69,9 @@ class MomentumStrategy(Strategy):
         if use_sue_filter:
             self.earnings_features = EarningsFeatures()
             print(f"[PIPELINE] Filtre SUE activé (seuil > {sue_threshold})")
+
+        # DB locale pour les données historiques (priorité sur yfinance)
+        self.db_manager = DatabaseManager(db_path)
 
     def scanner_filters(self) -> ScannerSubscription:
         scan_sub = ScannerSubscription()
@@ -94,8 +99,14 @@ class MomentumStrategy(Strategy):
         nan_count = 0
         for symbol in self.symbolsToAnalyse:
             start_date = trade_date - timedelta(days=self.lookback_days)
-            data = self.market_data.get_historical_data(symbol, start_date, trade_date, interval="1d")
+            # Priorité: DB locale → fallback yfinance
+            data = self.db_manager.get_historical_data(symbol, start_date, trade_date)
+            source = "db"
+            if data is None or len(data) < 60:
+                data = self.market_data.get_historical_data(symbol, start_date, trade_date, interval="1d")
+                source = "yfinance"
             if data is not None and len(data) >= 60:
+                print(f"[DATA] {symbol}: {len(data)} barres ({source})")
                 momentum_12_1 = MomentumFilters.calc_momentum_12_1(data)
                 if np.isnan(momentum_12_1):
                     nan_count += 1

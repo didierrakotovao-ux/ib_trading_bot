@@ -198,7 +198,9 @@ def run_comparison(periods: list = None, models: list = None):
 
     # Sauvegarder les résultats
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    output_file = f"backtest_comparison_{timestamp}.json"
+    resultats_dir = os.path.join(os.path.dirname(__file__), 'resultats')
+    os.makedirs(resultats_dir, exist_ok=True)
+    output_file = os.path.join(resultats_dir, f"backtest_comparison_{timestamp}.json")
 
     with open(output_file, 'w') as f:
         json.dump(results, f, indent=2, default=str)

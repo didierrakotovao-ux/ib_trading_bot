@@ -40,6 +40,10 @@ class AdDivergenceBTWrapper(bt.Strategy):
         self.last_entry_prices = {}
         self.pending_stops = {}
 
+        # Répertoire de sortie
+        self._resultats_dir = os.path.join(os.path.dirname(__file__), 'resultats')
+        os.makedirs(self._resultats_dir, exist_ok=True)
+
         # Journal de trading détaillé
         self.trade_entries = {}  # Stocke les infos d'entrée par symbole
         self.journal_filename = None
@@ -47,7 +51,7 @@ class AdDivergenceBTWrapper(bt.Strategy):
 
         # Préparation du fichier de diagnostic
         diag_date = datetime.now().strftime("%Y%m%d_%H%M%S")
-        self.diag_filename = f"diagnostique_backtests_{diag_date}.txt"
+        self.diag_filename = os.path.join(self._resultats_dir, f"diagnostique_backtests_{diag_date}.txt")
         with open(self.diag_filename, "w") as f:
             f.write(f"--- Début du diagnostic Backtest ({diag_date}) ---\n")
 
@@ -55,7 +59,7 @@ class AdDivergenceBTWrapper(bt.Strategy):
         """Initialise le fichier journal de trading."""
         import csv
         journal_date = datetime.now().strftime("%Y%m%d_%H%M%S")
-        self.journal_filename = f"trading_journal_{journal_date}.csv"
+        self.journal_filename = os.path.join(self._resultats_dir, f"trading_journal_{journal_date}.csv")
         with open(self.journal_filename, mode='w', newline='', encoding='utf-8') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow([
@@ -107,7 +111,7 @@ class AdDivergenceBTWrapper(bt.Strategy):
     def log_trade_to_csv(self, dt, symbol, order_type, exec_type, price, size, pnl=None):
         import csv
         import os
-        filename = 'trades_log.csv'
+        filename = os.path.join(self._resultats_dir, 'trades_log.csv')
         file_exists = os.path.isfile(filename)
         with open(filename, mode='a', newline='') as csvfile:
             writer = csv.writer(csvfile)

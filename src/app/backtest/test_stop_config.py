@@ -1,11 +1,18 @@
 """
-Script de test pour le wrapper TrailingOnly (sans Take Profit).
+Backtest avec la configuration de stops depuis stop_config.json.
 
-Options :
-  --period      : bull_2023_2024 | covid_crash | covid_recovery | bear_2022 | full_2020_2024
-  --start/--end : dates libres YYYY-MM-DD
-  --trailing    : % de trailing stop (défaut: 5)
-  --cooldown    : jours d'interdiction de réentrée après stop-out (défaut: 30, 0=désactivé)
+Modifiez stop_config.json pour tester différentes combinaisons :
+  - protection.type  : "fixed" ou "trailing"
+  - protection.pct   : % de recul
+  - profit.type      : "fixed" ou "dynamic"
+  - profit.fixed_pct : % de hausse (si fixed)
+  - profit.dynamic_atr_mult : multiplicateur ATR (si dynamic)
+
+Usage :
+    cd src/app/backtest
+    python test_stop_config.py
+    python test_stop_config.py --period bull_2023_2024
+    python test_stop_config.py --start 2022-01-01 --end 2022-12-31
 """
 import sys
 import os
@@ -15,8 +22,12 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../.
 
 from datetime import datetime
 from engine import BacktestEngine
-from trailing_only_wrapper import TrailingOnlyBTWrapper
+from stop_config_bt_wrapper import StopConfigBTWrapper
+from src.app.stop_manager import StopConfig
 
+# ---------------------------------------------------------------------------
+# Périodes prédéfinies (mêmes que compare_models.py)
+# ---------------------------------------------------------------------------
 PERIODS = {
     "bull_2023_2024":  (datetime(2023, 1,  1), datetime(2024, 12, 31)),
     "covid_crash":     (datetime(2020, 2, 18), datetime(2020, 3,  25)),
@@ -27,48 +38,72 @@ PERIODS = {
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Backtest TrailingOnly")
-    parser.add_argument('--period', choices=list(PERIODS.keys()), help='Période prédéfinie')
+    parser = argparse.ArgumentParser(
+        description="Backtest avec configuration de stops (stop_config.json)"
+    )
+    parser.add_argument(
+        '--period', choices=list(PERIODS.keys()),
+        help='Période prédéfinie'
+    )
     parser.add_argument('--start', type=str, help='Date début YYYY-MM-DD')
-    parser.add_argument('--end', type=str, help='Date fin YYYY-MM-DD')
-    parser.add_argument('--trailing', type=float, default=5.0, help='Trailing stop % (défaut: 5)')
-    parser.add_argument('--cooldown', type=int, default=30,
-                        help='Jours sans réentrée après stop-out (défaut: 30, 0=désactivé)')
+    parser.add_argument('--end',   type=str, help='Date fin   YYYY-MM-DD')
+    parser.add_argument(
+        '--config', type=str,
+        default=os.path.join(os.path.dirname(__file__), '..', '..', '..', 'stop_config.json'),
+        help='Chemin vers stop_config.json (défaut : racine du projet)'
+    )
     args = parser.parse_args()
 
+    # Résoudre les dates
     if args.period:
         start_date, end_date = PERIODS[args.period]
     elif args.start and args.end:
         start_date = datetime.strptime(args.start, '%Y-%m-%d')
         end_date   = datetime.strptime(args.end,   '%Y-%m-%d')
     else:
-        start_date = datetime(2025, 4, 22)
-        end_date   = datetime(2025, 10, 7)
+        # Défaut : année en cours
+        start_date = datetime(2024, 1, 1)
+        end_date   = datetime(2024, 12, 31)
 
-    cooldown_desc = f"{args.cooldown}j" if args.cooldown > 0 else "désactivé"
+    # Charger la config
+    config_path = os.path.abspath(args.config)
+    stop_cfg = StopConfig.from_json(config_path)
+
+    # Affichage
+    prot_desc = f"{stop_cfg.protection_type.upper()} -{stop_cfg.protection_pct}%"
+    prof_desc = (f"FIXED +{stop_cfg.profit_fixed_pct}%"
+                 if stop_cfg.profit_type == "fixed"
+                 else f"DYNAMIC {stop_cfg.profit_atr_mult}×ATR({stop_cfg.profit_atr_period})")
 
     print("=" * 60)
-    print("BACKTEST - TRAILING STOP ONLY (pas de TP)")
+    print("BACKTEST — STOP CONFIG")
     print("=" * 60)
-    print(f"Période       : {start_date.date()} -> {end_date.date()}")
-    print(f"Trailing Stop : {args.trailing}%")
-    print(f"Cooldown      : {cooldown_desc}")
+    print(f"Période    : {start_date.date()} → {end_date.date()}")
+    print(f"Protection : {prot_desc}")
+    print(f"Profit     : {prof_desc}")
+    print(f"Config     : {config_path}")
     print("=" * 60)
 
     engine = BacktestEngine(
-        strategy_cls=TrailingOnlyBTWrapper,
+        strategy_cls=StopConfigBTWrapper,
         start_date=start_date,
         end_date=end_date,
-        initial_cash=100000
+        initial_cash=100_000,
     )
 
-    # Patch pour injecter trailing_percent et cooldown_days
+    # Passer la config au wrapper via addstrategy kwargs
+    # (BacktestEngine.run() appelle addstrategy — on surcharge ici)
+    engine._stop_config = stop_cfg  # sera récupéré ci-dessous
+
+    # Patch minimal : injecter 'config' dans les kwargs de addstrategy
+    _original_run = engine.run
+
     def _patched_run():
         engine._configure_broker()
         engine._load_data()
         engine._add_analyzers()
         engine.cerebro.addstrategy(
-            TrailingOnlyBTWrapper,
+            StopConfigBTWrapper,
             start_date=engine.start_date,
             end_date=engine.end_date,
             dataframes=engine.dataframes,
@@ -76,11 +111,11 @@ def main():
             use_sue_filter=engine.use_sue_filter,
             sue_threshold=engine.sue_threshold,
             db_path=engine.db_path,
-            trailing_percent=args.trailing,
-            cooldown_days=args.cooldown,
+            config=stop_cfg,          # ← paramètre supplémentaire
         )
-        results_bt = engine.cerebro.run()
-        strat = results_bt[0]
+        import backtrader as bt
+        results = engine.cerebro.run()
+        strat = results[0]
         result_dict = {
             "final_value": engine.cerebro.broker.getvalue(),
             "pnl":         engine.cerebro.broker.getvalue() - engine.initial_cash,
@@ -98,7 +133,7 @@ def main():
 
     print()
     print("=" * 60)
-    print("RÉSULTATS")
+    print("RÉSULTATS BACKTRADER")
     print("=" * 60)
     print(f"Valeur finale : {results['final_value']:>12,.2f}$")
     print(f"PnL           : {results['pnl']:>+12,.2f}$")

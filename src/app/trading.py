@@ -101,9 +101,9 @@ class Trading:
             print(f"[JOURNAL] Entrée enregistrée: {symbol} @ {fill_price} (ID: {trade_id})")
 
         elif action == "SELL" and status.lower() == "filled":
-            # Fermer la position et mettre à jour le journal
+            # Sortie partielle ou totale
             if self.position_manager.has_open_position(symbol):
-                self.close_position(symbol, fill_price, fill_time, cause_sortie="TRAILING_STOP")
+                self.close_position(symbol, fill_price, fill_qty, fill_time, cause_sortie="TRAILING_STOP")
             else:
                 print(f"[WARNING] SELL reçu pour {symbol} mais aucune position ouverte")
 
@@ -202,42 +202,49 @@ class Trading:
         """
         return self.position_manager.get_open_positions()
 
-    def close_position(self, symbol, exit_price, exit_time=None, cause_sortie="MANUAL"):
+    def close_position(self, symbol, exit_price, qty_sold=None, exit_time=None, cause_sortie="MANUAL"):
         """
-        Ferme une position existante, met à jour le P&L et journalise la sortie.
+        Enregistre une sortie partielle ou totale.
+        qty_sold : nombre d'actions vendues (None = fermer tout le restant)
         """
-        position = self.position_manager.close_position(symbol, exit_price, exit_time)
+        if symbol not in self.trade_ids:
+            print(f"[WARNING] close_position: {symbol} pas dans trade_ids")
+            return None
 
-        if position and symbol in self.trade_ids:
-            # Calculer les commissions et PnL
-            commission_rate = 0.001  # 0.1%
-            commission = (position.entry_price * position.qty + exit_price * position.qty) * commission_rate
-            pnl_brut = position.pnl
-            pnl_net = pnl_brut - commission
+        trade_id = self.trade_ids[symbol]
 
-            # Mettre à jour le trade en BD avec les infos de sortie
-            self.trade_journal.connect()
-            cursor = self.trade_journal.conn.cursor()
-            cursor.execute("""
-                UPDATE trades SET
-                    date_sortie = ?,
-                    prix_sortie = ?,
-                    cause_sortie = ?,
-                    pnl_brut = ?,
-                    commission = ?,
-                    pnl_net = ?
-                WHERE id = ?
-            """, (
-                (exit_time or datetime.now()).strftime('%Y-%m-%d %H:%M:%S'),
-                exit_price,
-                cause_sortie,
-                round(pnl_brut, 2),
-                round(commission, 2),
-                round(pnl_net, 2),
-                self.trade_ids[symbol]
-            ))
-            self.trade_journal.conn.commit()
-            print(f"[JOURNAL] Sortie enregistrée: {symbol} @ {exit_price}, PnL: {pnl_net:.2f}$ ({cause_sortie})")
+        # Récupérer prix_entree et quantite_restante depuis la BD
+        self.trade_journal.connect()
+        cursor = self.trade_journal.conn.cursor()
+        cursor.execute("SELECT prix_entree, quantite_restante FROM trades WHERE id = ?", (trade_id,))
+        row = cursor.fetchone()
+        if not row:
+            print(f"[WARNING] close_position: trade_id={trade_id} introuvable")
+            return None
+        prix_entree, qty_restante = row
+
+        # Si qty_sold non précisé, vendre tout le restant
+        qty_vendue = int(qty_sold) if qty_sold else qty_restante
+        qty_vendue = min(qty_vendue, qty_restante)  # Ne pas vendre plus que ce qu'on a
+
+        # Mettre à jour le PositionManager
+        position, _ = self.position_manager.partial_close_position(
+            symbol, qty_vendue, exit_price, exit_time
+        )
+
+        # Journaliser via log_partial_exit (gère la fermeture totale si restant = 0)
+        self.trade_journal.log_partial_exit(
+            trade_id=trade_id,
+            symbol=symbol,
+            date_sortie=exit_time or datetime.now(),
+            prix_sortie=exit_price,
+            quantite_vendue=qty_vendue,
+            prix_entree=prix_entree,
+            cause_sortie=cause_sortie
+        )
+
+        # Si la position est entièrement fermée, retirer du mapping
+        if position and position.status == "closed":
             del self.trade_ids[symbol]
 
         return position
@@ -268,21 +275,14 @@ class Trading:
                     contrat = self.market_data_provider.create_contract(symbol)
                     entry_order = orders['entry_order']
 
-                    # Utiliser l'algorithme VWAP d'IB pour une meilleure exécution
-                    # VWAP exécute l'ordre sur une période en suivant le volume du marché
-                    entry_order.orderType = "LMT"  # VWAP nécessite un prix limite
-                    entry_order.algoStrategy = "Vwap"
-                    entry_order.algoParams = []
-                    # Paramètres VWAP :
-                    # - maxPctVol : % max du volume du marché (0.1 = 10%)
-                    # - startTime/endTime : période d'exécution (vide = jusqu'à la clôture)
-                    # - allowPastEndTime : continuer après endTime si non rempli
-                    # - noTakeLiq : ne pas prendre de liquidité (plus passif)
-                    entry_order.algoParams.append(TagValue("maxPctVol", "0.2"))  # Max 20% du volume
-                    entry_order.algoParams.append(TagValue("noTakeLiq", "0"))    # Peut prendre liquidité
-                    entry_order.algoParams.append(TagValue("allowPastEndTime", "1"))  # Continuer si besoin
+                    # Algo Adaptive IB : optimise le prix d'exécution sans plafond fixe.
+                    # Priority "Urgent" → se comporte comme un ordre marché mais cherche
+                    # à améliorer le prix; gère les gaps d'ouverture contrairement à VWAP+LMT.
+                    entry_order.orderType = "MKT"
+                    entry_order.algoStrategy = "Adaptive"
+                    entry_order.algoParams = [TagValue("adaptivePriority", "Urgent")]
 
-                    print(f"[ORDER ALGO] {symbol}: VWAP avec limite {entry_order.lmtPrice:.2f}$ (maxPctVol=20%)")
+                    print(f"[ORDER ALGO] {symbol}: Adaptive Urgent (MKT) — fill garanti à l'ouverture")
 
                     # Placer l'ordre d'entrée
                     entry_order_id = self.place_order(contrat, entry_order)
@@ -354,13 +354,19 @@ class Trading:
 
         print(f"[SYNC] {len(executions)} exécutions brutes trouvées")
 
-        # Agréger les fills partiels par symbole et side
-        # Utiliser une fenêtre de temps de 60 secondes pour regrouper
+        # Agréger les fills partiels du MÊME jour et du MÊME sens seulement
+        # (ex: ordre de 40 actions rempli en 3 fills le même jour → 1 entrée)
+        # Les sells de jours différents restent séparés pour gérer les sorties partielles
         aggregated = {}
         for ex in executions:
             symbol = ex['symbol']
             side = ex['side']
-            key = f"{symbol}_{side}"
+            # Extraire la date (YYYYMMDD) depuis le timestamp IB "YYYYMMDD HH:MM:SS"
+            try:
+                date_part = ex['time'][:8]
+            except Exception:
+                date_part = "00000000"
+            key = f"{symbol}_{side}_{date_part}"
 
             if key not in aggregated:
                 aggregated[key] = {
@@ -449,58 +455,46 @@ class Trading:
                     self.trade_ids[symbol] = existing[0]
                     print(f"[SYNC] Entrée déjà existante: {symbol} (ID: {existing[0]})")
 
-            # Traiter les SELL (sorties)
+            # Traiter les SELL (sorties partielles ou totales)
             for sell in trades['sells']:
                 try:
                     fill_time = datetime.strptime(sell['time'], "%Y%m%d %H:%M:%S")
-                except:
+                except Exception:
                     fill_time = datetime.now()
 
-                # Chercher une entrée ouverte (sans date_sortie) pour ce symbole
+                # Chercher une entrée ouverte (quantite_restante > 0) pour ce symbole
                 cursor.execute('''
-                    SELECT id, prix_entree, quantite FROM trades
-                    WHERE symbol = ? AND trade_mode = ? AND date_sortie IS NULL
+                    SELECT id, prix_entree, quantite_restante FROM trades
+                    WHERE symbol = ? AND trade_mode = ? AND (date_sortie IS NULL OR quantite_restante > 0)
                     ORDER BY date_entree DESC LIMIT 1
                 ''', (symbol, self.trade_mode.value))
 
                 entry = cursor.fetchone()
 
                 if entry:
-                    trade_id, entry_price, qty = entry
-                    pnl_brut = (sell['price'] - entry_price) * qty
-                    commission = (entry_price * qty + sell['price'] * qty) * 0.001
-                    pnl_net = pnl_brut - commission
+                    trade_id, entry_price, qty_restante = entry
+                    qty_vendue = min(int(sell['shares']), qty_restante)
 
-                    cursor.execute('''
-                        UPDATE trades SET
-                            date_sortie = ?,
-                            prix_sortie = ?,
-                            cause_sortie = ?,
-                            pnl_brut = ?,
-                            commission = ?,
-                            pnl_net = ?
-                        WHERE id = ?
-                    ''', (
-                        fill_time.strftime('%Y-%m-%d %H:%M:%S'),
-                        sell['price'],
-                        'TRAILING_STOP',
-                        round(pnl_brut, 2),
-                        round(commission, 2),
-                        round(pnl_net, 2),
-                        trade_id
-                    ))
-                    self.trade_journal.conn.commit()
-                    print(f"[SYNC] Sortie ajoutée: {symbol} @ {sell['price']}, PnL: {pnl_net:.2f}$")
+                    # Utiliser log_partial_exit : gère PnL sur qty réelle + fermeture si restant=0
+                    self.trade_journal.log_partial_exit(
+                        trade_id=trade_id,
+                        symbol=symbol,
+                        date_sortie=fill_time,
+                        prix_sortie=sell['price'],
+                        quantite_vendue=qty_vendue,
+                        prix_entree=entry_price,
+                        cause_sortie='TRAILING_STOP'
+                    )
 
-                    # Fermer la position dans position_manager
+                    # Mettre à jour le PositionManager
                     if self.position_manager.has_open_position(symbol):
-                        self.position_manager.close_position(symbol, sell['price'], fill_time)
-
-                    # Retirer du mapping
-                    if symbol in self.trade_ids:
-                        del self.trade_ids[symbol]
+                        pos, _ = self.position_manager.partial_close_position(
+                            symbol, qty_vendue, sell['price'], fill_time
+                        )
+                        if pos and pos.status == "closed" and symbol in self.trade_ids:
+                            del self.trade_ids[symbol]
                 else:
-                    print(f"[SYNC] SELL orphelin ignoré: {symbol} @ {sell['price']} (pas d'entrée correspondante)")
+                    print(f"[SYNC] SELL orphelin ignoré: {symbol} @ {sell['price']} (pas d'entrée ouverte)")
 
         print("[SYNC] Synchronisation terminée")
 
@@ -593,3 +587,6 @@ if __name__ == "__main__":
     finally:
         print("[TRADING] Fermeture...")
         trading.close()
+        # Forcer un exit propre — le thread IB API peut crasher en C lors du GC Python
+        import os
+        os._exit(0)

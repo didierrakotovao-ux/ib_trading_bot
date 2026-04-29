@@ -103,8 +103,7 @@ class MarketDataProvider(EWrapper, EClient):
         """Établit la connexion avec IB Gateway/TWS."""
         try:
             
-            EClient.connect(self, self.host, self.port, self._next_req_id)
-            self._next_req_id += 1
+            EClient.connect(self, self.host, self.port, self.client_id)
             # Lancer le thread de communication
             self._thread = threading.Thread(target=self.run, daemon=True)
             self._thread.start()
@@ -132,7 +131,7 @@ class MarketDataProvider(EWrapper, EClient):
         if self.isConnected():
             EClient.disconnect(self)
         self._connected = False
-        print("🔌 Déconnecté d'IB")
+        print("Deconnecte d'IB")
     
     def is_connected(self) -> bool:
         return self._connected and self.isConnected() # type: ignore
@@ -229,24 +228,39 @@ class MarketDataProvider(EWrapper, EClient):
         ]
         try:
             ticker = yf.Ticker(symbol)
-            df = ticker.history(
-                start=start_date,
-                end=end_date,
-                interval=interval,
-                auto_adjust=False  # Garder les prix non ajustés
-            )
+            df = None
+            for attempt in range(3):
+                try:
+                    df = ticker.history(
+                        start=start_date,
+                        end=end_date,
+                        interval=interval,
+                        auto_adjust=False  # Garder les prix non ajustés
+                    )
+                    break
+                except Exception as retry_e:
+                    if attempt < 2:
+                        time.sleep(2 ** attempt)  # backoff: 1s, 2s
+                    else:
+                        raise retry_e
+            if df is None:
+                return None
             
             if df.empty:
                 print(f"⚠️  Aucune donnée pour {symbol}")
                 return None
-            
-            info = ticker.info
-            name = (info.get('longName') or info.get('shortName') or '').lower()
-            summary = (info.get('summaryDetail') or '').lower() if isinstance(info.get('summaryDetail'), str) else ''
+
+            try:
+                info = ticker.info or {}
+                name = (info.get('longName') or info.get('shortName') or '').lower()
+                summary = (info.get('summaryDetail') or '').lower() if isinstance(info.get('summaryDetail'), str) else ''
                 # Exclure si mot-clé trouvé dans le nom ou le résumé
-            if any(kw in name for kw in leverage_keywords) or any(kw in summary for kw in leverage_keywords):
-                print(f"[FILTRAGE ETF LEVERAGE] {symbol} exclu: {name}")
-                return None
+                if any(kw in name for kw in leverage_keywords) or any(kw in summary for kw in leverage_keywords):
+                    print(f"[FILTRAGE ETF LEVERAGE] {symbol} exclu: {name}")
+                    return None
+            except Exception:
+                # ticker.info peut échouer (rate-limit, timeout) - on continue sans filtrage
+                pass
             
             # Standardiser les colonnes
             df = df.reset_index()
@@ -456,7 +470,9 @@ class MarketDataProvider(EWrapper, EClient):
         self._current_prices[req_id] = 0.0
         self._price_received[req_id] = False
 
-        # Demander les données de marché (snapshot)
+        # Demander snapshot — reqMktDataType(3) active les données différées (15 min, gratuit)
+        # si la souscription temps réel n'est pas disponible
+        self.reqMktDataType(3)
         self.reqMktData(req_id, contract, "", True, False, [])
 
         # Attendre le prix

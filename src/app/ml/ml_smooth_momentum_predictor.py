@@ -76,13 +76,24 @@ class MLSmoothMomentumPredictor:
         """Charge les données depuis la DB avec les métadonnées de secteur."""
         conn = sqlite3.connect(self.db_path)
 
-        query = """
+        cur = conn.cursor()
+        cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='symbol_metadata'")
+        has_metadata = cur.fetchone() is not None
+
+        if has_metadata:
+            sector_expr = "COALESCE(m.sector, 'Unknown') as sector"
+            join_clause = "LEFT JOIN symbol_metadata m ON h.symbol = m.symbol"
+        else:
+            sector_expr = "'Unknown' as sector"
+            join_clause = ""
+
+        query = f"""
             SELECT h.symbol, h.date, h.open, h.high, h.low, h.close, h.volume,
                    h.sma20_volume, h.hl_sma20vol, h.oc_sma20vol,
                    h.macd, h.macd_signal, h.rsi, h.adx, h.bb_high, h.bb_low, h.pct_close,
-                   COALESCE(m.sector, 'Unknown') as sector
+                   {sector_expr}
             FROM historical_data h
-            LEFT JOIN symbol_metadata m ON h.symbol = m.symbol
+            {join_clause}
             WHERE h.close > 0 AND h.volume > 0
         """
 

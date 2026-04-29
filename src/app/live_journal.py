@@ -18,16 +18,17 @@ class LiveJournal:
     Peut synchroniser avec IB et afficher les résultats.
     """
 
-    def __init__(self, port=7497, client_id=99):
+    def __init__(self, port=7497, client_id=None):
         """
         Initialise le journal.
 
         Args:
             port: Port IB (7497=paper TWS, 7496=live TWS, 4002=paper Gateway)
-            client_id: ID client IB (utiliser un ID différent de trading.py)
+            client_id: ID client IB (None = aléatoire dans 90-99 pour éviter les conflits)
         """
+        import random
         self.port = port
-        self.client_id = client_id
+        self.client_id = client_id if client_id is not None else random.randint(150, 199)
         self.trade_mode = TradeMode.PAPER if port == 7497 else TradeMode.LIVE
         self.trade_journal = TradeJournal()
         self.market_data_provider = None
@@ -72,12 +73,17 @@ class LiveJournal:
 
         print(f"[SYNC] {len(executions)} exécutions brutes trouvées")
 
-        # Agréger les fills partiels par symbole et side
+        # Agréger les fills du MÊME jour et du MÊME sens seulement
+        # Les sells de jours différents restent séparés (sorties partielles sur plusieurs jours)
         aggregated = {}
         for ex in executions:
             symbol = ex['symbol']
             side = ex['side']
-            key = f"{symbol}_{side}"
+            try:
+                date_part = ex['time'][:8]
+            except Exception:
+                date_part = "00000000"
+            key = f"{symbol}_{side}_{date_part}"
 
             if key not in aggregated:
                 aggregated[key] = {
@@ -155,48 +161,34 @@ class LiveJournal:
                 else:
                     print(f"  [=] Entrée existante: {symbol} (ID: {existing[0]})")
 
-            # Traiter les SELL (sorties)
+            # Traiter les SELL (sorties partielles ou totales)
             for sell in trades['sells']:
                 try:
                     fill_time = datetime.strptime(sell['time'], "%Y%m%d %H:%M:%S")
-                except:
+                except Exception:
                     fill_time = datetime.now()
 
-                # Chercher une entrée ouverte pour ce symbole
+                # Chercher une entrée ouverte (quantite_restante > 0)
                 cursor.execute('''
-                    SELECT id, prix_entree, quantite FROM trades
-                    WHERE symbol = ? AND trade_mode = ? AND date_sortie IS NULL
+                    SELECT id, prix_entree, quantite_restante FROM trades
+                    WHERE symbol = ? AND trade_mode = ? AND (date_sortie IS NULL OR quantite_restante > 0)
                     ORDER BY date_entree DESC LIMIT 1
                 ''', (symbol, self.trade_mode.value))
 
                 entry = cursor.fetchone()
 
                 if entry:
-                    trade_id, entry_price, qty = entry
-                    pnl_brut = (sell['price'] - entry_price) * qty
-                    commission = (entry_price * qty + sell['price'] * qty) * 0.001
-                    pnl_net = pnl_brut - commission
-
-                    cursor.execute('''
-                        UPDATE trades SET
-                            date_sortie = ?,
-                            prix_sortie = ?,
-                            cause_sortie = ?,
-                            pnl_brut = ?,
-                            commission = ?,
-                            pnl_net = ?
-                        WHERE id = ?
-                    ''', (
-                        fill_time.strftime('%Y-%m-%d %H:%M:%S'),
-                        sell['price'],
-                        'TRAILING_STOP',
-                        round(pnl_brut, 2),
-                        round(commission, 2),
-                        round(pnl_net, 2),
-                        trade_id
-                    ))
-                    self.trade_journal.conn.commit()
-                    print(f"  [+] Sortie ajoutée: {symbol} @ {sell['price']:.2f}, PnL: {pnl_net:.2f}$")
+                    trade_id, entry_price, qty_restante = entry
+                    qty_vendue = min(int(sell['shares']), qty_restante)
+                    self.trade_journal.log_partial_exit(
+                        trade_id=trade_id,
+                        symbol=symbol,
+                        date_sortie=fill_time,
+                        prix_sortie=sell['price'],
+                        quantite_vendue=qty_vendue,
+                        prix_entree=entry_price,
+                        cause_sortie='TRAILING_STOP'
+                    )
                 else:
                     print(f"  [!] SELL orphelin: {symbol} @ {sell['price']:.2f} (pas d'entrée ouverte)")
 

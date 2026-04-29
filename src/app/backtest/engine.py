@@ -197,7 +197,9 @@ class BacktestEngine:
     def _save_results_json(self, results):
         """Sauvegarde les résultats dans un fichier JSON."""
         import json
-        filename = f"backtest_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        resultats_dir = os.path.join(os.path.dirname(__file__), 'resultats')
+        os.makedirs(resultats_dir, exist_ok=True)
+        filename = os.path.join(resultats_dir, f"backtest_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
         with open(filename, 'w') as f:
             json.dump(results, f, indent=2, default=str)
         print(f"[RESULTS] Sauvegardé: {filename}")

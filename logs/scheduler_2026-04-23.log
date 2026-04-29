@@ -1,0 +1,20 @@
+2026-04-23 09:00:01 [INFO] ============================================================
+2026-04-23 09:00:01 [INFO] Scheduler de trading démarré
+2026-04-23 09:00:01 [INFO] Mode: PAPER | Port: 7497
+2026-04-23 09:00:01 [INFO] Dry-run: False
+2026-04-23 09:00:01 [INFO] Planning :
+2026-04-23 09:00:01 [INFO]   09:20 → Prise de position
+2026-04-23 09:00:01 [INFO]   10:00 → Surveillance des stops (boucle jusqu'à 16h) [arrière-plan]
+2026-04-23 09:00:01 [INFO]   16:15 → Synchronisation journal IB
+2026-04-23 09:00:01 [INFO]   16:30 → Mise à jour données US
+2026-04-23 09:00:01 [INFO]   16:45 → Mise à jour données Canada
+2026-04-23 09:00:01 [INFO] ============================================================
+2026-04-23 09:20:02 [INFO] --- Prise de position (09:20) ---
+2026-04-23 09:20:02 [INFO] Port IB utilisé: 7497 (paper)
+2026-04-23 09:20:02 [INFO] >>> Lancement: D:\QuantProjects\ib_trading_bot\.venv\Scripts\python.exe D:\QuantProjects\ib_trading_bot\src\app\trading.py
+2026-04-23 09:20:02 [INFO] Répertoire de travail: D:\QuantProjects\ib_trading_bot\src\app
+2026-04-23 09:21:03 [INFO] Tâche 'trading' terminée avec succès (code 0)
+2026-04-23 10:00:03 [INFO] --- Surveillance des stops (boucle jusqu'à 16h) (10:00) ---
+2026-04-23 10:00:03 [INFO] >>> Lancement: D:\QuantProjects\ib_trading_bot\.venv\Scripts\python.exe D:\QuantProjects\ib_trading_bot\src\app\stop_manager.py --port 7497
+2026-04-23 10:00:03 [INFO] Répertoire de travail: D:\QuantProjects\ib_trading_bot\src\app
+2026-04-23 10:00:03 [INFO] Tâche 'stop_monitor' lancée en arrière-plan

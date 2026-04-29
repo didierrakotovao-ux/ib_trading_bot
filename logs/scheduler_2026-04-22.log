@@ -1,0 +1,34 @@
+2026-04-22 09:00:01 [INFO] ============================================================
+2026-04-22 09:00:01 [INFO] Scheduler de trading démarré
+2026-04-22 09:00:01 [INFO] Mode: PAPER | Port: 7497
+2026-04-22 09:00:01 [INFO] Dry-run: False
+2026-04-22 09:00:01 [INFO] Planning :
+2026-04-22 09:00:01 [INFO]   09:20 → Prise de position
+2026-04-22 09:00:01 [INFO]   10:00 → Surveillance des stops (boucle jusqu'à 16h) [arrière-plan]
+2026-04-22 09:00:01 [INFO]   16:15 → Synchronisation journal IB
+2026-04-22 09:00:01 [INFO]   16:30 → Mise à jour données US
+2026-04-22 09:00:01 [INFO]   16:45 → Mise à jour données Canada
+2026-04-22 09:00:01 [INFO] ============================================================
+2026-04-22 09:20:01 [INFO] --- Prise de position (09:20) ---
+2026-04-22 09:20:01 [INFO] Port IB utilisé: 7497 (paper)
+2026-04-22 09:20:01 [INFO] >>> Lancement: D:\QuantProjects\ib_trading_bot\.venv\Scripts\python.exe D:\QuantProjects\ib_trading_bot\src\app\trading.py
+2026-04-22 09:20:01 [INFO] Répertoire de travail: D:\QuantProjects\ib_trading_bot\src\app
+2026-04-22 09:20:56 [INFO] Tâche 'trading' terminée avec succès (code 0)
+2026-04-22 10:00:26 [INFO] --- Surveillance des stops (boucle jusqu'à 16h) (10:00) ---
+2026-04-22 10:00:26 [INFO] >>> Lancement: D:\QuantProjects\ib_trading_bot\.venv\Scripts\python.exe D:\QuantProjects\ib_trading_bot\src\app\stop_manager.py --port 7497
+2026-04-22 10:00:26 [INFO] Répertoire de travail: D:\QuantProjects\ib_trading_bot\src\app
+2026-04-22 10:00:26 [INFO] Tâche 'stop_monitor' lancée en arrière-plan
+2026-04-22 16:15:27 [INFO] --- Synchronisation journal IB (16:15) ---
+2026-04-22 16:15:27 [INFO] >>> Lancement: D:\QuantProjects\ib_trading_bot\.venv\Scripts\python.exe D:\QuantProjects\ib_trading_bot\src\app\live_journal.py sync --port 7497
+2026-04-22 16:15:27 [INFO] Répertoire de travail: D:\QuantProjects\ib_trading_bot\src\app
+2026-04-22 16:15:34 [INFO] Tâche 'journal_sync' terminée avec succès (code 0)
+2026-04-22 16:30:04 [INFO] --- Mise à jour données US (16:30) ---
+2026-04-22 16:30:04 [INFO] >>> Lancement: D:\QuantProjects\ib_trading_bot\.venv\Scripts\python.exe D:\QuantProjects\ib_trading_bot\src\app\database\update_historical_data.py
+2026-04-22 16:30:04 [INFO] Répertoire de travail: D:\QuantProjects\ib_trading_bot
+2026-04-22 17:00:04 [ERROR] Tâche 'update_us' : timeout (30 min dépassé)
+2026-04-22 17:00:04 [WARNING] Tâche 'update_us' échouée, elle ne sera pas relancée automatiquement.
+2026-04-22 17:00:34 [INFO] --- Mise à jour données Canada (16:45) ---
+2026-04-22 17:00:34 [INFO] >>> Lancement: D:\QuantProjects\ib_trading_bot\.venv\Scripts\python.exe D:\QuantProjects\ib_trading_bot\src\app\database\update_canada_data.py
+2026-04-22 17:00:34 [INFO] Répertoire de travail: D:\QuantProjects\ib_trading_bot
+2026-04-22 17:24:32 [INFO] Tâche 'update_canada' terminée avec succès (code 0)
+2026-04-22 17:24:32 [INFO] Toutes les tâches du jour terminées. Prochain cycle demain à 09h00 (dans 15h59m)

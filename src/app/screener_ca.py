@@ -54,7 +54,7 @@ class CanadianScreener:
         """Initialise le scorer ML selon le type choisi."""
         if self.scoring_type == "smooth_ml":
             return SmoothMLScoring(
-                model_path="models/smooth_momentum_model.pkl",
+                model_path="models/smooth_ml_ca.pkl",
                 db_path=os.path.basename(self.db_path)
             )
         elif self.scoring_type == "ml":

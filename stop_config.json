@@ -1,0 +1,67 @@
+
+{
+  "_comment": "Configuration des stops et prises de bénéfice — modifier selon les résultats des tests",
+
+  "_usage": {
+    "description": "Lancer stop_manager.py depuis la racine du projet",
+    "commandes": {
+      "boucle_paper":   "python src/app/stop_manager.py --port 7497",
+      "boucle_live":    "python src/app/stop_manager.py --port 7496 --live",
+      "setup_only":     "python src/app/stop_manager.py --setup-only",
+      "afficher_stops": "python src/app/stop_manager.py --show"
+    },
+    "options": {
+      "--port":        "Port IB Gateway/TWS  (7497 = paper TWS | 7496 = live TWS | 4002 = IB Gateway)",
+      "--live":        "Active le mode live trading (sans ce flag = paper par défaut)",
+      "--setup-only":  "Configure les niveaux stop/TP dans la BD sans démarrer la surveillance",
+      "--show":        "Affiche les stops actifs en BD et quitte immédiatement"
+    }
+  },
+
+
+  "_protection_doc": {
+    "type_fixed":    "Stop à prix fixe : order STOP placé à entry × (1 - pct/100). Simple, prévisible.",
+    "type_trailing": "Stop suiveur    : remonte avec le prix, déclenche si recul de pct% depuis le plus haut.",
+    "pct_conseils":  "Backtest results — trailing 5% : trop serré (churning), trailing 8-12% : meilleur ratio gain/perte"
+  },
+
+  "protection": {
+    "type": "trailing",
+    "_type_options": ["fixed", "trailing"],
+    "pct": 8.0,
+    "_pct_comment": "% de recul depuis le prix d'entrée (fixed) ou depuis le plus haut (trailing)"
+  },
+
+  "_profit_doc": {
+    "type_fixed":   "Limite fixe : ordre LIMIT à entry × (1 + fixed_pct/100). Cible connue à l'avance.",
+    "type_dynamic": "Limite ATR  : ordre LIMIT à entry + (dynamic_atr_mult × ATR). S'adapte à la volatilité du titre.",
+    "conseil":      "dynamic recommandé sur titres volatils (ATR élevé), fixed sur titres stables"
+  },
+
+  "profit": {
+    "type": "fixed",
+    "_type_options": ["fixed", "dynamic"],
+    "fixed_pct": 15.0,
+    "_fixed_pct_comment": "% de hausse depuis le prix d'entrée pour prise de bénéfice fixe",
+    "dynamic_atr_mult": 2.0,
+    "_dynamic_atr_mult_comment": "Multiplicateur ATR : target = entry + N × ATR(dynamic_atr_period)",
+    "dynamic_atr_period": 14,
+    "_dynamic_atr_period_comment": "Période ATR (14 = standard, 20 = plus lissé)"
+  },
+
+  "execution": {
+    "use_darkice_for_profit": true,
+    "_darkice_comment": "DarkIce pour la prise de bénéfice (moins visible au marché)",
+    "darkice_start": "09:35:00",
+    "darkice_end": "15:45:00",
+    "protection_order_type": "MKT",
+    "_protection_order_comment": "MKT = exécution immédiate quand stop virtuel déclenché"
+  },
+
+  "monitoring": {
+    "check_interval_sec": 300,
+    "_check_interval_comment": "Fréquence de vérification des niveaux (secondes). 300 = toutes les 5 min",
+    "active_hours_start": "09:30",
+    "active_hours_end": "15:55"
+  }
+}

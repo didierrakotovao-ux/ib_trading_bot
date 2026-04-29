@@ -1,0 +1,8 @@
+2026-04-29 09:00:18 [INFO] ============================================================
+2026-04-29 09:00:18 [INFO] Scheduler de trading démarré
+2026-04-29 09:00:18 [INFO] Mode: PAPER | Port: 7497
+2026-04-29 09:00:18 [INFO] Dry-run: False
+2026-04-29 09:00:18 [INFO] Planning :
+2026-04-29 09:00:18 [INFO]   09:20 → Prise de position
+2026-04-29 09:00:18 [INFO]   10:00 → Surveillance des stops (boucle jusqu'à 16h) [arrière-plan]
+2026-04-29 09:00:18 [INFO] ============================================================

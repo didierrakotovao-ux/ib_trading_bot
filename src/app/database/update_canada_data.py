@@ -30,7 +30,7 @@ class CanadaDataUpdater:
 
     def get_symbols(self) -> list:
         """Récupère tous les symboles en base."""
-        conn = sqlite3.connect(self.db_path)
+        conn = sqlite3.connect(self.db_path, timeout=60)
         cursor = conn.cursor()
         cursor.execute("SELECT DISTINCT symbol FROM historical_data ORDER BY symbol")
         symbols = [row[0] for row in cursor.fetchall()]
@@ -39,7 +39,7 @@ class CanadaDataUpdater:
 
     def get_last_global_date(self) -> str:
         """Récupère la dernière date globale en base."""
-        conn = sqlite3.connect(self.db_path)
+        conn = sqlite3.connect(self.db_path, timeout=60)
         cursor = conn.cursor()
         cursor.execute("SELECT MAX(date) FROM historical_data")
         result = cursor.fetchone()
@@ -75,7 +75,7 @@ class CanadaDataUpdater:
             if df.empty:
                 return 0
 
-            conn = sqlite3.connect(self.db_path)
+            conn = sqlite3.connect(self.db_path, timeout=60)
             total_inserted = 0
 
             # Si un seul symbole, la structure est différente

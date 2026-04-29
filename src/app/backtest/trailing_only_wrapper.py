@@ -23,6 +23,7 @@ class TrailingOnlyBTWrapper(bt.Strategy):
         capital=100000,
         max_stocks=5,
         trailing_percent=5.0,  # Trailing stop à 5%
+        cooldown_days=30,       # Jours d'interdiction de réentrée après stop-out (0 = désactivé)
         dataframes=None,  # DataFrames pré-chargés depuis SQLite
         scoring_type="smooth_ml",  # Type de scoring: "ml", "smooth_ml", "earnings_ml"
         use_sue_filter=False,  # Filtre SUE (Novy-Marx)
@@ -63,6 +64,7 @@ class TrailingOnlyBTWrapper(bt.Strategy):
         self.pending_order_bundles = {}
         self.last_entry_prices = {}
         self.pending_stops = {}
+        self.stop_exit_dates = {}   # symbol → date de dernier stop-out
 
         # Journal de trading en BD
         self.trade_entries = {}
@@ -73,7 +75,9 @@ class TrailingOnlyBTWrapper(bt.Strategy):
 
         # Préparation du fichier de diagnostic
         diag_date = datetime.now().strftime("%Y%m%d_%H%M%S")
-        self.diag_filename = f"diagnostique_trailing_only_{diag_date}.txt"
+        resultats_dir = os.path.join(os.path.dirname(__file__), 'resultats')
+        os.makedirs(resultats_dir, exist_ok=True)
+        self.diag_filename = os.path.join(resultats_dir, f"diagnostique_trailing_only_{diag_date}.txt")
         with open(self.diag_filename, "w") as f:
             f.write(f"--- Début du diagnostic TrailingOnly ({diag_date}) ---\n")
 
@@ -186,6 +190,10 @@ class TrailingOnlyBTWrapper(bt.Strategy):
                     )
                     del self.trade_entries[symbol]
 
+                # Enregistrer la date de stop-out pour le cooldown
+                if self.p.cooldown_days > 0:
+                    self.stop_exit_dates[symbol] = order.data.datetime.date(0)
+
                 # Nettoyage complet de tous les dictionnaires pour permettre une réentrée
                 if symbol in self.pending_stops:
                     del self.pending_stops[symbol]
@@ -195,8 +203,10 @@ class TrailingOnlyBTWrapper(bt.Strategy):
                     del self.orders_by_symbol[symbol]
                 if symbol in self.pending_order_bundles:
                     del self.pending_order_bundles[symbol]
-                    
-                self.log_diag(f"[CLEANUP] Position fermée pour {symbol} via {order_type}, PnL: {pnl:.2f}, Bars: {bars_held}, tous les trackers nettoyés")
+
+                cooldown_msg = (f", cooldown jusqu'au {self.stop_exit_dates[symbol] + timedelta(days=self.p.cooldown_days)}"
+                                if self.p.cooldown_days > 0 else "")
+                self.log_diag(f"[CLEANUP] Position fermée pour {symbol} via {order_type}, PnL: {pnl:.2f}, Bars: {bars_held}{cooldown_msg}")
 
             self.pending_order_bundles[symbol] = None
 
@@ -246,7 +256,14 @@ class TrailingOnlyBTWrapper(bt.Strategy):
             if has_position or has_pending_order or has_pending_stop:
                 self.log_diag(f"[FILTER] {symbol} ignoré (position={has_position}, order={has_pending_order}, stop={has_pending_stop})")
                 continue
-                
+
+            # Vérifier le cooldown après stop-out
+            if self.p.cooldown_days > 0 and symbol in self.stop_exit_dates:
+                days_since_stop = (current_date - self.stop_exit_dates[symbol]).days
+                if days_since_stop < self.p.cooldown_days:
+                    self.log_diag(f"[COOLDOWN] {symbol} ignoré (stop il y a {days_since_stop}j, cooldown={self.p.cooldown_days}j)")
+                    continue
+
             symbols_available.append(symbol)
         
         if not symbols_available:

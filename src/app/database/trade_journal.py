@@ -38,7 +38,7 @@ class TradeJournal:
     def connect(self):
         """Établit la connexion à la base de données."""
         if self.conn is None:
-            self.conn = sqlite3.connect(self.db_path, check_same_thread=False)
+            self.conn = sqlite3.connect(self.db_path, check_same_thread=False, timeout=60)
             self.conn.row_factory = sqlite3.Row
 
     def close(self):
@@ -68,13 +68,14 @@ class TradeJournal:
                 date_entree DATETIME NOT NULL,
                 prix_entree REAL NOT NULL,
                 quantite INTEGER NOT NULL,
+                quantite_restante INTEGER NOT NULL DEFAULT 0,
 
-                -- Sortie
+                -- Sortie (renseignée uniquement quand quantite_restante = 0)
                 date_sortie DATETIME,
                 prix_sortie REAL,
                 cause_sortie TEXT,
 
-                -- Performance
+                -- Performance (cumulée sur toutes les sorties partielles)
                 pnl_brut REAL,
                 commission REAL,
                 pnl_net REAL,
@@ -93,6 +94,42 @@ class TradeJournal:
 
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
+        """)
+
+        # Migration : ajouter quantite_restante si la colonne n'existe pas encore
+        try:
+            cursor.execute("ALTER TABLE trades ADD COLUMN quantite_restante INTEGER NOT NULL DEFAULT 0")
+            # Initialiser quantite_restante = quantite pour les lignes existantes
+            cursor.execute("UPDATE trades SET quantite_restante = quantite WHERE quantite_restante = 0 AND date_sortie IS NULL")
+        except Exception:
+            pass  # Colonne déjà présente
+
+        # Table des sorties partielles : une ligne par événement de vente
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS trade_exits (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                trade_id INTEGER NOT NULL,
+                symbol TEXT NOT NULL,
+                date_sortie DATETIME NOT NULL,
+                prix_sortie REAL NOT NULL,
+                quantite_vendue INTEGER NOT NULL,
+                cause_sortie TEXT,
+                pnl_brut REAL,
+                commission REAL,
+                pnl_net REAL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (trade_id) REFERENCES trades(id)
+            )
+        """)
+
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_trade_exits_trade_id
+            ON trade_exits(trade_id)
+        """)
+
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_trade_exits_symbol_date
+            ON trade_exits(symbol, date_sortie DESC)
         """)
 
         # Index pour les requêtes fréquentes
@@ -190,15 +227,18 @@ class TradeJournal:
 
         cursor = self.conn.cursor()
 
+        # quantite_restante = quantite à l'entrée (si pas de sortie immédiate, ex: backtest)
+        quantite_restante_init = 0 if date_sortie else quantite
+
         cursor.execute("""
             INSERT INTO trades (
                 trade_mode, strategy_name, symbol,
-                date_entree, prix_entree, quantite,
+                date_entree, prix_entree, quantite, quantite_restante,
                 date_sortie, prix_sortie, cause_sortie,
                 pnl_brut, commission, pnl_net,
                 bars_held, score_entree, exhaustion_signals,
                 backtest_start_date, backtest_end_date, notes
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             trade_mode.value,
             strategy_name,
@@ -206,6 +246,7 @@ class TradeJournal:
             date_entree.strftime('%Y-%m-%d %H:%M:%S') if date_entree else None,
             prix_entree,
             quantite,
+            quantite_restante_init,
             date_sortie.strftime('%Y-%m-%d %H:%M:%S') if date_sortie else None,
             prix_sortie,
             cause_sortie,
@@ -222,6 +263,99 @@ class TradeJournal:
 
         self.conn.commit()
         return cursor.lastrowid or 0
+
+    def log_partial_exit(
+        self,
+        trade_id: int,
+        symbol: str,
+        date_sortie: datetime,
+        prix_sortie: float,
+        quantite_vendue: int,
+        prix_entree: float,
+        cause_sortie: str = "MANUAL"
+    ) -> int:
+        """
+        Enregistre une sortie partielle ou totale d'une position.
+
+        - Insère une ligne dans trade_exits
+        - Décrémente quantite_restante sur la trade parente
+        - Si quantite_restante atteint 0, ferme la trade (date_sortie, PnL cumulé)
+
+        Returns:
+            ID de la ligne trade_exits insérée
+        """
+        self.connect()
+        if self.conn is None:
+            raise RuntimeError("Connexion BD échouée")
+
+        commission_rate = 0.001
+        pnl_brut = (prix_sortie - prix_entree) * quantite_vendue
+        commission = (prix_entree * quantite_vendue + prix_sortie * quantite_vendue) * commission_rate
+        pnl_net = pnl_brut - commission
+
+        cursor = self.conn.cursor()
+
+        # Insérer la sortie partielle
+        cursor.execute("""
+            INSERT INTO trade_exits (trade_id, symbol, date_sortie, prix_sortie,
+                                     quantite_vendue, cause_sortie, pnl_brut, commission, pnl_net)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            trade_id, symbol,
+            date_sortie.strftime('%Y-%m-%d %H:%M:%S'),
+            prix_sortie, quantite_vendue, cause_sortie,
+            round(pnl_brut, 2), round(commission, 2), round(pnl_net, 2)
+        ))
+        exit_id = cursor.lastrowid
+
+        # Décrémenter quantite_restante
+        cursor.execute("""
+            UPDATE trades SET quantite_restante = quantite_restante - ?
+            WHERE id = ?
+        """, (quantite_vendue, trade_id))
+
+        # Vérifier si la position est entièrement fermée
+        cursor.execute("SELECT quantite_restante FROM trades WHERE id = ?", (trade_id,))
+        row = cursor.fetchone()
+        if row and row[0] <= 0:
+            # Calculer le PnL cumulé de toutes les sorties
+            cursor.execute("""
+                SELECT SUM(pnl_brut), SUM(commission), SUM(pnl_net), MAX(date_sortie)
+                FROM trade_exits WHERE trade_id = ?
+            """, (trade_id,))
+            totals = cursor.fetchone()
+            total_pnl_brut = totals[0] or 0
+            total_commission = totals[1] or 0
+            total_pnl_net = totals[2] or 0
+            last_exit_date = totals[3]
+
+            cursor.execute("""
+                UPDATE trades SET
+                    date_sortie = ?,
+                    prix_sortie = ?,
+                    cause_sortie = ?,
+                    pnl_brut = ?,
+                    commission = ?,
+                    pnl_net = ?,
+                    quantite_restante = 0
+                WHERE id = ?
+            """, (
+                last_exit_date,
+                prix_sortie,
+                cause_sortie,
+                round(total_pnl_brut, 2),
+                round(total_commission, 2),
+                round(total_pnl_net, 2),
+                trade_id
+            ))
+            print(f"[JOURNAL] Position fermée (trade_id={trade_id}): PnL net total = {total_pnl_net:.2f}$")
+        else:
+            restant = row[0] if row else '?'
+            print(f"[JOURNAL] Sortie partielle enregistrée (trade_id={trade_id}): "
+                  f"{quantite_vendue} vendues @ {prix_sortie:.2f}, PnL={pnl_net:.2f}$, restant={restant}")
+
+        self.conn.commit()
+        return exit_id or 0
 
     def get_trades(
         self,

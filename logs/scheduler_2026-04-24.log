@@ -1,0 +1,65 @@
+2026-04-24 09:00:00 [INFO] ============================================================
+2026-04-24 09:00:00 [INFO] Scheduler de trading démarré
+2026-04-24 09:00:00 [INFO] Mode: PAPER | Port: 7497
+2026-04-24 09:00:00 [INFO] Dry-run: False
+2026-04-24 09:00:00 [INFO] Planning :
+2026-04-24 09:00:00 [INFO]   09:20 → Prise de position
+2026-04-24 09:00:00 [INFO]   10:00 → Surveillance des stops (boucle jusqu'à 16h) [arrière-plan]
+2026-04-24 09:00:00 [INFO]   16:15 → Synchronisation journal IB
+2026-04-24 09:00:00 [INFO]   16:30 → Mise à jour données US
+2026-04-24 09:00:00 [INFO]   16:45 → Mise à jour données Canada
+2026-04-24 09:00:00 [INFO] ============================================================
+2026-04-24 09:20:00 [INFO] --- Prise de position (09:20) ---
+2026-04-24 09:20:00 [INFO] Port IB utilisé: 7497 (paper)
+2026-04-24 09:20:00 [INFO] >>> Lancement: D:\QuantProjects\ib_trading_bot\.venv\Scripts\python.exe D:\QuantProjects\ib_trading_bot\src\app\trading.py
+2026-04-24 09:20:00 [INFO] Répertoire de travail: D:\QuantProjects\ib_trading_bot\src\app
+2026-04-24 09:20:48 [INFO] Tâche 'trading' terminée avec succès (code 0)
+2026-04-24 10:00:18 [INFO] --- Surveillance des stops (boucle jusqu'à 16h) (10:00) ---
+2026-04-24 10:00:18 [INFO] >>> Lancement: D:\QuantProjects\ib_trading_bot\.venv\Scripts\python.exe D:\QuantProjects\ib_trading_bot\src\app\stop_manager.py --port 7497
+2026-04-24 10:00:18 [INFO] Répertoire de travail: D:\QuantProjects\ib_trading_bot\src\app
+2026-04-24 10:00:18 [INFO] Tâche 'stop_monitor' lancée en arrière-plan
+2026-04-24 16:15:19 [INFO] --- Synchronisation journal IB (16:15) ---
+2026-04-24 16:15:19 [INFO] >>> Lancement: D:\QuantProjects\ib_trading_bot\.venv\Scripts\python.exe D:\QuantProjects\ib_trading_bot\src\app\live_journal.py sync --port 7497
+2026-04-24 16:15:19 [INFO] Répertoire de travail: D:\QuantProjects\ib_trading_bot\src\app
+2026-04-24 16:15:22 [INFO] Tâche 'journal_sync' terminée avec succès (code 0)
+2026-04-24 16:30:22 [INFO] --- Mise à jour données US (16:30) ---
+2026-04-24 16:30:22 [INFO] >>> Lancement: D:\QuantProjects\ib_trading_bot\.venv\Scripts\python.exe D:\QuantProjects\ib_trading_bot\src\app\database\update_historical_data.py
+2026-04-24 16:30:22 [INFO] Répertoire de travail: D:\QuantProjects\ib_trading_bot
+2026-04-24 17:00:22 [ERROR] Tâche 'update_us' : timeout (30 min dépassé)
+2026-04-24 17:00:22 [WARNING] Tâche 'update_us' échouée, elle ne sera pas relancée automatiquement.
+2026-04-24 17:00:52 [INFO] --- Mise à jour données Canada (16:45) ---
+2026-04-24 17:00:52 [INFO] >>> Lancement: D:\QuantProjects\ib_trading_bot\.venv\Scripts\python.exe D:\QuantProjects\ib_trading_bot\src\app\database\update_canada_data.py
+2026-04-24 17:00:52 [INFO] Répertoire de travail: D:\QuantProjects\ib_trading_bot
+2026-04-24 17:28:18 [INFO] Tâche 'update_canada' terminée avec succès (code 0)
+2026-04-24 17:28:18 [INFO] Toutes les tâches du jour terminées. Prochain cycle demain à 09h00 (dans 15h59m)
+2026-04-25 09:27:26 [INFO] Weekend — prochaine vérification demain 8h00 (dans 22h)
+2026-04-25 10:27:26 [INFO] Weekend — prochaine vérification demain 8h00 (dans 21h)
+2026-04-25 11:27:26 [INFO] Weekend — prochaine vérification demain 8h00 (dans 20h)
+2026-04-25 12:27:27 [INFO] Weekend — prochaine vérification demain 8h00 (dans 19h)
+2026-04-25 13:27:27 [INFO] Weekend — prochaine vérification demain 8h00 (dans 18h)
+2026-04-25 14:27:27 [INFO] Weekend — prochaine vérification demain 8h00 (dans 17h)
+2026-04-25 15:27:28 [INFO] Weekend — prochaine vérification demain 8h00 (dans 16h)
+2026-04-25 16:27:28 [INFO] Weekend — prochaine vérification demain 8h00 (dans 15h)
+2026-04-25 17:27:28 [INFO] Weekend — prochaine vérification demain 8h00 (dans 14h)
+2026-04-25 18:27:28 [INFO] Weekend — prochaine vérification demain 8h00 (dans 13h)
+2026-04-25 19:27:28 [INFO] Weekend — prochaine vérification demain 8h00 (dans 12h)
+2026-04-25 20:27:28 [INFO] Weekend — prochaine vérification demain 8h00 (dans 11h)
+2026-04-25 21:27:28 [INFO] Weekend — prochaine vérification demain 8h00 (dans 10h)
+2026-04-25 22:27:28 [INFO] Weekend — prochaine vérification demain 8h00 (dans 9h)
+2026-04-25 23:27:29 [INFO] Weekend — prochaine vérification demain 8h00 (dans 8h)
+2026-04-26 00:27:33 [INFO] Weekend — prochaine vérification demain 8h00 (dans 31h)
+2026-04-26 01:27:34 [INFO] Weekend — prochaine vérification demain 8h00 (dans 30h)
+2026-04-26 02:27:36 [INFO] Weekend — prochaine vérification demain 8h00 (dans 29h)
+2026-04-26 03:27:37 [INFO] Weekend — prochaine vérification demain 8h00 (dans 28h)
+2026-04-26 04:27:45 [INFO] Weekend — prochaine vérification demain 8h00 (dans 27h)
+2026-04-26 05:27:46 [INFO] Weekend — prochaine vérification demain 8h00 (dans 26h)
+2026-04-26 06:28:45 [INFO] Weekend — prochaine vérification demain 8h00 (dans 25h)
+2026-04-26 07:29:32 [INFO] Weekend — prochaine vérification demain 8h00 (dans 24h)
+2026-04-26 08:30:12 [INFO] Weekend — prochaine vérification demain 8h00 (dans 23h)
+2026-04-26 09:30:50 [INFO] Weekend — prochaine vérification demain 8h00 (dans 22h)
+2026-04-26 10:33:05 [INFO] Weekend — prochaine vérification demain 8h00 (dans 21h)
+2026-04-26 11:34:59 [INFO] Weekend — prochaine vérification demain 8h00 (dans 20h)
+2026-04-26 12:37:02 [INFO] Weekend — prochaine vérification demain 8h00 (dans 19h)
+2026-04-26 13:38:27 [INFO] Weekend — prochaine vérification demain 8h00 (dans 18h)
+2026-04-26 14:39:39 [INFO] Weekend — prochaine vérification demain 8h00 (dans 17h)
+2026-04-26 15:40:11 [INFO] Weekend — prochaine vérification demain 8h00 (dans 16h)

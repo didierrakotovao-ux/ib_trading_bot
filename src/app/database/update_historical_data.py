@@ -27,7 +27,7 @@ class HistoricalDataUpdater:
 
     def get_symbols_to_update(self) -> list:
         """Récupère tous les symboles de la base de données."""
-        conn = sqlite3.connect(self.db_path)
+        conn = sqlite3.connect(self.db_path, timeout=60)
         cursor = conn.cursor()
         cursor.execute("SELECT DISTINCT symbol FROM historical_data ORDER BY symbol")
         symbols = [row[0] for row in cursor.fetchall()]
@@ -36,7 +36,7 @@ class HistoricalDataUpdater:
 
     def get_last_date(self, symbol: str) -> str:
         """Récupère la dernière date en base pour un symbole."""
-        conn = sqlite3.connect(self.db_path)
+        conn = sqlite3.connect(self.db_path, timeout=60)
         cursor = conn.cursor()
         cursor.execute("""
             SELECT MAX(date) FROM historical_data WHERE symbol = ?
@@ -95,7 +95,7 @@ class HistoricalDataUpdater:
             df['source'] = 'yfinance'
 
             # Insérer en base
-            conn = sqlite3.connect(self.db_path)
+            conn = sqlite3.connect(self.db_path, timeout=60)
             cursor = conn.cursor()
 
             inserted = 0
