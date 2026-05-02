@@ -1,7 +1,7 @@
-"""
+﻿"""
 Wrapper Backtrader pour actions canadiennes (TSX/TSXV/NEO).
-Applique le même pipeline que CanadianScreener :
-  Momentum 12-1 (top 30%) → FIP < 0 → Score ML ≥ seuil saisonnier
+Applique le mÃªme pipeline que CanadianScreener :
+  Momentum 12-1 (top 30%) â†’ FIP < 0 â†’ Score ML â‰¥ seuil saisonnier
 
 Stops configurables depuis stop_config.json (identique au wrapper US).
 
@@ -26,8 +26,8 @@ from market_data_mock import MarketDataMock
 
 class CanadaBTWrapper(bt.Strategy):
     """
-    Wrapper Backtrader pour le marché canadien.
-    Pipeline : Momentum 12-1 → FIP → ML (smooth_ml) avec stops configurables.
+    Wrapper Backtrader pour le marchÃ© canadien.
+    Pipeline : Momentum 12-1 â†’ FIP â†’ ML (smooth_ml) avec stops configurables.
     """
     params = dict(
         capital=100000,
@@ -45,7 +45,7 @@ class CanadaBTWrapper(bt.Strategy):
 
         self.stop_cfg: StopConfig = self.p.config
         if self.stop_cfg is None:
-            raise ValueError("Passer un StopConfig via le paramètre 'config'")
+            raise ValueError("Passer un StopConfig via le paramÃ¨tre 'config'")
 
         self.market_data = MarketDataMock(self.datas)
         if self.p.dataframes:
@@ -82,7 +82,7 @@ class CanadaBTWrapper(bt.Strategy):
                 else f"atr{self.stop_cfg.profit_atr_mult:.1f}")
         self.strategy_name = f"CA_StopConfig_{prot}_{prof}"
 
-        self.trade_journal = TradeJournal()
+        self.trade_journal = TradeJournal("backtest_journal.db")
         self.trade_journal.clear_backtest_trades(self.strategy_name)
 
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -91,14 +91,14 @@ class CanadaBTWrapper(bt.Strategy):
         self.diag_filename = os.path.join(resultats_dir, f"diagnostique_canada_{ts}.txt")
         profit_desc = (f"fixed +{self.stop_cfg.profit_fixed_pct}%"
                        if self.stop_cfg.profit_type == "fixed"
-                       else f"dynamic {self.stop_cfg.profit_atr_mult}×ATR({self.stop_cfg.profit_atr_period})")
+                       else f"dynamic {self.stop_cfg.profit_atr_mult}Ã—ATR({self.stop_cfg.profit_atr_period})")
         with open(self.diag_filename, "w") as f:
             f.write(f"--- CanadaBTWrapper ({ts}) ---\n")
             f.write(f"DB         : {db_path}\n")
             f.write(f"Protection : {self.stop_cfg.protection_type} -{self.stop_cfg.protection_pct}%\n")
             f.write(f"Profit     : {profit_desc}\n\n")
 
-        print(f"[BT-CA] Stratégie : {self.strategy_name}")
+        print(f"[BT-CA] StratÃ©gie : {self.strategy_name}")
         print(f"[BT-CA] Protection : {self.stop_cfg.protection_type} -{self.stop_cfg.protection_pct}%")
         print(f"[BT-CA] Profit     : {profit_desc}")
 
@@ -253,7 +253,7 @@ class CanadaBTWrapper(bt.Strategy):
             entry_order = self.buy(data=data, size=qty)
             if entry_order:
                 self.orders_by_symbol[symbol] = {"entry": entry_order}
-                self.log_diag(f"[BT-CA] {symbol}: Entrée qty={qty}")
+                self.log_diag(f"[BT-CA] {symbol}: EntrÃ©e qty={qty}")
 
     def stop(self):
         for data in self.datas:
@@ -289,7 +289,7 @@ class CanadaBTWrapper(bt.Strategy):
                 del self.trade_entries[symbol]
 
         print("\n" + "=" * 60)
-        print(f"RÉSUMÉ BD — {self.strategy_name}")
+        print(f"RÃ‰SUMÃ‰ BD â€” {self.strategy_name}")
         print("=" * 60)
         summary = self.trade_journal.get_performance_summary(
             trade_mode=TradeMode.BACKTEST,
@@ -357,3 +357,4 @@ class CanadaBTWrapper(bt.Strategy):
     def notify_trade(self, trade):
         if trade.isclosed:
             self.orders_by_symbol.pop(trade.data._name, None)
+

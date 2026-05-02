@@ -1,7 +1,7 @@
-"""
-Wrapper Backtrader avec stop activé uniquement après détection d'essoufflement du mouvement.
-L'idée: laisser courir les profits tant que le momentum est fort, puis activer un trailing stop
-dès que des signes d'essoufflement sont détectés.
+﻿"""
+Wrapper Backtrader avec stop activÃ© uniquement aprÃ¨s dÃ©tection d'essoufflement du mouvement.
+L'idÃ©e: laisser courir les profits tant que le momentum est fort, puis activer un trailing stop
+dÃ¨s que des signes d'essoufflement sont dÃ©tectÃ©s.
 """
 import backtrader as bt
 from datetime import date, datetime, timedelta
@@ -17,26 +17,26 @@ from market_data_mock import MarketDataMock
 
 class ExhaustionStopBTWrapper(bt.Strategy):
     """
-    Stratégie avec stop activé uniquement après détection d'essoufflement.
+    StratÃ©gie avec stop activÃ© uniquement aprÃ¨s dÃ©tection d'essoufflement.
 
-    Indicateurs d'essoufflement utilisés:
-    - MACD histogram décroissant sur N jours
-    - RSI en zone extrême (>70 pour long)
-    - Volume ratio décroissant
-    - ADX décroissant (tendance qui faiblit)
+    Indicateurs d'essoufflement utilisÃ©s:
+    - MACD histogram dÃ©croissant sur N jours
+    - RSI en zone extrÃªme (>70 pour long)
+    - Volume ratio dÃ©croissant
+    - ADX dÃ©croissant (tendance qui faiblit)
 
-    Le stop n'est placé que lorsque plusieurs de ces signaux convergent.
+    Le stop n'est placÃ© que lorsque plusieurs de ces signaux convergent.
     """
     params = dict(
         capital=100000,
         max_stocks=5,
-        trailing_percent=5.0,           # Trailing stop une fois activé
+        trailing_percent=5.0,           # Trailing stop une fois activÃ©
         exhaustion_threshold=2,         # Nombre de signaux requis pour confirmer l'essoufflement
-        macd_lookback=3,                # Jours pour évaluer la tendance MACD
+        macd_lookback=3,                # Jours pour Ã©valuer la tendance MACD
         rsi_extreme=70,                 # Seuil RSI surachat
         volume_lookback=5,              # Jours pour comparer le volume
-        adx_lookback=3,                 # Jours pour évaluer la tendance ADX
-        min_bars_before_check=3,        # Bars minimum avant de vérifier l'essoufflement
+        adx_lookback=3,                 # Jours pour Ã©valuer la tendance ADX
+        min_bars_before_check=3,        # Bars minimum avant de vÃ©rifier l'essoufflement
         dataframes=None
     )
 
@@ -47,11 +47,11 @@ class ExhaustionStopBTWrapper(bt.Strategy):
         # MarketData mock avec cache des DataFrames
         self.market_data = MarketDataMock(self.datas)
 
-        # Injecter les DataFrames pré-chargés dans le cache
+        # Injecter les DataFrames prÃ©-chargÃ©s dans le cache
         if self.p.dataframes:
             self._preload_cache(self.p.dataframes)
 
-        # Stratégie métier
+        # StratÃ©gie mÃ©tier
         self.strategy = AdDivergenceStrategy(
             market_data=self.market_data,
             capital=self.p.capital,
@@ -63,16 +63,16 @@ class ExhaustionStopBTWrapper(bt.Strategy):
         self.last_entry_prices = {}
         self.pending_stops = {}
 
-        # Tracking pour la détection d'essoufflement
-        self.entry_bar = {}              # Bar d'entrée pour chaque symbole
-        self.stop_activated = {}         # Si le stop a été activé
-        self.exhaustion_detected = {}    # Si l'essoufflement a été détecté
+        # Tracking pour la dÃ©tection d'essoufflement
+        self.entry_bar = {}              # Bar d'entrÃ©e pour chaque symbole
+        self.stop_activated = {}         # Si le stop a Ã©tÃ© activÃ©
+        self.exhaustion_detected = {}    # Si l'essoufflement a Ã©tÃ© dÃ©tectÃ©
 
         # Journal de trading en BD
         self.trade_entries = {}
         self.strategy_name = "ExhaustionStop"
-        self.trade_journal = TradeJournal()
-        # Effacer les trades backtest existants pour cette stratégie
+        self.trade_journal = TradeJournal("backtest_journal.db")
+        # Effacer les trades backtest existants pour cette stratÃ©gie
         self.trade_journal.clear_backtest_trades(self.strategy_name)
 
         # Stats d'essoufflement
@@ -82,14 +82,14 @@ class ExhaustionStopBTWrapper(bt.Strategy):
             'exhaustion_signals': []
         }
 
-        # Préparation du fichier de diagnostic
+        # PrÃ©paration du fichier de diagnostic
         diag_date = datetime.now().strftime("%Y%m%d_%H%M%S")
         resultats_dir = os.path.join(os.path.dirname(__file__), 'resultats')
         os.makedirs(resultats_dir, exist_ok=True)
         self.diag_filename = os.path.join(resultats_dir, f"diagnostique_exhaustion_{diag_date}.txt")
         with open(self.diag_filename, "w") as f:
-            f.write(f"--- Début du diagnostic Exhaustion Stop ({diag_date}) ---\n")
-            f.write(f"Paramètres:\n")
+            f.write(f"--- DÃ©but du diagnostic Exhaustion Stop ({diag_date}) ---\n")
+            f.write(f"ParamÃ¨tres:\n")
             f.write(f"  - trailing_percent: {self.p.trailing_percent}%\n")
             f.write(f"  - exhaustion_threshold: {self.p.exhaustion_threshold} signaux\n")
             f.write(f"  - rsi_extreme: {self.p.rsi_extreme}\n")
@@ -97,7 +97,7 @@ class ExhaustionStopBTWrapper(bt.Strategy):
 
     def _log_trade_journal(self, symbol, entry_date, qty, entry_price, exit_date, exit_price, cause, pnl_brut, bars_held=0, exhaustion_signals=""):
         """Enregistre un trade dans le journal BD."""
-        # Calculer les commissions (0.1% à l'achat + 0.1% à la vente)
+        # Calculer les commissions (0.1% Ã  l'achat + 0.1% Ã  la vente)
         commission_rate = 0.001
         commission_entree = entry_price * qty * commission_rate
         commission_sortie = exit_price * qty * commission_rate
@@ -124,7 +124,7 @@ class ExhaustionStopBTWrapper(bt.Strategy):
         )
 
     def _preload_cache(self, dataframes):
-        """Pré-charge les DataFrames dans le cache du MarketDataMock."""
+        """PrÃ©-charge les DataFrames dans le cache du MarketDataMock."""
         import pandas as pd
         for symbol, df in dataframes.items():
             df_reset = df.reset_index()
@@ -134,7 +134,7 @@ class ExhaustionStopBTWrapper(bt.Strategy):
             df_reset['date'] = pd.to_datetime(df_reset['date'])
             self.market_data._data_cache[symbol] = df_reset
         self.market_data._preloaded = True
-        print(f"[CACHE] {len(dataframes)} symboles pré-chargés dans le cache")
+        print(f"[CACHE] {len(dataframes)} symboles prÃ©-chargÃ©s dans le cache")
 
     def log_diag(self, message):
         with open(self.diag_filename, "a") as f:
@@ -142,19 +142,19 @@ class ExhaustionStopBTWrapper(bt.Strategy):
 
     def _detect_exhaustion(self, symbol, df):
         """
-        Détecte l'essoufflement du mouvement haussier.
+        DÃ©tecte l'essoufflement du mouvement haussier.
 
         Returns:
             tuple: (is_exhausted: bool, signals: list of str)
         """
         if len(df) < 20:
-            self.log_diag(f"[DETECT] {symbol}: Pas assez de données ({len(df)} < 20)")
+            self.log_diag(f"[DETECT] {symbol}: Pas assez de donnÃ©es ({len(df)} < 20)")
             return False, []
 
         signals = []
         debug_info = []
 
-        # 1. MACD histogram décroissant
+        # 1. MACD histogram dÃ©croissant
         try:
             import pandas_ta as ta
             macd_df = ta.macd(df['close'], fast=12, slow=26)
@@ -173,7 +173,7 @@ class ExhaustionStopBTWrapper(bt.Strategy):
             if macd_diff_mean < 0:
                 signals.append("MACD_DECLINING")
 
-        # 2. RSI en zone extrême (abaissé à 65 pour plus de sensibilité)
+        # 2. RSI en zone extrÃªme (abaissÃ© Ã  65 pour plus de sensibilitÃ©)
         try:
             import pandas_ta as ta
             rsi = ta.rsi(df['close'], length=14)
@@ -190,7 +190,7 @@ class ExhaustionStopBTWrapper(bt.Strategy):
             if rsi_val > self.p.rsi_extreme:
                 signals.append(f"RSI_EXTREME_{rsi_val:.0f}")
 
-        # 3. Volume ratio décroissant
+        # 3. Volume ratio dÃ©croissant
         sma20_vol = df['volume'].rolling(20).mean()
         vol_ratio = df['volume'] / (sma20_vol + 1e-6)
 
@@ -199,10 +199,10 @@ class ExhaustionStopBTWrapper(bt.Strategy):
             avg_recent = recent_vol.iloc[-1]
             avg_prior = recent_vol.iloc[:-1].mean()
             debug_info.append(f"VOL_ratio={avg_recent:.2f}/{avg_prior:.2f}")
-            if avg_recent < avg_prior * 0.9:  # Ajusté: 10% plus bas (était 20%)
+            if avg_recent < avg_prior * 0.9:  # AjustÃ©: 10% plus bas (Ã©tait 20%)
                 signals.append("VOLUME_DECLINING")
 
-        # 4. ADX décroissant (tendance qui faiblit)
+        # 4. ADX dÃ©croissant (tendance qui faiblit)
         try:
             import pandas_ta as ta
             adx_df = ta.adx(df['high'], df['low'], df['close'], length=14)
@@ -217,15 +217,15 @@ class ExhaustionStopBTWrapper(bt.Strategy):
             if adx_diff_mean < 0:
                 signals.append("ADX_DECLINING")
 
-        # 5. Rendement qui ralentit (ajusté: return_5d < return_10d * 0.7)
+        # 5. Rendement qui ralentit (ajustÃ©: return_5d < return_10d * 0.7)
         if len(df) >= 10:
             return_5d = (df['close'].iloc[-1] / df['close'].iloc[-5] - 1)
             return_10d = (df['close'].iloc[-1] / df['close'].iloc[-10] - 1)
             debug_info.append(f"R5d={return_5d:.3f}/R10d={return_10d:.3f}")
-            if return_5d < return_10d * 0.7 and return_10d > 0:  # Ajusté (était /2)
+            if return_5d < return_10d * 0.7 and return_10d > 0:  # AjustÃ© (Ã©tait /2)
                 signals.append("MOMENTUM_SLOWING")
 
-        # 6. NOUVEAU: Prix proche du haut récent mais momentum faible
+        # 6. NOUVEAU: Prix proche du haut rÃ©cent mais momentum faible
         if len(df) >= 20:
             high_20d = df['high'].iloc[-20:].max()
             current_close = df['close'].iloc[-1]
@@ -236,7 +236,7 @@ class ExhaustionStopBTWrapper(bt.Strategy):
 
         is_exhausted = len(signals) >= self.p.exhaustion_threshold
 
-        # Log détaillé pour debugging
+        # Log dÃ©taillÃ© pour debugging
         self.log_diag(f"[DETECT] {symbol}: {' | '.join(debug_info)}")
         self.log_diag(f"[DETECT] {symbol}: Signaux={signals} ({len(signals)}/{self.p.exhaustion_threshold})")
 
@@ -250,12 +250,12 @@ class ExhaustionStopBTWrapper(bt.Strategy):
             if order.isbuy():
                 order_type = 'ENTRY'
                 self.last_entry_prices[symbol] = order.executed.price # Symbole a analyser  pour l'essouflement
-                self.entry_bar[symbol] = len(self)  # Stocker le bar d'entrée
+                self.entry_bar[symbol] = len(self)  # Stocker le bar d'entrÃ©e
                 self.stop_activated[symbol] = False
                 self.exhaustion_detected[symbol] = False
                 self.exhaustion_stats['total_positions'] += 1
 
-                # Stocker les infos d'entrée pour le journal
+                # Stocker les infos d'entrÃ©e pour le journal
                 self.trade_entries[symbol] = {
                     'date_entree': order.data.datetime.datetime(0),
                     'prix_entree': order.executed.price,
@@ -306,7 +306,7 @@ class ExhaustionStopBTWrapper(bt.Strategy):
                 self.stop_activated.pop(symbol, None)
                 self.exhaustion_detected.pop(symbol, None)
 
-                self.log_diag(f"[CLEANUP] Position fermée pour {symbol} via {order_type}, PnL: {pnl:.2f}, Bars: {bars_held}")
+                self.log_diag(f"[CLEANUP] Position fermÃ©e pour {symbol} via {order_type}, PnL: {pnl:.2f}, Bars: {bars_held}")
 
             self.pending_order_bundles[symbol] = None
 
@@ -314,22 +314,22 @@ class ExhaustionStopBTWrapper(bt.Strategy):
         current_date = self.datas[0].datetime.date(0)
         current_bar = len(self)
 
-        # Ne trader que dans la période spécifiée
+        # Ne trader que dans la pÃ©riode spÃ©cifiÃ©e
         if current_date < self.start_date.date() or current_date > self.end_date.date():
             return
         
-        # Vérifier l'essoufflement pour les positions ouvertes
+        # VÃ©rifier l'essoufflement pour les positions ouvertes
         for symbol in self.last_entry_prices.keys():
             data = self._get_data(symbol)
             if data is None:
                 continue
 
-            # Vérifier si assez de bars sont passés
+            # VÃ©rifier si assez de bars sont passÃ©s
             entry_bar = self.entry_bar.get(symbol, 0)
             if current_bar - entry_bar < self.p.min_bars_before_check:
                 continue
 
-            # Récupérer le DataFrame historique (45 jours calendaires = ~30 jours de bourse)
+            # RÃ©cupÃ©rer le DataFrame historique (45 jours calendaires = ~30 jours de bourse)
             start_date_hist = current_date - timedelta(days=45)
             df = self.market_data.get_historical_data(
                 symbol,
@@ -339,10 +339,10 @@ class ExhaustionStopBTWrapper(bt.Strategy):
             if df is None or len(df) < 20:
                 continue
 
-            # Détecter l'essoufflement
+            # DÃ©tecter l'essoufflement
             is_exhausted, signals = self._detect_exhaustion(symbol, df)
             if is_exhausted and not self.stop_activated.get(symbol, False):
-                self.log_diag(f"[EXHAUSTION] Essoufflement détecté pour {symbol} avec signaux: {signals}")
+                self.log_diag(f"[EXHAUSTION] Essoufflement dÃ©tectÃ© pour {symbol} avec signaux: {signals}")
 
                 # Placer le trailing stop
                 stop_order = self.sell(
@@ -360,14 +360,14 @@ class ExhaustionStopBTWrapper(bt.Strategy):
                     'signals': signals
                 })
 
-                # Mettre à jour le journal d'entrée
+                # Mettre Ã  jour le journal d'entrÃ©e
                 if symbol in self.trade_entries:
                     self.trade_entries[symbol]['exhaustion_signals'] = signals
         
         symbols = [d._name for d in self.datas]
         self.strategy.set_symbols_to_analyse(symbols)
         symbols_to_trade = self.strategy.get_symbols(current_date)
-        self.log_diag(f"{current_date} Symboles sélectionnés: {symbols_to_trade}")
+        self.log_diag(f"{current_date} Symboles sÃ©lectionnÃ©s: {symbols_to_trade}")
         order_bundles = self.strategy.get_order_params()
 
         for bundle in order_bundles:
@@ -379,7 +379,7 @@ class ExhaustionStopBTWrapper(bt.Strategy):
             pos = self.getposition(data)
 
             if pos.size > 0:
-                self.log_diag(f"[CONTROL] Position déjà ouverte sur {symbol}")
+                self.log_diag(f"[CONTROL] Position dÃ©jÃ  ouverte sur {symbol}")
                 continue
             if pos.size < 0:
                 self.log_diag(f"[ERROR] Position short sur {symbol}")
@@ -393,7 +393,7 @@ class ExhaustionStopBTWrapper(bt.Strategy):
                         self.broker.cancel(stop)
                     self.pending_stops[symbol] = None
 
-                # Ordre d'entrée simple (market order)
+                # Ordre d'entrÃ©e simple (market order)
                 entry_order = self.buy(data=data, size=bundle["entry_order"].totalQuantity)
 
                 if entry_order is not None:
@@ -413,17 +413,17 @@ class ExhaustionStopBTWrapper(bt.Strategy):
             self.orders_by_symbol.pop(symbol, None)
 
     def stop(self):
-        """Appelé à la fin du backtest - affiche les statistiques."""
+        """AppelÃ© Ã  la fin du backtest - affiche les statistiques."""
         print("\n" + "=" * 60)
         print("STATISTIQUES ESSOUFFLEMENT")
         print("=" * 60)
         print(f"Total positions: {self.exhaustion_stats['total_positions']}")
-        print(f"Essoufflements détectés: {self.exhaustion_stats['exhaustion_detected']}")
+        print(f"Essoufflements dÃ©tectÃ©s: {self.exhaustion_stats['exhaustion_detected']}")
 
         if self.exhaustion_stats['total_positions'] > 0:
             pct = (self.exhaustion_stats['exhaustion_detected'] /
                    self.exhaustion_stats['total_positions'] * 100)
-            print(f"Taux de détection: {pct:.1f}%")
+            print(f"Taux de dÃ©tection: {pct:.1f}%")
 
         # Compter les types de signaux
         signal_counts = {}
@@ -433,13 +433,13 @@ class ExhaustionStopBTWrapper(bt.Strategy):
                 signal_counts[sig_type] = signal_counts.get(sig_type, 0) + 1
 
         if signal_counts:
-            print("\nSignaux les plus fréquents:")
+            print("\nSignaux les plus frÃ©quents:")
             for sig, count in sorted(signal_counts.items(), key=lambda x: -x[1]):
                 print(f"  - {sig}: {count}")
 
-        # Afficher le résumé depuis la BD
+        # Afficher le rÃ©sumÃ© depuis la BD
         print("\n" + "-" * 60)
-        print("RÉSUMÉ BD")
+        print("RÃ‰SUMÃ‰ BD")
         print("-" * 60)
         summary = self.trade_journal.get_performance_summary(
             trade_mode=TradeMode.BACKTEST,
@@ -456,3 +456,4 @@ class ExhaustionStopBTWrapper(bt.Strategy):
 
         # Fermer la connexion BD
         self.trade_journal.close()
+

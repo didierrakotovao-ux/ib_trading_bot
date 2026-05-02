@@ -9,6 +9,7 @@
 *backtest*.json
 *backtest*.txt
 *diagno*.txt
+*.log
 
 # Ignore Python cache directories
 __pycache__/

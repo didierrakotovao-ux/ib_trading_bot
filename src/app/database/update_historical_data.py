@@ -23,7 +23,11 @@ class HistoricalDataUpdater:
     """Met à jour les données historiques de façon incrémentale."""
 
     def __init__(self, db_path: str = "trading_data.db"):
-        self.db_path = db_path
+        if os.path.isabs(db_path):
+            self.db_path = db_path
+        else:
+            project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..'))
+            self.db_path = os.path.join(project_root, db_path)
 
     def get_symbols_to_update(self) -> list:
         """Récupère tous les symboles de la base de données."""

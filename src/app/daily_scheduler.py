@@ -108,9 +108,8 @@ def run_task(task: str, port: int, dry_run: bool, logger: logging.Logger,
     cmd = [sys.executable, script]
 
     if task == 'trading':
-        # trading.py n'accepte pas d'arguments CLI actuellement,
-        # le port est défini en haut du __main__ block.
-        # On log le port pour traçabilité.
+        if port == 7496:
+            cmd += ['--live']
         logger.info(f"Port IB utilisé: {port} ({'paper' if port in (7497, 4002) else 'live'})")
 
     elif task == 'stop_monitor':

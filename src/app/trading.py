@@ -540,20 +540,29 @@ class Trading:
 
 
 if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Bot de trading IB")
+    parser.add_argument('--live', action='store_true',
+                        help='Live trading (port 7496, capital 10 000$). '
+                             'Par défaut : paper trading (port 7497, capital 100 000$).')
+    args = parser.parse_args()
+
     # Configuration
     # Port 7497 = Paper Trading (TWS), Port 7496 = Live Trading (TWS)
     # Port 4002 = Paper Trading (Gateway), Port 4001 = Live Trading (Gateway)
-    PAPER_PORT = 7497
-    LIVE_PORT = 7496
     CLIENT_ID = 11
+    MAX_POSITIONS = 5  # Max 5 positions (chaque position = 1/5 du capital)
 
-    # Capital et gestion des positions
-    TOTAL_CAPITAL = 100000  # Capital total disponible
-    MAX_POSITIONS = 5       # Max 5 positions (chaque position = 1/5 du capital)
+    if args.live:
+        PORT = 7496
+        TOTAL_CAPITAL = 10000
+    else:
+        PORT = 7497
+        TOTAL_CAPITAL = 100000
 
-    # Utiliser paper trading par défaut
     trading = Trading(
-        port=PAPER_PORT,
+        port=PORT,
         client_id=CLIENT_ID,
         total_capital=TOTAL_CAPITAL,
         max_positions=MAX_POSITIONS

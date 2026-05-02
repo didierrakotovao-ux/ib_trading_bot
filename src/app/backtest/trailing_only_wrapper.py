@@ -26,6 +26,7 @@ class TrailingOnlyBTWrapper(bt.Strategy):
         cooldown_days=30,       # Jours d'interdiction de réentrée après stop-out (0 = désactivé)
         dataframes=None,  # DataFrames pré-chargés depuis SQLite
         scoring_type="smooth_ml",  # Type de scoring: "ml", "smooth_ml", "earnings_ml"
+        smooth_model_path=None,  # Chemin du modèle smooth_ml (None = modèle US par défaut)
         use_sue_filter=False,  # Filtre SUE (Novy-Marx)
         sue_threshold=0.0,  # Seuil SUE (SUE > sue_threshold)
         db_path=None  # Chemin DB (None = trading_data.db)
@@ -55,6 +56,7 @@ class TrailingOnlyBTWrapper(bt.Strategy):
             use_trailing_stop=True,
             trailing_percent=self.p.trailing_percent,
             scoring_type=self.p.scoring_type,
+            smooth_model_path=self.p.smooth_model_path,
             use_sue_filter=self.p.use_sue_filter,
             sue_threshold=self.p.sue_threshold,
             db_path=db_path
@@ -69,7 +71,7 @@ class TrailingOnlyBTWrapper(bt.Strategy):
         # Journal de trading en BD
         self.trade_entries = {}
         self.strategy_name = "TrailingOnly"
-        self.trade_journal = TradeJournal()
+        self.trade_journal = TradeJournal("backtest_journal.db")
         # Effacer les trades backtest existants pour cette stratégie
         self.trade_journal.clear_backtest_trades(self.strategy_name)
 
@@ -273,7 +275,12 @@ class TrailingOnlyBTWrapper(bt.Strategy):
         # Mettre à jour la liste des symboles à trader (APRÈS filtrage)
         self.strategy.symbolsToTrade = symbols_available
         self.log_diag(f"[FILTER] Symboles disponibles après filtrage: {symbols_available}")
-        
+
+        # Mettre à jour le capital avec la valeur actuelle du portefeuille
+        current_capital = self.broker.getvalue()
+        self.strategy.capital = current_capital
+        self.log_diag(f"[CAPITAL] Valeur portefeuille actuelle: {current_capital:,.2f}$")
+
         # Générer les ordres UNIQUEMENT pour les symboles disponibles
         order_bundles = self.strategy.get_order_params()
 

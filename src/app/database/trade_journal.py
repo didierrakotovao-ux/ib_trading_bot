@@ -2,6 +2,7 @@
 Module de journalisation des trades en base de données.
 Supporte trois modes : backtest, paper, live.
 """
+import os
 import sqlite3
 import pandas as pd
 from datetime import datetime
@@ -31,7 +32,11 @@ class TradeJournal:
         Args:
             db_path: Chemin vers le fichier SQLite
         """
-        self.db_path = db_path
+        if os.path.isabs(db_path):
+            self.db_path = db_path
+        else:
+            project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..'))
+            self.db_path = os.path.join(project_root, db_path)
         self.conn: Optional[sqlite3.Connection] = None
         self._create_table()
 

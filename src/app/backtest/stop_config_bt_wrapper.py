@@ -1,12 +1,12 @@
-"""
+﻿"""
 Wrapper Backtrader utilisant la configuration de stops depuis stop_config.json.
 
 Supporte 4 combinaisons :
-  - Protection : fixed (Stop à prix fixe) ou trailing (StopTrail)
-  - Profit     : fixed (Limit à prix fixe) ou dynamic (Limit à entry + N×ATR)
+  - Protection : fixed (Stop Ã  prix fixe) ou trailing (StopTrail)
+  - Profit     : fixed (Limit Ã  prix fixe) ou dynamic (Limit Ã  entry + NÃ—ATR)
 
-Stop et TP sont liés en OCA (One Cancels All) : quand l'un se déclenche,
-l'autre est annulé automatiquement par Backtrader.
+Stop et TP sont liÃ©s en OCA (One Cancels All) : quand l'un se dÃ©clenche,
+l'autre est annulÃ© automatiquement par Backtrader.
 
 Usage :
     python test_stop_config.py
@@ -22,7 +22,7 @@ from src.app.strategies.momentum import MomentumStrategy
 from src.app.database.trade_journal import TradeJournal, TradeMode
 from src.app.stop_manager import StopConfig
 
-# Import local (même répertoire backtest)
+# Import local (mÃªme rÃ©pertoire backtest)
 sys.path.insert(0, os.path.dirname(__file__))
 from market_data_mock import MarketDataMock
 
@@ -30,12 +30,12 @@ from market_data_mock import MarketDataMock
 class StopConfigBTWrapper(bt.Strategy):
     """
     Wrapper Backtrader avec stops configurables depuis stop_config.json.
-    Chaque entrée génère un couple Stop + TP en groupe OCA.
+    Chaque entrÃ©e gÃ©nÃ¨re un couple Stop + TP en groupe OCA.
     """
     params = dict(
         capital=100000,
         max_stocks=5,
-        config=None,           # StopConfig chargé avant le lancement
+        config=None,           # StopConfig chargÃ© avant le lancement
         dataframes=None,
         scoring_type="smooth_ml",
         use_sue_filter=False,
@@ -50,7 +50,7 @@ class StopConfigBTWrapper(bt.Strategy):
         # Config stops
         self.stop_cfg: StopConfig = self.p.config
         if self.stop_cfg is None:
-            raise ValueError("Passer un StopConfig via le paramètre 'config'")
+            raise ValueError("Passer un StopConfig via le paramÃ¨tre 'config'")
 
         # MarketData mock
         self.market_data = MarketDataMock(self.datas)
@@ -64,17 +64,17 @@ class StopConfigBTWrapper(bt.Strategy):
                 d, period=self.stop_cfg.profit_atr_period
             )
 
-        # Résoudre db_path
+        # RÃ©soudre db_path
         db_path = "trading_data.db"
         if self.p.db_path:
             db_path = os.path.basename(self.p.db_path)
 
-        # Stratégie métier
+        # StratÃ©gie mÃ©tier
         self.strategy = MomentumStrategy(
             market_data=self.market_data,
             capital=self.p.capital,
             max_stocks=self.p.max_stocks,
-            use_trailing_stop=False,  # géré ici, pas dans la stratégie
+            use_trailing_stop=False,  # gÃ©rÃ© ici, pas dans la stratÃ©gie
             scoring_type=self.p.scoring_type,
             use_sue_filter=self.p.use_sue_filter,
             sue_threshold=self.p.sue_threshold,
@@ -82,9 +82,9 @@ class StopConfigBTWrapper(bt.Strategy):
         )
 
         # Trackers par symbole
-        self.orders_by_symbol = {}     # symbol → {'entry': order}
-        self.pending_stops = {}        # symbol → {'stop': order, 'tp': order}
-        self.trade_entries = {}        # symbol → infos d'entrée
+        self.orders_by_symbol = {}     # symbol â†’ {'entry': order}
+        self.pending_stops = {}        # symbol â†’ {'stop': order, 'tp': order}
+        self.trade_entries = {}        # symbol â†’ infos d'entrÃ©e
         self.last_entry_prices = {}
 
         # Journal
@@ -94,7 +94,7 @@ class StopConfigBTWrapper(bt.Strategy):
                 else f"atr{self.stop_cfg.profit_atr_mult:.1f}")
         self.strategy_name = f"StopConfig_{prot}_{prof}"
 
-        self.trade_journal = TradeJournal()
+        self.trade_journal = TradeJournal("backtest_journal.db")
         self.trade_journal.clear_backtest_trades(self.strategy_name)
 
         # Fichier de diagnostic
@@ -107,10 +107,10 @@ class StopConfigBTWrapper(bt.Strategy):
             f.write(f"Protection : {self.stop_cfg.protection_type} -{self.stop_cfg.protection_pct}%\n")
             profit_desc = (f"fixed +{self.stop_cfg.profit_fixed_pct}%"
                            if self.stop_cfg.profit_type == "fixed"
-                           else f"dynamic {self.stop_cfg.profit_atr_mult}×ATR({self.stop_cfg.profit_atr_period})")
+                           else f"dynamic {self.stop_cfg.profit_atr_mult}Ã—ATR({self.stop_cfg.profit_atr_period})")
             f.write(f"Profit     : {profit_desc}\n\n")
 
-        print(f"[BT] Stratégie : {self.strategy_name}")
+        print(f"[BT] StratÃ©gie : {self.strategy_name}")
         print(f"[BT] Protection : {self.stop_cfg.protection_type} -{self.stop_cfg.protection_pct}%")
         print(f"[BT] Profit     : {profit_desc}")
 
@@ -177,7 +177,7 @@ class StopConfigBTWrapper(bt.Strategy):
                 )
                 self.log_diag(f"[BT] {symbol}: Trailing stop -{self.stop_cfg.protection_pct}%")
 
-            # --- Prise de bénéfice ---
+            # --- Prise de bÃ©nÃ©fice ---
             tp_price = self._calc_profit_price(entry_price, symbol)
             tp_order = self.sell(
                 data=data, size=qty,
@@ -206,7 +206,7 @@ class StopConfigBTWrapper(bt.Strategy):
             qty = abs(order.executed.size)
             pnl = (exit_price - entry_price) * qty
 
-            # Déterminer la cause de sortie
+            # DÃ©terminer la cause de sortie
             stops = self.pending_stops.get(symbol, {})
             if stops and order == stops.get('tp'):
                 cause = f"TAKE_PROFIT_{self.stop_cfg.profit_type.upper()}"
@@ -256,7 +256,7 @@ class StopConfigBTWrapper(bt.Strategy):
         self.strategy.set_symbols_to_analyse(symbols)
         symbols_to_trade = self.strategy.get_symbols(current_date)
 
-        # Filtrer symboles déjà en position ou avec ordres en attente
+        # Filtrer symboles dÃ©jÃ  en position ou avec ordres en attente
         symbols_available = []
         for symbol in symbols_to_trade:
             data = self._get_data(symbol)
@@ -289,7 +289,7 @@ class StopConfigBTWrapper(bt.Strategy):
             entry_order = self.buy(data=data, size=qty)
             if entry_order:
                 self.orders_by_symbol[symbol] = {"entry": entry_order}
-                self.log_diag(f"[BT] {symbol}: Entrée qty={qty}")
+                self.log_diag(f"[BT] {symbol}: EntrÃ©e qty={qty}")
 
     def stop(self):
         """Ferme les positions ouvertes en fin de backtest."""
@@ -327,9 +327,9 @@ class StopConfigBTWrapper(bt.Strategy):
                 )
                 del self.trade_entries[symbol]
 
-        # Résumé
+        # RÃ©sumÃ©
         print("\n" + "=" * 60)
-        print(f"RÉSUMÉ BD — {self.strategy_name}")
+        print(f"RÃ‰SUMÃ‰ BD â€” {self.strategy_name}")
         print("=" * 60)
         summary = self.trade_journal.get_performance_summary(
             trade_mode=TradeMode.BACKTEST,
@@ -354,7 +354,7 @@ class StopConfigBTWrapper(bt.Strategy):
 
     def _log_trade_journal(self, symbol, entry_date, qty, entry_price,
                            exit_date, exit_price, cause, pnl_brut, bars_held=0):
-        """Enregistre un trade fermé dans le journal BD."""
+        """Enregistre un trade fermÃ© dans le journal BD."""
         commission_rate = 0.001
         commission = (entry_price + exit_price) * qty * commission_rate
         pnl_net = pnl_brut - commission
@@ -401,3 +401,4 @@ class StopConfigBTWrapper(bt.Strategy):
     def notify_trade(self, trade):
         if trade.isclosed:
             self.orders_by_symbol.pop(trade.data._name, None)
+

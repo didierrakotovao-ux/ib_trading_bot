@@ -25,6 +25,8 @@ def main():
                         help='Date de fin YYYY-MM-DD (default: 2024-12-31)')
     parser.add_argument('--scoring', choices=['smooth_ml', 'ml'], default='smooth_ml',
                         help='Type de scoring (default: smooth_ml)')
+    parser.add_argument('--model-path', type=str, default='models/smooth_ml_ca.pkl',
+                        help='Chemin du modèle smooth_ml (default: models/smooth_ml_ca.pkl)')
     parser.add_argument('--trailing', type=float, default=5.0,
                         help='Trailing stop %% (default: 5.0)')
     parser.add_argument('--capital', type=float, default=100000,
@@ -60,6 +62,7 @@ def main():
         end_date=end_date,
         initial_cash=args.capital,
         scoring_type=args.scoring,
+        smooth_model_path=args.model_path,
         db_path="trading_data_ca.db",
         min_price=args.min_price,
         min_volume=args.min_volume,

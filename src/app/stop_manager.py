@@ -294,33 +294,69 @@ class StopManager:
     def setup_all_open_positions(self):
         """
         Configure les stops pour toutes les positions ouvertes sans config active.
-        Utilisé au démarrage ou après une reprise.
+        TWS est la source de vérité pour les positions réelles ;
+        la DB fournit le prix d'entrée. Fallback sur la DB si TWS ne répond pas.
         """
+        ib_positions = self.market_data.req_ib_positions()
+        ib_open = {p["symbol"]: int(abs(p["qty"])) for p in ib_positions if p["qty"] != 0}
+
+        if not ib_open:
+            # Fallback DB si TWS ne renvoie rien
+            print("[STOPS] Positions TWS non disponibles — fallback sur la DB")
+            conn = self._connect()
+            cursor = conn.execute("""
+                SELECT t.id, t.symbol, t.prix_entree, t.quantite_restante
+                FROM trades t
+                LEFT JOIN position_stops ps
+                    ON ps.symbol = t.symbol AND ps.trade_mode = t.trade_mode AND ps.active = 1
+                WHERE t.trade_mode = ? AND t.date_sortie IS NULL AND t.quantite_restante > 0
+                  AND ps.id IS NULL
+            """, (self.trade_mode.value,))
+            rows = cursor.fetchall()
+            conn.close()
+            if not rows:
+                print("[STOPS] Toutes les positions ont déjà une config de stop active")
+                return
+            print(f"[STOPS] Configuration des stops pour {len(rows)} position(s) sans stop actif...")
+            for row in rows:
+                self.setup_position(
+                    symbol=row["symbol"],
+                    entry_price=row["prix_entree"],
+                    qty=row["quantite_restante"],
+                    trade_id=row["id"]
+                )
+            return
+
+        # Pour chaque position TWS sans stop actif, chercher le prix d'entrée en DB
         conn = self._connect()
-        # Positions ouvertes dans le journal sans stop actif
-        cursor = conn.execute("""
-            SELECT t.id, t.symbol, t.prix_entree, t.quantite_restante
-            FROM trades t
-            LEFT JOIN position_stops ps
-                ON ps.symbol = t.symbol AND ps.trade_mode = t.trade_mode AND ps.active = 1
-            WHERE t.trade_mode = ? AND t.date_sortie IS NULL AND t.quantite_restante > 0
-              AND ps.id IS NULL
-        """, (self.trade_mode.value,))
-        rows = cursor.fetchall()
+        to_setup = []
+        for symbol, ib_qty in ib_open.items():
+            existing = conn.execute("""
+                SELECT id FROM position_stops
+                WHERE symbol = ? AND trade_mode = ? AND active = 1
+            """, (symbol, self.trade_mode.value)).fetchone()
+            if existing:
+                continue
+
+            row = conn.execute("""
+                SELECT id, prix_entree FROM trades
+                WHERE symbol = ? AND trade_mode = ? AND quantite_restante > 0
+                ORDER BY date_entree DESC LIMIT 1
+            """, (symbol, self.trade_mode.value)).fetchone()
+
+            if row:
+                to_setup.append((symbol, row["prix_entree"], ib_qty, row["id"]))
+            else:
+                print(f"[STOPS] {symbol}: position TWS ({ib_qty} actions) sans entrée en DB — stop non configuré")
         conn.close()
 
-        if not rows:
+        if not to_setup:
             print("[STOPS] Toutes les positions ont déjà une config de stop active")
             return
 
-        print(f"[STOPS] Configuration des stops pour {len(rows)} position(s) sans stop actif...")
-        for row in rows:
-            self.setup_position(
-                symbol=row["symbol"],
-                entry_price=row["prix_entree"],
-                qty=row["quantite_restante"],
-                trade_id=row["id"]
-            )
+        print(f"[STOPS] Configuration des stops pour {len(to_setup)} position(s) depuis TWS...")
+        for symbol, entry_price, qty, trade_id in to_setup:
+            self.setup_position(symbol=symbol, entry_price=entry_price, qty=qty, trade_id=trade_id)
 
     # ------------------------------------------------------------------
     # Mise à jour trailing
@@ -463,6 +499,23 @@ class StopManager:
                     print(f"[STOPS] {s['symbol']}: position fermée dans IB → stop désactivé en DB")
                 conn.commit()
                 stops = [s for s in stops if s["symbol"] in ib_symbols]
+
+            # 3. Détecter les nouvelles positions TWS sans stop actif
+            active_symbols = {s["symbol"] for s in stops}
+            new_symbols = ib_symbols - active_symbols
+            if new_symbols:
+                print(f"[STOPS] Nouvelles positions sans stop détectées: {new_symbols}")
+                for symbol in new_symbols:
+                    ib_qty = next(int(abs(p["qty"])) for p in ib_positions if p["symbol"] == symbol)
+                    row = conn.execute("""
+                        SELECT id, prix_entree FROM trades
+                        WHERE symbol = ? AND trade_mode = ? AND quantite_restante > 0
+                        ORDER BY date_entree DESC LIMIT 1
+                    """, (symbol, self.trade_mode.value)).fetchone()
+                    if row:
+                        self.setup_position(symbol, row["prix_entree"], ib_qty, trade_id=row["id"])
+                    else:
+                        print(f"[STOPS] {symbol}: nouvelle position TWS sans entrée DB — stop non configuré")
         else:
             print("[STOPS] Positions IB non disponibles — vérification des orphelins ignorée")
 

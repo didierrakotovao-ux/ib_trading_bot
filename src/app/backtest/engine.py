@@ -23,6 +23,7 @@ class BacktestEngine:
         stake=100,
         lookback_days=350,  # Jours de données historiques pour le scoring
         scoring_type="smooth_ml",  # Type de scoring: "ml", "smooth_ml", "earnings_ml"
+        smooth_model_path=None,  # Chemin du modèle smooth_ml (None = modèle US par défaut)
         use_sue_filter=False,  # Filtre SUE (Novy-Marx)
         sue_threshold=0.0,  # Seuil SUE
         max_symbols=None,  # Limiter le nombre de symboles (None = tous)
@@ -38,6 +39,7 @@ class BacktestEngine:
         self.stake = stake
         self.lookback_days = lookback_days
         self.scoring_type = scoring_type
+        self.smooth_model_path = smooth_model_path
         self.use_sue_filter = use_sue_filter
         self.sue_threshold = sue_threshold
         self.max_symbols = max_symbols
@@ -144,6 +146,7 @@ class BacktestEngine:
             end_date=self.end_date,
             dataframes=self.dataframes,  # Passer les DataFrames complets pour le cache
             scoring_type=self.scoring_type,
+            smooth_model_path=self.smooth_model_path,
             use_sue_filter=self.use_sue_filter,
             sue_threshold=self.sue_threshold,
             db_path=self.db_path
