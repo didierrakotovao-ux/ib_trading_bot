@@ -122,6 +122,10 @@ class StopManager:
         self.market_data = market_data
         self.db_path = db_path
         self.trade_mode = trade_mode
+        # Symboles pour lesquels un SELL a été placé mais pas encore confirmé dans IB.
+        # Évite la race condition : stop déclenché → LMT en vol → scan suivant voit
+        # encore la position dans IB → recrée un stop → 2e SELL → position short.
+        self._pending_sells: set = set()
         self._create_table()
         print(f"[STOPS] StopManager initialisé\n{config.summary()}")
 
@@ -417,7 +421,7 @@ class StopManager:
         return order_id
 
     def _place_profit_order(self, symbol: str, qty: int, target_price: float):
-        """Ordre LMT de prise de bénéfice, avec DarkIce si configuré."""
+        """Ordre LMT de prise de bénéfice, avec DarkIce si configuré, fallback LMT simple."""
         contract = self.market_data.create_contract(symbol)
         order = Order()
         order.action = "SELL"
@@ -434,15 +438,37 @@ class StopManager:
                 TagValue("displaySize", "0"),
                 TagValue("startTime", self.config.darkice_start),
                 TagValue("endTime", self.config.darkice_end),
-                TagValue("wouldPrice", str(round(target_price, 2))),
             ]
-            print(f"[STOPS] {symbol}: PROFIT target={target_price:.2f} → LMT DarkIce "
-                  f"SELL {qty} (orderId=...)")
+            print(f"[STOPS] {symbol}: PROFIT target={target_price:.2f} → LMT DarkIce SELL {qty}")
         else:
-            print(f"[STOPS] {symbol}: PROFIT target={target_price:.2f} → LMT "
-                  f"SELL {qty}")
+            print(f"[STOPS] {symbol}: PROFIT target={target_price:.2f} → LMT SELL {qty}")
 
+        # Réinitialiser avant de placer pour éviter un résidu d'un ordre précédent
+        if hasattr(self.market_data, '_last_order_error'):
+            self.market_data._last_order_error = None
         order_id = self.market_data.placeOrder(contract, order)
+
+        # Vérifier si IB a retourné une erreur sur cet ordre (attente courte)
+        import time
+        time.sleep(2)
+        if hasattr(self.market_data, '_last_order_error') and \
+                self.market_data._last_order_error and \
+                self.market_data._last_order_error.get('req_id') == order_id:
+            error_msg = self.market_data._last_order_error.get('msg', '')
+            print(f"[STOPS] {symbol}: DarkIce refusé ({error_msg}), fallback LMT simple")
+            self.market_data._last_order_error = None
+            # Fallback : LMT sans algo
+            fallback = Order()
+            fallback.action = "SELL"
+            fallback.orderType = "LMT"
+            fallback.lmtPrice = round(target_price, 2)
+            fallback.totalQuantity = qty
+            fallback.eTradeOnly = False
+            fallback.firmQuoteOnly = False
+            fallback.tif = "DAY"
+            order_id = self.market_data.placeOrder(contract, fallback)
+            print(f"[STOPS] {symbol}: PROFIT → LMT fallback SELL {qty} (orderId={order_id})")
+
         return order_id
 
     def _mark_triggered(self, stop_id: int, trigger_type: str):
@@ -474,6 +500,8 @@ class StopManager:
         # 1. Positions réelles dans IB
         ib_positions = self.market_data.req_ib_positions()
         ib_symbols = {p["symbol"] for p in ib_positions if p["qty"] != 0}
+        # Source de vérité pour la quantité réelle (long uniquement)
+        ib_qty_map = {p["symbol"]: int(abs(p["qty"])) for p in ib_positions if p["qty"] > 0}
 
         conn = self._connect()
         cursor = conn.execute("""
@@ -496,6 +524,8 @@ class StopManager:
                         "UPDATE position_stops SET active = 0 WHERE id = ?",
                         (s["id"],)
                     )
+                    # Position confirmée fermée → retirer du suivi des sells en cours
+                    self._pending_sells.discard(s["symbol"])
                     print(f"[STOPS] {s['symbol']}: position fermée dans IB → stop désactivé en DB")
                 conn.commit()
                 stops = [s for s in stops if s["symbol"] in ib_symbols]
@@ -503,6 +533,11 @@ class StopManager:
             # 3. Détecter les nouvelles positions TWS sans stop actif
             active_symbols = {s["symbol"] for s in stops}
             new_symbols = ib_symbols - active_symbols
+            # Exclure les symboles avec un SELL en cours (ordre en vol, position encore visible dans IB)
+            pending_new = new_symbols & self._pending_sells
+            if pending_new:
+                print(f"[STOPS] Ordre SELL en cours pour {pending_new} — setup ignoré (attente exécution IB)")
+            new_symbols -= self._pending_sells
             if new_symbols:
                 print(f"[STOPS] Nouvelles positions sans stop détectées: {new_symbols}")
                 for symbol in new_symbols:
@@ -524,12 +559,32 @@ class StopManager:
         if not stops:
             return
 
+        # Récupérer les ordres SELL déjà actifs dans IB pour éviter les doublons
+        # (un LMT DAY non exécuté la veille ne doit pas déclencher un 2e ordre)
+        open_sell_symbols: set = set()
+        try:
+            open_orders = self.market_data.req_open_orders()
+            open_sell_symbols = {
+                o["symbol"] for o in open_orders
+                if o["action"] == "SELL" and o.get("status") not in ("Cancelled", "Filled", "Inactive")
+            }
+            if open_sell_symbols:
+                print(f"[STOPS] Ordres SELL actifs dans IB: {open_sell_symbols}")
+        except Exception as e:
+            print(f"[STOPS] Impossible de récupérer les ordres ouverts: {e}")
+
         print(f"[STOPS] Scan de {len(stops)} position(s)...")
 
         for s in stops:
             symbol = s["symbol"]
             stop_id = s["id"]
             qty = s["qty_remaining"]
+            # Quantité réelle dans IB (source de vérité — évite de vendre plus que détenu)
+            actual_qty = ib_qty_map.get(symbol, qty) if ib_qty_map else qty
+            if actual_qty <= 0:
+                print(f"[STOPS] {symbol}: qty IB=0 — position fermée, stop désactivé")
+                self._mark_triggered(stop_id, "no_position")
+                continue
 
             # Récupération du prix :
             #   - PAPER : yfinance en source principale (pas de subscription IB requise)
@@ -563,19 +618,28 @@ class StopManager:
 
             profit_level = s["profit_level"]
 
+            # Vérifier qu'aucun ordre SELL n'est déjà en cours dans IB
+            if symbol in open_sell_symbols:
+                print(f"[STOPS] {symbol}: ordre SELL déjà actif dans IB — scan ignoré")
+                continue
+
             # --- Vérification stop de protection ---
             if current_price <= stop_level:
-                print(f"[STOPS] {symbol}: STOP DÉCLENCHÉ "
-                      f"prix={current_price:.2f} ≤ stop={stop_level:.2f}")
-                self._place_protection_order(symbol, qty)
+                print(f"[STOPS] {symbol}: STOP DECLENCHE "
+                      f"prix={current_price:.2f} <= stop={stop_level:.2f} "
+                      f"(qty IB={actual_qty})")
+                self._place_protection_order(symbol, actual_qty)
+                self._pending_sells.add(symbol)
                 self._mark_triggered(stop_id, "stop")
                 continue   # pas besoin de vérifier profit
 
             # --- Vérification prise de bénéfice ---
             if current_price >= profit_level:
-                print(f"[STOPS] {symbol}: PROFIT DÉCLENCHÉ "
-                      f"prix={current_price:.2f} ≥ target={profit_level:.2f}")
-                self._place_profit_order(symbol, qty, profit_level)
+                print(f"[STOPS] {symbol}: PROFIT DECLENCHE "
+                      f"prix={current_price:.2f} >= target={profit_level:.2f} "
+                      f"(qty IB={actual_qty})")
+                self._place_profit_order(symbol, actual_qty, profit_level)
+                self._pending_sells.add(symbol)
                 self._mark_triggered(stop_id, "profit")
                 continue
 

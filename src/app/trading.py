@@ -122,8 +122,12 @@ class Trading:
 
     def get_available_capital(self):
         """
-        Retourne le capital disponible pour de nouvelles positions.
+        Retourne le capital disponible depuis IB (source de vérité).
+        Fallback sur total_capital - capital_used si IB non disponible.
         """
+        cash = self.market_data_provider.req_account_cash()
+        if cash >= 0:
+            return cash
         return self.total_capital - self.get_capital_used()
 
     def can_open_position(self, price, qty):
@@ -281,6 +285,28 @@ class Trading:
                     entry_order.orderType = "MKT"
                     entry_order.algoStrategy = "Adaptive"
                     entry_order.algoParams = [TagValue("adaptivePriority", "Urgent")]
+
+                    # Recalculer la quantité avec le prix actuel (yfinance) pour éviter
+                    # de dépasser capital_per_position en cas de gap d'ouverture.
+                    # La stratégie calcule qty sur le close DB (veille) — si le stock
+                    # a gapé, la valeur réelle peut largement dépasser la limite.
+                    try:
+                        import yfinance as yf
+                        ticker = yf.Ticker(symbol)
+                        live_price = ticker.fast_info.last_price or 0.0
+                        if live_price > 0:
+                            capped_qty = int(self.capital_per_position / live_price)
+                            if capped_qty <= 0:
+                                print(f"[ORDER ALGO] {symbol}: prix live {live_price:.2f} trop élevé pour le capital — ordre annulé")
+                                continue
+                            if capped_qty != entry_order.totalQuantity:
+                                print(f"[ORDER ALGO] {symbol}: qty ajustée {entry_order.totalQuantity}→{capped_qty} "
+                                      f"(prix live {live_price:.2f}, capital/position {self.capital_per_position:,.0f}$)")
+                                entry_order.totalQuantity = capped_qty
+                                if 'stop_order' in orders:
+                                    orders['stop_order'].totalQuantity = capped_qty
+                    except Exception as e:
+                        print(f"[ORDER ALGO] {symbol}: impossible de récupérer prix live ({e}) — qty inchangée")
 
                     print(f"[ORDER ALGO] {symbol}: Adaptive Urgent (MKT) — fill garanti à l'ouverture")
 
@@ -589,6 +615,22 @@ if __name__ == "__main__":
         trading.sync_executions_from_ib()
         trading.sync_positions_with_ib()
         trading.init_trade()
+
+        # Attendre la confirmation des fills avant de fermer
+        # Les ordres IBALGO (Adaptive) remplissent de façon asynchrone
+        if trading.pending_orders:
+            print(f"[TRADING] Attente des confirmations de fill: {trading.pending_orders}")
+            import time
+            timeout = 120  # 2 minutes max
+            start = time.time()
+            while trading.pending_orders and (time.time() - start) < timeout:
+                time.sleep(2)
+            if trading.pending_orders:
+                print(f"[WARNING] Ordres non confirmés après {timeout}s: {trading.pending_orders}")
+                print("[TRADING] Sync depuis IB pour capturer les fills manquants...")
+                trading.sync_executions_from_ib()
+            else:
+                print("[TRADING] Tous les fills confirmés")
 
     except KeyboardInterrupt:
         print("\nArrêt demandé par l'utilisateur (Ctrl+C)")

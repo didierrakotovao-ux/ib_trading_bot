@@ -49,6 +49,13 @@ class MarketDataProvider(EWrapper, EClient):
         self.executions = []
         self.executions_done = False
 
+        # Pour la récupération du cash disponible
+        self._account_cash = None
+        self._account_cash_done = False
+
+        # Pour la détection des erreurs d'ordre (fallback)
+        self._last_order_error = None
+
     # --- Gestion des positions IB ---
     def req_ib_positions(self):
         """Demande les positions en cours à IB, attend que la connexion soit vraiment prête."""
@@ -80,6 +87,65 @@ class MarketDataProvider(EWrapper, EClient):
     def positionEnd(self):
         print("[DEBUG] positionEnd callback called")
         self._ib_positions_done = True
+
+    # --- Ordres ouverts ---
+    def req_open_orders(self, timeout: float = 5.0) -> list:
+        """Retourne les ordres ouverts dans IB (pour détecter les SELL déjà actifs)."""
+        self._open_orders = []
+        self._open_orders_done = False
+        self.reqOpenOrders()
+        start = time.time()
+        while not self._open_orders_done and (time.time() - start) < timeout:
+            time.sleep(0.1)
+        return list(self._open_orders)
+
+    def openOrder(self, orderId, contract, order, orderState):
+        """Callback IB pour chaque ordre ouvert."""
+        if not hasattr(self, '_open_orders'):
+            self._open_orders = []
+        self._open_orders.append({
+            'orderId': orderId,
+            'symbol': contract.symbol,
+            'action': order.action,
+            'qty': order.totalQuantity,
+            'orderType': order.orderType,
+            'status': orderState.status,
+        })
+
+    def openOrderEnd(self):
+        """Callback IB signalant la fin de la liste des ordres ouverts."""
+        if not hasattr(self, '_open_orders_done'):
+            self._open_orders_done = False
+        self._open_orders_done = True
+
+    def req_account_cash(self, timeout: float = 10.0) -> float:
+        """Retourne le cash disponible (AvailableFunds) depuis IB. Retourne -1 si indisponible."""
+        self._account_cash = None
+        self._account_cash_done = False
+        req_id = self._next_req_id
+        self._next_req_id += 1
+        self.reqAccountSummary(req_id, "All", "AvailableFunds")
+        start = time.time()
+        while not self._account_cash_done and (time.time() - start) < timeout:
+            time.sleep(0.1)
+        self.cancelAccountSummary(req_id)
+        if self._account_cash is None:
+            print("[ACCOUNT] Cash non disponible depuis IB")
+            return -1.0
+        print(f"[ACCOUNT] Cash disponible IB: {self._account_cash:,.2f}$")
+        return self._account_cash
+
+    def accountSummary(self, reqId, account, tag, value, currency):
+        """Callback IB pour le résumé de compte."""
+        if tag == "AvailableFunds":
+            try:
+                self._account_cash = float(value)
+            except ValueError:
+                pass
+
+    def accountSummaryEnd(self, reqId):
+        """Callback IB signalant la fin du résumé de compte."""
+        self._account_cash_done = True
 
     def get_ib_positions(self):
         """Récupère la liste des positions ouvertes via l'API IB."""
@@ -292,6 +358,9 @@ class MarketDataProvider(EWrapper, EClient):
     def error(self, reqId, errorCode, errorString):
         """Callback IB pour les erreurs."""
         print(f"[IB ERROR] reqId={reqId} code={errorCode} msg={errorString}")
+        # Capturer les erreurs d'ordre pour le mécanisme de fallback
+        if errorCode >= 400 and reqId > 0:
+            self._last_order_error = {'req_id': reqId, 'code': errorCode, 'msg': errorString}
 
     def register_order_callback(self, callback):
         """

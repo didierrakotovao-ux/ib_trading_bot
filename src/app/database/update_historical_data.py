@@ -65,7 +65,7 @@ class HistoricalDataUpdater:
             # Pas de données, télécharger 2 ans
             start_date = (datetime.now() - timedelta(days=730)).strftime('%Y-%m-%d')
 
-        end_date = datetime.now().strftime('%Y-%m-%d')
+        end_date = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
 
         # Vérifier si mise à jour nécessaire
         if start_date >= end_date:

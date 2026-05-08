@@ -189,7 +189,7 @@ class CanadaDataUpdater:
                 start_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
                 print(f"[UPDATE] Pas de données, sync depuis {start_date}")
 
-        end_date = datetime.now().strftime('%Y-%m-%d')
+        end_date = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
 
         if start_date >= end_date:
             print("[UPDATE] Données déjà à jour.")
