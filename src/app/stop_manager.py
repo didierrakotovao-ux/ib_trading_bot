@@ -134,7 +134,7 @@ class StopManager:
     # ------------------------------------------------------------------
 
     def _connect(self):
-        conn = sqlite3.connect(self.db_path, check_same_thread=False)
+        conn = sqlite3.connect(self.db_path, check_same_thread=False, timeout=60)
         conn.row_factory = sqlite3.Row
         return conn
 
@@ -295,6 +295,48 @@ class StopManager:
         finally:
             conn.close()
 
+    def _recently_closed(self, symbol: str, conn, minutes: int = 60) -> bool:
+        """
+        Retourne True si ce symbole a été fermé (quantite_restante=0) dans les N dernières minutes.
+        Protège contre la latence IB : une position vendue reste visible dans TWS
+        quelques secondes/minutes, ce qui provoquerait une nouvelle entrée journal et un doublon SELL.
+        """
+        row = conn.execute("""
+            SELECT id FROM trades
+            WHERE symbol = ? AND trade_mode = ?
+              AND quantite_restante = 0
+              AND date_sortie >= datetime('now', 'localtime', ? )
+        """, (symbol, self.trade_mode.value, f"-{minutes} minutes")).fetchone()
+        return row is not None
+
+    def _create_journal_entry(self, symbol: str, avg_cost: float, qty: int) -> Optional[int]:
+        """
+        Crée une entrée minimale dans trades quand trading.py n'a pas journalisé le fill.
+        Utilise avg_cost IB comme prix d'entrée.
+        Refuse si le symbole a été fermé récemment (position IB en cours de règlement).
+        """
+        try:
+            conn = self._connect()
+            if self._recently_closed(symbol, conn):
+                print(f"[STOPS] {symbol}: trade fermé récemment — position IB en règlement, entrée ignorée")
+                conn.close()
+                return None
+            cursor = conn.execute("""
+                INSERT INTO trades
+                    (trade_mode, strategy_name, symbol, date_entree,
+                     prix_entree, quantite, quantite_restante)
+                VALUES (?, 'Momentum', ?, datetime('now','localtime'), ?, ?, ?)
+            """, (self.trade_mode.value, symbol, avg_cost, qty, qty))
+            trade_id = cursor.lastrowid
+            conn.commit()
+            conn.close()
+            print(f"[STOPS] {symbol}: entrée journal créée automatiquement "
+                  f"(ID={trade_id}, avg_cost IB={avg_cost:.4f}, qty={qty})")
+            return trade_id
+        except Exception as e:
+            print(f"[STOPS] {symbol}: impossible de créer l'entrée journal: {e}")
+            return None
+
     def setup_all_open_positions(self):
         """
         Configure les stops pour toutes les positions ouvertes sans config active.
@@ -303,6 +345,7 @@ class StopManager:
         """
         ib_positions = self.market_data.req_ib_positions()
         ib_open = {p["symbol"]: int(abs(p["qty"])) for p in ib_positions if p["qty"] != 0}
+        ib_avg_cost = {p["symbol"]: p["avg_cost"] for p in ib_positions if p["qty"] != 0}
 
         if not ib_open:
             # Fallback DB si TWS ne renvoie rien
@@ -351,7 +394,13 @@ class StopManager:
             if row:
                 to_setup.append((symbol, row["prix_entree"], ib_qty, row["id"]))
             else:
-                print(f"[STOPS] {symbol}: position TWS ({ib_qty} actions) sans entrée en DB — stop non configuré")
+                avg_cost = ib_avg_cost.get(symbol, 0.0)
+                if avg_cost > 0:
+                    trade_id = self._create_journal_entry(symbol, avg_cost, ib_qty)
+                    if trade_id:
+                        to_setup.append((symbol, avg_cost, ib_qty, trade_id))
+                else:
+                    print(f"[STOPS] {symbol}: position TWS sans entrée DB ni avg_cost — stop non configuré")
         conn.close()
 
         if not to_setup:
@@ -541,7 +590,9 @@ class StopManager:
             if new_symbols:
                 print(f"[STOPS] Nouvelles positions sans stop détectées: {new_symbols}")
                 for symbol in new_symbols:
-                    ib_qty = next(int(abs(p["qty"])) for p in ib_positions if p["symbol"] == symbol)
+                    ib_pos  = next(p for p in ib_positions if p["symbol"] == symbol)
+                    ib_qty  = int(abs(ib_pos["qty"]))
+                    avg_cost = ib_pos.get("avg_cost", 0.0)
                     row = conn.execute("""
                         SELECT id, prix_entree FROM trades
                         WHERE symbol = ? AND trade_mode = ? AND quantite_restante > 0
@@ -549,8 +600,14 @@ class StopManager:
                     """, (symbol, self.trade_mode.value)).fetchone()
                     if row:
                         self.setup_position(symbol, row["prix_entree"], ib_qty, trade_id=row["id"])
+                    elif self._recently_closed(symbol, conn):
+                        print(f"[STOPS] {symbol}: trade fermé récemment — position IB en règlement, stop ignoré")
+                    elif avg_cost > 0:
+                        trade_id = self._create_journal_entry(symbol, avg_cost, ib_qty)
+                        if trade_id:
+                            self.setup_position(symbol, avg_cost, ib_qty, trade_id=trade_id)
                     else:
-                        print(f"[STOPS] {symbol}: nouvelle position TWS sans entrée DB — stop non configuré")
+                        print(f"[STOPS] {symbol}: nouvelle position TWS sans entrée DB ni avg_cost — stop non configuré")
         else:
             print("[STOPS] Positions IB non disponibles — vérification des orphelins ignorée")
 
