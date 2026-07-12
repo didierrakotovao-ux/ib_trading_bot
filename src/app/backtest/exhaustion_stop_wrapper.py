@@ -72,8 +72,12 @@ class ExhaustionStopBTWrapper(bt.Strategy):
         self.trade_entries = {}
         self.strategy_name = "ExhaustionStop"
         self.trade_journal = TradeJournal("backtest_journal.db")
-        # Effacer les trades backtest existants pour cette stratÃ©gie
-        self.trade_journal.clear_backtest_trades(self.strategy_name)
+        # Efface uniquement les trades de la même période (les autres fenêtres
+        # de backtest sont conservées)
+        self.trade_journal.clear_backtest_trades(
+            self.strategy_name,
+            backtest_start_date=self.start_date,
+            backtest_end_date=self.end_date)
 
         # Stats d'essoufflement
         self.exhaustion_stats = {

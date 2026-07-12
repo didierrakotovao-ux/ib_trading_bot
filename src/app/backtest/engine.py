@@ -72,19 +72,33 @@ class BacktestEngine:
         # Charger les données depuis (start_date - lookback_days) pour avoir assez d'historique pour le scoring
         data_start_date = self.start_date - timedelta(days=self.lookback_days + 100)  # +100 pour marge (252 jours trading = ~365 calendaires)
 
-        query = """
-            SELECT symbol, date, open, high, low, close, volume, adjusted_close
-            FROM historical_data
-            WHERE date BETWEEN %s AND %s
-            AND close >= %s
-            AND volume >= %s
-            ORDER BY symbol, date
-        """
-        df = read_sql(
-            query,
-            (data_start_date.strftime('%Y-%m-%d'), self.end_date.strftime('%Y-%m-%d'),
-             self.min_price, self.min_volume)
-        )
+        # Lecture via le cache SQLite local (synchronisé depuis PostgreSQL) :
+        # supprime la latence réseau sur les chargements répétés de fenêtres.
+        # Repli automatique sur PostgreSQL en cas de problème de cache.
+        df = None
+        try:
+            from src.app.database.local_cache import ensure_fresh, read_ohlcv
+            ensure_fresh()
+            df = read_ohlcv(data_start_date, self.end_date,
+                            min_price=self.min_price, min_volume=self.min_volume)
+            print("[DATA] Source: cache SQLite local")
+        except Exception as e:
+            print(f"[DATA][WARN] Cache local indisponible ({e}) — lecture PostgreSQL")
+
+        if df is None or df.empty:
+            query = """
+                SELECT symbol, date, open, high, low, close, volume, adjusted_close
+                FROM historical_data
+                WHERE date BETWEEN %s AND %s
+                AND close >= %s
+                AND volume >= %s
+                ORDER BY symbol, date
+            """
+            df = read_sql(
+                query,
+                (data_start_date.strftime('%Y-%m-%d'), self.end_date.strftime('%Y-%m-%d'),
+                 self.min_price, self.min_volume)
+            )
         if df.empty:
             print("[INFO] Aucun symbole ne passe le screener.")
             return

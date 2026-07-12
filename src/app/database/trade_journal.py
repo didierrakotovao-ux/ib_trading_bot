@@ -130,19 +130,37 @@ class TradeJournal:
         cur.close()
         print("[OK] Table trades initialisée")
 
-    def clear_backtest_trades(self, strategy_name: str):
-        """Efface tous les trades de backtest pour une stratégie donnée."""
+    def clear_backtest_trades(self, strategy_name: str,
+                              backtest_start_date=None, backtest_end_date=None):
+        """
+        Efface les trades de backtest pour une stratégie donnée.
+
+        Si backtest_start_date/backtest_end_date sont fournis, seuls les
+        trades de CETTE période sont effacés (re-run de la même fenêtre) —
+        les résultats des autres périodes sont conservés, ce qui permet de
+        comparer plusieurs fenêtres pour une même stratégie.
+        Sans période : ancien comportement (tout effacer pour la stratégie).
+        """
         self.connect()
         cur = self.conn.cursor()
-        cur.execute("""
-            DELETE FROM trades
-            WHERE trade_mode = 'backtest' AND strategy_name = %s
-        """, (strategy_name,))
+        if backtest_start_date is not None and backtest_end_date is not None:
+            cur.execute("""
+                DELETE FROM trades
+                WHERE trade_mode = 'backtest' AND strategy_name = %s
+                  AND backtest_start_date = %s AND backtest_end_date = %s
+            """, (strategy_name, backtest_start_date, backtest_end_date))
+            scope = f" (période {backtest_start_date} -> {backtest_end_date})"
+        else:
+            cur.execute("""
+                DELETE FROM trades
+                WHERE trade_mode = 'backtest' AND strategy_name = %s
+            """, (strategy_name,))
+            scope = " (toutes périodes)"
         deleted = cur.rowcount
         self.conn.commit()
         cur.close()
         if deleted > 0:
-            print(f"[CLEAN] {deleted} trades backtest effacés pour {strategy_name}")
+            print(f"[CLEAN] {deleted} trades backtest effacés pour {strategy_name}{scope}")
 
     def log_trade(
         self,
@@ -326,13 +344,29 @@ class TradeJournal:
     def get_performance_summary(
         self,
         trade_mode: Optional[TradeMode] = None,
-        strategy_name: Optional[str] = None
+        strategy_name: Optional[str] = None,
+        backtest_start_date=None,
+        backtest_end_date=None
     ) -> Dict[str, Any]:
-        """Calcule un résumé de performance."""
+        """
+        Calcule un résumé de performance.
+        Si backtest_start_date/backtest_end_date sont fournis, ne considère
+        que les trades de cette période (plusieurs fenêtres de backtest
+        peuvent coexister en base pour une même stratégie).
+        """
         df = self.get_trades(trade_mode=trade_mode, strategy_name=strategy_name)
 
         if df.empty:
             return {"error": "Aucun trade trouvé"}
+
+        if backtest_start_date is not None and 'backtest_start_date' in df.columns:
+            df = df[pd.to_datetime(df['backtest_start_date'])
+                    == pd.to_datetime(backtest_start_date).normalize()]
+        if backtest_end_date is not None and 'backtest_end_date' in df.columns:
+            df = df[pd.to_datetime(df['backtest_end_date'])
+                    == pd.to_datetime(backtest_end_date).normalize()]
+        if df.empty:
+            return {"error": "Aucun trade trouvé pour cette période"}
 
         closed = df[df['date_sortie'].notna()].copy()
         if closed.empty:

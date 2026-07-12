@@ -78,6 +78,25 @@ class TrailingOnlyBTWrapper(bt.Strategy):
                 db_path=db_path,
             )
 
+        # Pré-calcul vectorisé des scores (une fois pour toute la fenêtre,
+        # au lieu de recalculer features+score par symbole et par jour) —
+        # gain ~50-100x sur la durée du backtest, chemin live inchangé
+        if self.p.dataframes:
+            try:
+                from score_precompute import precompute_for_strategy
+                self.strategy.precomputed = precompute_for_strategy(
+                    scoring_type=self.p.scoring_type,
+                    dataframes=self.p.dataframes,
+                    model_path=(self.p.wyckoff_model_path
+                                if self.p.scoring_type == "wyckoff_ml"
+                                else self.p.smooth_model_path),
+                )
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
+                print(f"[PRECOMPUTE][WARN] Pré-calcul indisponible ({e}) — "
+                      f"scoring par jour classique")
+
         self.orders_by_symbol = {}
         self.pending_order_bundles = {}
         self.last_entry_prices = {}
@@ -99,8 +118,12 @@ class TrailingOnlyBTWrapper(bt.Strategy):
             self.strategy_name = f"TrailingOnly_{model_tag}"
            
         self.trade_journal = TradeJournal("backtest_journal.db")
-        # Effacer les trades backtest existants pour cette stratégie
-        self.trade_journal.clear_backtest_trades(self.strategy_name)
+        # Effacer les trades backtest existants pour cette stratégie SUR CETTE
+        # PÉRIODE uniquement — les runs d'autres fenêtres sont conservés
+        self.trade_journal.clear_backtest_trades(
+            self.strategy_name,
+            backtest_start_date=self.start_date,
+            backtest_end_date=self.end_date)
 
         # Préparation du fichier de diagnostic
         diag_date = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -509,7 +532,9 @@ class TrailingOnlyBTWrapper(bt.Strategy):
         print("=" * 60)
         summary = self.trade_journal.get_performance_summary(
             trade_mode=TradeMode.BACKTEST,
-            strategy_name=self.strategy_name
+            strategy_name=self.strategy_name,
+            backtest_start_date=self.start_date,
+            backtest_end_date=self.end_date
         )
         if "error" not in summary:
             print(f"Trades: {summary['total_trades']} (W:{summary['winning_trades']} / L:{summary['losing_trades']})")

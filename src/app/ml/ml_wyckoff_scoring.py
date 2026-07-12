@@ -9,25 +9,36 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 from src.app.ml.scoring import Scoring
 from src.app.strategies.wyckoff_vpa import compute_vpa_features, detect_events
+from src.app.ml.market_context import (
+    load_market_features, merge_market_features, MARKET_FEATURE_COLUMNS)
 
 class WyckoffMLScoring(Scoring):
     """
     Scoring utilisant le modèle Wyckoff/VPA (meta-labeling d'événements).
+
+    Discipline meta-labeling : le modèle n'est entraîné QUE sur les jours
+    d'événement (spring/test/SOS). Par défaut (require_event=True), le score
+    est 0 quand la dernière barre n'est pas un événement — sinon le modèle
+    extrapolerait hors de sa distribution d'entraînement.
     """
     name = "WyckoffMLScoring"
     df: pd.DataFrame
 
     def __init__(self, model_path: str = "models/wyckoff_model.pkl",
-                 db_path=None):  # db_path ignoré — connexion via pg_config.py
+                 db_path=None,  # db_path ignoré — connexion via pg_config.py
+                 require_event: bool = True):
         self.df = None
         self.model = None
         self.scaler = None
         self.model_loaded = False
+        self.require_event = require_event
         project_root = Path(__file__).parent.parent.parent.parent
         self.model_path = project_root / model_path
 
         # Colonnes chargées depuis le modèle
         self.feature_columns: List[str] = []
+        # Cache du contexte marché (SPY/QQQ), partagé pour toute la session
+        self._market_cache = None
 
         self._load_model()
 
@@ -73,6 +84,14 @@ class WyckoffMLScoring(Scoring):
 
         local_df = compute_vpa_features(local_df)
         local_df = detect_events(local_df)
+
+        # Contexte de marché — seulement si le modèle chargé a été entraîné
+        # avec (rétro-compatible avec les anciens pkl)
+        if any(c in self.feature_columns for c in MARKET_FEATURE_COLUMNS):
+            if self._market_cache is None:
+                self._market_cache = load_market_features()
+            local_df = merge_market_features(local_df, market=self._market_cache)
+
         return local_df
 
     def score(self, df: pd.DataFrame, symbol: str):
@@ -88,13 +107,18 @@ class WyckoffMLScoring(Scoring):
                 print(f"[WARN] Pas assez de donnees ({len(df)} < 60)")
                 return 0
 
-            df_clean = df.dropna(subset=self.feature_columns)
-
-            if df_clean.empty:
-                print("[WARN] Pas de donnees valides apres nettoyage")
+            # Discipline meta-labeling : ne scorer que les jours d'événement
+            # (le modèle n'a jamais vu de jour ordinaire à l'entraînement)
+            if self.require_event and not bool(df['event_any'].iloc[-1]):
                 return 0
 
-            X = df_clean[self.feature_columns].iloc[-1:].values
+            # Scorer la DERNIÈRE barre ou rien — pas une barre plus ancienne
+            # qui aurait survécu au dropna
+            last = df[self.feature_columns].iloc[-1:]
+            if last.isna().any(axis=None):
+                return 0
+
+            X = last.values
             X_scaled = self.scaler.transform(X)
             probability = self.model.predict_proba(X_scaled)[0, 1]
 

@@ -11,6 +11,7 @@ from src.app.database.db_manager import DatabaseManager
 from src.app.ml.ml_wyckoff_scoring import WyckoffMLScoring
 from src.app.screener.providers.market_data_provider import MarketDataProvider
 from src.app.strategies.strategy import Strategy
+from src.app.strategies.earnings_filter import EarningsFilter
 
 
 class WyckoffMLStrategy(Strategy):
@@ -34,7 +35,12 @@ class WyckoffMLStrategy(Strategy):
         scoring_type="wyckoff_ml",
         db_path="trading_data.db",
         wyckoff_model_path=None,
-        score_threshold=55,
+        # Seuil calibré par balayage EV out-of-time (2025-04 -> 2026-07,
+        # modèle avec contexte marché) : +1.58%/trade à 60 vs +0.32% à 55
+        score_threshold=60,
+        use_earnings_filter=True,
+        earnings_blackout_days=14,
+        post_earnings_days=5,
     ):
         if scoring_type != "wyckoff_ml":
             raise ValueError(
@@ -54,7 +60,18 @@ class WyckoffMLStrategy(Strategy):
         self.use_trailing_stop = use_trailing_stop
         self.trailing_percent = trailing_percent
 
+        # Filtre earnings symétrique : pas d'entrée dans [annonce-14j, annonce+5j]
+        # (validé sur 3 backtests : 14/14 trades bloqués étaient perdants)
+        self.use_earnings_filter = use_earnings_filter
+        self.earnings_filter = EarningsFilter(
+            blackout_days=earnings_blackout_days,
+            post_earnings_days=post_earnings_days) \
+            if use_earnings_filter else None
+
         self.db_manager = DatabaseManager(db_path)
+
+        # Scores pré-calculés (backtest uniquement) : injectés par le wrapper
+        self.precomputed = None
 
     def scanner_filters(self) -> ScannerSubscription:
         scan_sub = ScannerSubscription()
@@ -70,7 +87,42 @@ class WyckoffMLStrategy(Strategy):
         scored_symbols = []
         _cache_preloaded = getattr(self.market_data, '_preloaded', False)
 
-        for symbol in self.symbolsToAnalyse:
+        # Filtre earnings en amont du scoring (une requête pour tout le lot)
+        symbols = self.symbolsToAnalyse
+        if self.use_earnings_filter and symbols:
+            self.earnings_filter.preload(symbols, trade_date)
+            n_before = len(symbols)
+            symbols = [s for s in symbols
+                       if not self.earnings_filter.is_in_blackout(s, trade_date)]
+            if n_before != len(symbols):
+                print(f"[WYCKOFF] {trade_date} | {n_before - len(symbols)} symboles "
+                      f"en blackout earnings écartés")
+
+        # Mode backtest avec scores pré-calculés : lookups O(1), données
+        # chargées uniquement pour les symboles sélectionnés
+        if self.precomputed is not None:
+            scored = [(s, self.precomputed.score(s, trade_date)) for s in symbols]
+            scored = [(s, sc) for s, sc in scored if sc >= self.score_threshold]
+            scored.sort(key=lambda x: x[1], reverse=True)
+            start_date = trade_date - timedelta(days=self.lookback_days)
+            self.symbolsToTrade, self.symbolsData, self.symbolsScores = [], {}, {}
+            for symbol, score in scored[:self.max_stocks]:
+                data = self.market_data.get_historical_data(
+                    symbol, start_date, trade_date, interval="1d")
+                if data is None or len(data) < 60:
+                    data = self.db_manager.get_historical_data(
+                        symbol, start_date, trade_date)
+                if data is None or len(data) < 60:
+                    continue
+                self.symbolsToTrade.append(symbol)
+                self.symbolsData[symbol] = data
+                self.symbolsScores[symbol] = score
+            print(f"[WYCKOFF] {trade_date} | {len(self.symbolsToTrade)} selectionnes "
+                  f"(precalcule, seuil={self.score_threshold})"
+                  + (f": {self.symbolsToTrade}" if self.symbolsToTrade else ""))
+            return self.symbolsToTrade
+
+        for symbol in symbols:
             start_date = trade_date - timedelta(days=self.lookback_days)
             data = None
 
@@ -99,6 +151,8 @@ class WyckoffMLStrategy(Strategy):
 
         self.symbolsToTrade = [s[0] for s in selected]
         self.symbolsData = {s[0]: s[2] for s in selected}
+        # Scores d'entrée, lus par le wrapper de backtest (score_entree)
+        self.symbolsScores = {s[0]: s[1] for s in selected}
 
         print(
             f"[WYCKOFF] {trade_date} | {len(self.symbolsToTrade)} selectionnes "

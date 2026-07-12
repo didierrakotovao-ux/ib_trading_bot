@@ -30,6 +30,7 @@ import sys, os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 from src.app.database.pg_connection import read_sql
 from src.app.ml.triple_barrier import triple_barrier_labels, load_barriers_from_stop_config
+from src.app.ml.market_context import merge_market_features, MARKET_FEATURE_COLUMNS
 from src.app.strategies.wyckoff_vpa import (
     compute_vpa_features, detect_events, ML_FEATURE_COLUMNS)
 
@@ -39,7 +40,9 @@ import xgboost as xgb
 class MLWyckoffPredictor:
     """Meta-labeling des événements Wyckoff/VPA."""
 
-    FEATURE_COLUMNS = ML_FEATURE_COLUMNS
+    # Features VPA + contexte de marché (le modèle apprend l'interaction
+    # setup × régime — même approche que le pipeline momentum)
+    FEATURE_COLUMNS = ML_FEATURE_COLUMNS + MARKET_FEATURE_COLUMNS
 
     def __init__(self, model_path: str = "models/wyckoff_model.pkl"):
         self.model_path = Path(model_path)
@@ -87,6 +90,9 @@ class MLWyckoffPredictor:
               f"({n_events/max(len(df),1)*100:.2f}%)")
         for etype, cnt in counts.items():
             print(f"         {etype}: {cnt:,}")
+
+        print("[2b/3] Contexte de marché (SPY/QQQ)...")
+        df = merge_market_features(df)
 
         print("[3/3] Labels triple-barriere...")
         df = triple_barrier_labels(

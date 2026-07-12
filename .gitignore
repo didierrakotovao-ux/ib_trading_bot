@@ -25,3 +25,4 @@ tmpclaude-ae65-cwd
 
 # Fichier de config base de données (contient mot de passe)
 src/app/database/pg_config.py
+cache/

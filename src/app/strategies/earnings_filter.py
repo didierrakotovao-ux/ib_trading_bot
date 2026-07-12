@@ -35,16 +35,26 @@ def _as_date(d) -> date:
 
 
 class EarningsFilter:
-    """Blackout d'entrée si une annonce de résultats est proche."""
+    """
+    Blackout d'entrée autour d'une annonce de résultats — SYMÉTRIQUE :
+      - AVANT l'annonce (blackout_days) : le gap d'annonce traverse le stop ;
+      - APRÈS l'annonce (post_earnings_days) : la réaction post-earnings se
+        déroule sur plusieurs jours, trop erratique pour un trailing stop
+        (cas RAIL/OWLT : entrées à J+1 de l'annonce, gaps -12% et -22%).
+    """
 
-    def __init__(self, blackout_days: int = 14):
+    def __init__(self, blackout_days: int = 14, post_earnings_days: int = 5):
         """
         Args:
             blackout_days: fenêtre calendaire avant l'annonce (14 j
                 calendaires ≈ 10 jours de bourse) pendant laquelle on
                 n'ouvre pas de position.
+            post_earnings_days: fenêtre calendaire après une annonce
+                pendant laquelle on n'ouvre pas non plus (réaction et
+                drift post-earnings).
         """
         self.blackout_days = blackout_days
+        self.post_earnings_days = post_earnings_days
         self._dates: Dict[str, List[date]] = {}
         self._missing: set = set()
 
@@ -97,9 +107,26 @@ class EarningsFilter:
             nxt += timedelta(days=QUARTER_DAYS)
         return nxt
 
+    def last_announcement(self, symbol: str, as_of) -> Optional[date]:
+        """Dernière annonce connue strictement avant as_of (None si aucune)."""
+        dates = self._dates.get(symbol)
+        if not dates:
+            return None
+        i = bisect.bisect_left(dates, _as_date(as_of))
+        return dates[i - 1] if i > 0 else None
+
     def is_in_blackout(self, symbol: str, as_of) -> bool:
-        """True si une annonce (réelle ou estimée) tombe dans la fenêtre."""
+        """
+        True si as_of tombe dans la fenêtre [annonce - blackout_days,
+        annonce + post_earnings_days] d'une annonce réelle ou estimée.
+        """
+        d = _as_date(as_of)
+        # Avant l'annonce (jour même inclus, via next_announcement)
         nxt = self.next_announcement(symbol, as_of)
-        if nxt is None:
-            return False
-        return (nxt - _as_date(as_of)).days <= self.blackout_days
+        if nxt is not None and (nxt - d).days <= self.blackout_days:
+            return True
+        # Après une annonce récente
+        last = self.last_announcement(symbol, as_of)
+        if last is not None and (d - last).days <= self.post_earnings_days:
+            return True
+        return False

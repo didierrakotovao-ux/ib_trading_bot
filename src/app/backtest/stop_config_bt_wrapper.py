@@ -111,7 +111,12 @@ class StopConfigBTWrapper(bt.Strategy):
         self.strategy_name = f"StopConfig_{model_tag}_{prot}_{prof}"
 
         self.trade_journal = TradeJournal("backtest_journal.db")
-        self.trade_journal.clear_backtest_trades(self.strategy_name)
+        # Efface uniquement les trades de la même période (les autres fenêtres
+        # de backtest sont conservées)
+        self.trade_journal.clear_backtest_trades(
+            self.strategy_name,
+            backtest_start_date=self.start_date,
+            backtest_end_date=self.end_date)
 
         # Fichier de diagnostic
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")

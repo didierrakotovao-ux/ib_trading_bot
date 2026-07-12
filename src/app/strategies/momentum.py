@@ -37,6 +37,7 @@ class MomentumStrategy(Strategy):
                  momentum_top_pct=0.3, fip_threshold=0.0,
                  use_seasonal_threshold=False,
                  use_earnings_filter=True, earnings_blackout_days=14,
+                 post_earnings_days=5,
                  use_sue_filter=False, sue_threshold=0.0,
                  db_path="trading_data.db",
                  smooth_model_path=None):
@@ -73,7 +74,10 @@ class MomentumStrategy(Strategy):
         # (les gaps post-earnings traversent le trailing stop)
         self.use_earnings_filter = use_earnings_filter
         self.earnings_blackout_days = earnings_blackout_days
-        self.earnings_filter = EarningsFilter(blackout_days=earnings_blackout_days) \
+        self.post_earnings_days = post_earnings_days
+        self.earnings_filter = EarningsFilter(
+            blackout_days=earnings_blackout_days,
+            post_earnings_days=post_earnings_days) \
             if use_earnings_filter else None
 
         # Filtre SUE (Novy-Marx) — retiré, EarningsFeatures n'est plus chargé
@@ -84,6 +88,11 @@ class MomentumStrategy(Strategy):
 
         # DB locale pour les données historiques (priorité sur yfinance)
         self.db_manager = DatabaseManager(db_path)
+
+        # Scores pré-calculés (backtest uniquement) : injectés par le wrapper
+        # via score_precompute.py — get_symbols passe alors en mode lookup
+        # au lieu de recalculer features+score par symbole et par jour
+        self.precomputed = None
 
     def scanner_filters(self) -> ScannerSubscription:
         scan_sub = ScannerSubscription()
@@ -106,6 +115,10 @@ class MomentumStrategy(Strategy):
         5. Seuil dynamique selon la saisonnalité
         6. Top max_stocks par score
         """
+        # Mode backtest avec scores pré-calculés : pipeline en lookups O(1)
+        if self.precomputed is not None:
+            return self._get_symbols_precomputed(trade_date)
+
         # Étape 1: Récupérer les données pour tous les symboles
         all_candidates = []
         nan_count = 0
@@ -189,6 +202,71 @@ class MomentumStrategy(Strategy):
         self.symbolsData = {s[0]: s[2] for s in selected}
         # Scores d'entrée, exposés pour la journalisation (score_entree)
         self.symbolsScores = {s[0]: s[1] for s in selected}
+        return self.symbolsToTrade
+
+    def _get_symbols_precomputed(self, trade_date) -> list:
+        """
+        Même pipeline que get_symbols (momentum 12-1 -> FIP -> earnings ->
+        score -> top N) mais servi par les lookups pré-calculés — les données
+        ne sont chargées que pour les symboles finalement sélectionnés.
+        """
+        pre = self.precomputed
+
+        # Étape 2: momentum 12-1 (mêmes sémantiques que filter_top_momentum)
+        candidates = []
+        for symbol in self.symbolsToAnalyse:
+            mom = pre.momentum_12_1(symbol, trade_date)
+            if not np.isnan(mom):
+                candidates.append((symbol, mom))
+        candidates.sort(key=lambda x: x[1], reverse=True)
+        n_keep = max(1, int(len(candidates) * self.momentum_top_pct)) \
+            if candidates else 0
+        momentum_filtered = candidates[:n_keep]
+        print(f"[PIPELINE] {trade_date} | {len(momentum_filtered)} après momentum "
+              f"top {self.momentum_top_pct*100:.0f}% (précalculé)")
+
+        # Étape 3: FIP
+        fip_filtered = [
+            (s, m) for s, m in momentum_filtered
+            if not np.isnan(pre.fip(s, trade_date))
+            and pre.fip(s, trade_date) < self.fip_threshold
+        ]
+        print(f"[PIPELINE] {trade_date} | {len(fip_filtered)} après filtre FIP")
+
+        # Étape 3b: earnings
+        if self.use_earnings_filter and fip_filtered:
+            self.earnings_filter.preload([s for s, _ in fip_filtered], trade_date)
+            fip_filtered = [
+                (s, m) for s, m in fip_filtered
+                if not self.earnings_filter.is_in_blackout(s, trade_date)
+            ]
+            print(f"[PIPELINE] {trade_date} | {len(fip_filtered)} après filtre earnings")
+
+        # Étape 4: seuil de score
+        if self.use_seasonal_threshold:
+            threshold = MomentumFilters.get_score_threshold(trade_date.month)
+        else:
+            threshold = self.score_threshold
+        scored = [(s, pre.score(s, trade_date)) for s, _ in fip_filtered]
+        scored = [(s, sc) for s, sc in scored if sc >= threshold]
+        print(f"[PIPELINE] {trade_date} | {len(scored)} après scoring (seuil={threshold})"
+              + (f": {[s for s, _ in scored]}" if scored else ""))
+
+        # Étape 5: top max_stocks, puis données pour les seuls sélectionnés
+        scored.sort(key=lambda x: x[1], reverse=True)
+        selected = scored[:self.max_stocks]
+        start_date = trade_date - timedelta(days=self.lookback_days)
+        self.symbolsToTrade, self.symbolsData, self.symbolsScores = [], {}, {}
+        for symbol, score in selected:
+            data = self.market_data.get_historical_data(
+                symbol, start_date, trade_date, interval="1d")
+            if data is None or len(data) < 60:
+                data = self.db_manager.get_historical_data(symbol, start_date, trade_date)
+            if data is None or len(data) < 60:
+                continue
+            self.symbolsToTrade.append(symbol)
+            self.symbolsData[symbol] = data
+            self.symbolsScores[symbol] = score
         return self.symbolsToTrade
 
     def get_order_params(self):
