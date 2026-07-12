@@ -3,7 +3,6 @@ ML Earnings Scoring - Scoring avec le modèle earnings momentum (SUE/CAR3).
 """
 import pandas as pd
 import numpy as np
-import sqlite3
 import joblib
 from pathlib import Path
 from typing import Optional, List
@@ -13,6 +12,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 from src.app.ml.scoring import Scoring
 from src.app.ml.earnings_features import EarningsFeatures
+from src.app.database.pg_connection import get_conn
 
 
 class EarningsMLScoring(Scoring):
@@ -24,15 +24,13 @@ class EarningsMLScoring(Scoring):
     df: pd.DataFrame
 
     def __init__(self, model_path: str = "models/earnings_momentum_model.pkl",
-                 db_path: str = "trading_data.db"):
+                 db_path=None):  # db_path ignoré — connexion via pg_config.py
         self.df = None
         self.model = None
         self.scaler = None
         self.model_loaded = False
-        # Résoudre les chemins par rapport à la racine du projet
         project_root = Path(__file__).parent.parent.parent.parent
         self.model_path = project_root / model_path
-        self.db_path = str(project_root / db_path)
 
         # Colonnes de features
         self.feature_columns: List[str] = []
@@ -46,7 +44,7 @@ class EarningsMLScoring(Scoring):
         self._earnings_cache: dict = {}
 
         # Earnings features helper
-        self.earnings_features = EarningsFeatures(self.db_path)
+        self.earnings_features = EarningsFeatures()
 
         self._load_model()
         self._load_sector_cache()
@@ -76,10 +74,11 @@ class EarningsMLScoring(Scoring):
     def _load_sector_cache(self):
         """Charge le cache des secteurs depuis la BD."""
         try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            cursor.execute("SELECT symbol, sector FROM symbol_metadata")
-            self._sector_cache = {row[0]: row[1] for row in cursor.fetchall()}
+            conn = get_conn()
+            cur = conn.cursor()
+            cur.execute("SELECT symbol, sector FROM symbol_metadata")
+            self._sector_cache = {row[0]: row[1] for row in cur.fetchall()}
+            cur.close()
             conn.close()
             print(f"[OK] Cache secteurs chargé: {len(self._sector_cache)} symboles")
         except Exception as e:

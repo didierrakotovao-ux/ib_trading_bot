@@ -1,6 +1,7 @@
 # Ignore Python virtual environment
 .venv/
-
+collectOF/
+Indicators/
 # Ignore CSV and database files
 *.csv
 *.db
@@ -21,3 +22,6 @@ tmpclaude-2150-cwd
 tmpclaude-7550-cwd
 tmpclaude-ae65-cwd
 .claude/settings.local.json
+
+# Fichier de config base de données (contient mot de passe)
+src/app/database/pg_config.py

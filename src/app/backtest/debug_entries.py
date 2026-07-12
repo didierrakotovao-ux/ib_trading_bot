@@ -6,13 +6,13 @@ import sys
 sys.path.insert(0, '.')
 
 import pandas as pd
-import sqlite3
 from datetime import datetime, timedelta
 
 # Importer le scoring
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 from src.app.ml.ml_scoring import MLScoring
+from src.app.database.pg_connection import read_sql
 
 
 def analyze_entries():
@@ -118,21 +118,19 @@ def analyze_scores_for_date(target_date_str):
     target_date = datetime.strptime(target_date_str, '%Y-%m-%d')
 
     # Charger les données
-    conn = sqlite3.connect("trading_data.db")
     lookback_days = 350
     data_start = target_date - timedelta(days=lookback_days + 50)
 
     query = """
         SELECT symbol, date, open, high, low, close, volume
         FROM historical_data
-        WHERE date BETWEEN ? AND ?
+        WHERE date BETWEEN %s AND %s
         ORDER BY symbol, date
     """
-    df = pd.read_sql_query(query, conn, params=(
+    df = read_sql(query, (
         data_start.strftime('%Y-%m-%d'),
         target_date.strftime('%Y-%m-%d')
     ))
-    conn.close()
 
     if df.empty:
         print("Pas de données")

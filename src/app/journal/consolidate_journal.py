@@ -2,12 +2,13 @@
 Consolidation du journal IB (CSV TWS) vers la base de données.
 Insère les trades et exits manquants identifiés dans DUE674885.TRANSACTIONS.csv
 """
-import sqlite3
 import os
+import sys
 from datetime import datetime
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..'))
-DB_PATH = os.path.join(PROJECT_ROOT, 'trading_data.db')
+sys.path.insert(0, PROJECT_ROOT)
+from src.app.database.pg_connection import get_conn, dict_cursor
 
 # BUYs absents de la DB (date, symbol, qty, prix_moyen, commission)
 MISSING_BUYS = [
@@ -90,31 +91,34 @@ MISSING_SELLS = [
 ]
 
 
-def find_trade(conn, sym, sell_date, qty_sold):
+def find_trade(cur, sym, sell_date, qty_sold):
+    """Cherche le trade parent pour un SELL donné."""
     # 1. Trade ouvert (restante >= qty), entré avant sell_date (FIFO)
-    row = conn.execute('''
+    cur.execute('''
         SELECT id, prix_entree, quantite, quantite_restante
         FROM trades
-        WHERE symbol=? AND trade_mode='paper'
-          AND date(date_entree) <= ? AND quantite_restante >= ?
+        WHERE symbol=%s AND trade_mode='paper'
+          AND DATE(date_entree) <= %s AND quantite_restante >= %s
         ORDER BY date_entree ASC LIMIT 1
-    ''', (sym, sell_date, qty_sold)).fetchone()
+    ''', (sym, sell_date, qty_sold))
+    row = cur.fetchone()
     if row:
         return dict(row), True
 
-    # 2. Trade fermé (restante=0) sans exit pour ce qty — ajout exit seulement
-    row = conn.execute('''
+    # 2. Trade fermé sans exit pour ce qty
+    cur.execute('''
         SELECT t.id, t.prix_entree, t.quantite, t.quantite_restante
         FROM trades t
-        WHERE t.symbol=? AND t.trade_mode='paper'
-          AND date(t.date_entree) <= ?
+        WHERE t.symbol=%s AND t.trade_mode='paper'
+          AND DATE(t.date_entree) <= %s
           AND t.quantite_restante = 0
           AND NOT EXISTS (
               SELECT 1 FROM trade_exits te
-              WHERE te.trade_id=t.id AND date(te.date_sortie)=? AND te.quantite_vendue=?
+              WHERE te.trade_id=t.id AND DATE(te.date_sortie)=%s AND te.quantite_vendue=%s
           )
         ORDER BY t.date_entree DESC LIMIT 1
-    ''', (sym, sell_date, sell_date, qty_sold)).fetchone()
+    ''', (sym, sell_date, sell_date, qty_sold))
+    row = cur.fetchone()
     if row:
         return dict(row), False
 
@@ -122,26 +126,28 @@ def find_trade(conn, sym, sell_date, qty_sold):
 
 
 def main():
-    conn = sqlite3.connect(DB_PATH, timeout=60)
-    conn.row_factory = sqlite3.Row
+    conn = get_conn()
+    cur = dict_cursor(conn)
     inserted_trades = inserted_exits = updated_restante = 0
 
     # --- Phase 1 : BUYs manquants ---
     print('=== Phase 1 : Insertion des BUYs manquants ===')
     for (date, sym, qty, px, comm) in MISSING_BUYS:
-        existing = conn.execute(
-            'SELECT id FROM trades WHERE symbol=? AND trade_mode=? AND date(date_entree)=?',
+        cur.execute(
+            'SELECT id FROM trades WHERE symbol=%s AND trade_mode=%s AND DATE(date_entree)=%s',
             (sym, 'paper', date)
-        ).fetchone()
+        )
+        existing = cur.fetchone()
         if existing:
             print(f'  [SKIP] {date} {sym} déjà en DB (id={existing["id"]})')
             continue
-        conn.execute('''
+        cur.execute('''
             INSERT INTO trades (trade_mode, strategy_name, symbol, date_entree, prix_entree,
                 quantite, quantite_restante, created_at)
-            VALUES (?,?,?,?,?,?,?,datetime('now'))
+            VALUES (%s,%s,%s,%s,%s,%s,%s,NOW())
+            RETURNING id
         ''', ('paper', 'smooth_momentum', sym, date + ' 09:30:00', px, qty, qty))
-        tid = conn.execute('SELECT last_insert_rowid()').fetchone()[0]
+        tid = cur.fetchone()['id']
         print(f'  [OK] {date} {sym} qty={qty} @ {px:.4f}  trade_id={tid}')
         inserted_trades += 1
     conn.commit()
@@ -150,51 +156,55 @@ def main():
     print()
     print('=== Phase 2 : Insertion des SELLs manquants ===')
     for (date, sym, qty, px, comm) in MISSING_SELLS:
-        trade, is_open = find_trade(conn, sym, date, qty)
+        trade, is_open = find_trade(cur, sym, date, qty)
         if trade is None:
             print(f'  [WARN] {date} {sym} SELL {qty}: aucun trade trouvé')
             continue
-        dup = conn.execute(
-            'SELECT id FROM trade_exits WHERE trade_id=? AND date(date_sortie)=? AND quantite_vendue=?',
+        cur.execute(
+            'SELECT id FROM trade_exits WHERE trade_id=%s AND DATE(date_sortie)=%s AND quantite_vendue=%s',
             (trade['id'], date, qty)
-        ).fetchone()
-        if dup:
+        )
+        if cur.fetchone():
             print(f'  [SKIP] {date} {sym} exit déjà enregistré')
             continue
         entry_px = trade['prix_entree']
         pnl_brut = round((px - entry_px) * qty, 2)
-        pnl_net = round(pnl_brut + comm, 2)
-        conn.execute('''
+        pnl_net  = round(pnl_brut + comm, 2)
+        cur.execute('''
             INSERT INTO trade_exits
                 (trade_id, symbol, date_sortie, prix_sortie, quantite_vendue,
                  cause_sortie, pnl_brut, commission, pnl_net)
-            VALUES (?,?,?,?,?,?,?,?,?)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
         ''', (trade['id'], sym, date + ' 16:00:00', px, qty,
               'CSV_CLOSE', pnl_brut, comm, pnl_net))
         inserted_exits += 1
         if is_open:
             new_r = max(0, trade['quantite_restante'] - qty)
-            conn.execute('UPDATE trades SET quantite_restante=? WHERE id=?',
-                         (new_r, trade['id']))
+            cur.execute('UPDATE trades SET quantite_restante=%s WHERE id=%s',
+                        (new_r, trade['id']))
             updated_restante += 1
         sign = '+' if pnl_net >= 0 else ''
         print(f'  [OK] {date} {sym} qty={qty} @ {px:.4f} PnL={sign}{pnl_net:.2f}  trade_id={trade["id"]}')
     conn.commit()
 
-    # --- Phase 3 : Vérification finale ---
+    # --- Phase 3 : Résumé ---
     print()
     print('=== Résumé ===')
     print(f'  Trades insérés    : {inserted_trades}')
     print(f'  Exits insérés     : {inserted_exits}')
     print(f'  Restante mis à jour: {updated_restante}')
 
-    total_exits = conn.execute("SELECT COUNT(*) FROM trade_exits te JOIN trades t ON t.id=te.trade_id WHERE t.trade_mode='paper'").fetchone()[0]
-    total_trades = conn.execute("SELECT COUNT(*) FROM trades WHERE trade_mode='paper'").fetchone()[0]
-    pnl = conn.execute("SELECT SUM(pnl_net) FROM trade_exits te JOIN trades t ON t.id=te.trade_id WHERE t.trade_mode='paper'").fetchone()[0] or 0
+    cur.execute("SELECT COUNT(*) FROM trade_exits te JOIN trades t ON t.id=te.trade_id WHERE t.trade_mode='paper'")
+    total_exits = cur.fetchone()[0]
+    cur.execute("SELECT COUNT(*) FROM trades WHERE trade_mode='paper'")
+    total_trades = cur.fetchone()[0]
+    cur.execute("SELECT SUM(pnl_net) FROM trade_exits te JOIN trades t ON t.id=te.trade_id WHERE t.trade_mode='paper'")
+    pnl = cur.fetchone()[0] or 0
     print(f'  Trades paper total: {total_trades}')
     print(f'  Exits paper total : {total_exits}')
     print(f'  PnL net total     : {pnl:+.2f}$')
 
+    cur.close()
     conn.close()
 
 

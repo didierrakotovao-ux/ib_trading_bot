@@ -396,6 +396,11 @@ class MarketDataProvider(EWrapper, EClient):
         self._next_req_id += 1
         return order_id
 
+    def cancelOrder(self, order_id: int):
+        """Annule un ordre actif par son orderId."""
+        print(f"[IB ORDER] Cancelling order orderId={order_id}")
+        super().cancelOrder(order_id, "")
+
     def orderStatus(self, orderId, status, filled, remaining, avgFillPrice,
                     permId, parentId, lastFillPrice, clientId, whyHeld, mktCapPrice=0.0):
         """Callback IB pour le statut des ordres."""

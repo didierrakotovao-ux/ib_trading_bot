@@ -142,8 +142,8 @@ class LiveJournal:
                 # Vérifier si déjà dans le journal
                 cursor.execute('''
                     SELECT id FROM trades
-                    WHERE symbol = ? AND trade_mode = ? AND date(date_entree) = ?
-                    AND ABS(quantite - ?) < 10
+                    WHERE symbol = %s AND trade_mode = %s AND DATE(date_entree) = %s
+                    AND ABS(quantite - %s) < 10
                 ''', (symbol, self.trade_mode.value, date_str, buy['shares']))
 
                 existing = cursor.fetchone()
@@ -171,7 +171,7 @@ class LiveJournal:
                 # Chercher une entrée ouverte (quantite_restante > 0)
                 cursor.execute('''
                     SELECT id, prix_entree, quantite_restante FROM trades
-                    WHERE symbol = ? AND trade_mode = ? AND (date_sortie IS NULL OR quantite_restante > 0)
+                    WHERE symbol = %s AND trade_mode = %s AND (date_sortie IS NULL OR quantite_restante > 0)
                     ORDER BY date_entree DESC LIMIT 1
                 ''', (symbol, self.trade_mode.value))
 
@@ -205,7 +205,7 @@ class LiveJournal:
             SELECT id, symbol, date_entree, prix_entree, quantite,
                    date_sortie, prix_sortie, cause_sortie, pnl_net
             FROM trades
-            WHERE trade_mode = ? AND date_entree >= ?
+            WHERE trade_mode = %s AND date_entree >= %s
             ORDER BY date_entree DESC
         ''', (self.trade_mode.value, date_limit))
 
@@ -230,7 +230,9 @@ class LiveJournal:
             status = "OUVERT" if not date_s else "FERMÉ"
             pnl_str = f"PnL: {pnl:+.2f}$" if pnl else ""
 
-            print(f"{symbol:6} | {date_e[:16]} | {qty:5} @ {prix_e:8.2f} | {status:6} {pnl_str}")
+            # date_e peut être str (SQLite) ou datetime (PostgreSQL/psycopg2)
+            date_str = date_e.strftime('%Y-%m-%d %H:%M') if hasattr(date_e, 'strftime') else str(date_e)[:16]
+            print(f"{symbol:6} | {date_str} | {qty:5} @ {prix_e:8.2f} | {status:6} {pnl_str}")
 
             if date_s:
                 closed_trades += 1
@@ -285,7 +287,7 @@ class LiveJournal:
         # Trouver l'entrée ouverte
         cursor.execute('''
             SELECT id, prix_entree, quantite FROM trades
-            WHERE symbol = ? AND trade_mode = ? AND date_sortie IS NULL
+            WHERE symbol = %s AND trade_mode = %s AND date_sortie IS NULL
             ORDER BY date_entree DESC LIMIT 1
         ''', (symbol.upper(), self.trade_mode.value))
 
@@ -303,13 +305,13 @@ class LiveJournal:
 
         cursor.execute('''
             UPDATE trades SET
-                date_sortie = ?,
-                prix_sortie = ?,
-                cause_sortie = ?,
-                pnl_brut = ?,
-                commission = ?,
-                pnl_net = ?
-            WHERE id = ?
+                date_sortie = %s,
+                prix_sortie = %s,
+                cause_sortie = %s,
+                pnl_brut = %s,
+                commission = %s,
+                pnl_net = %s
+            WHERE id = %s
         ''', (
             exit_time.strftime('%Y-%m-%d %H:%M:%S'),
             price,
@@ -338,14 +340,14 @@ class LiveJournal:
 
         # Compter les trades paper dans la fenêtre
         cursor.execute(
-            "SELECT COUNT(*) FROM trades WHERE trade_mode = ? AND date_entree >= ?",
+            "SELECT COUNT(*) FROM trades WHERE trade_mode = %s AND date_entree >= %s",
             (self.trade_mode.value, date_limit)
         )
         count = cursor.fetchone()[0]
 
         # Supprimer uniquement les trades dans la fenêtre since_days
         cursor.execute(
-            "DELETE FROM trades WHERE trade_mode = ? AND date_entree >= ?",
+            "DELETE FROM trades WHERE trade_mode = %s AND date_entree >= %s",
             (self.trade_mode.value, date_limit)
         )
         self.trade_journal.conn.commit()

@@ -1,0 +1,1951 @@
+[2026-07-10  8:30:03,26] Demarrage collecte Futures L2 
+
+============================================================
+FUTURES L2 COLLECTOR  (format parquet NinjaTrader)
+============================================================
+Host/Port      : 192.168.0.103:7496
+Client ID      : 97
+Symboles       : MES, MNQ, YM
+Contrat        : 202609
+Profondeur L2  : 5 niveaux
+Chunk parquet  : 30s
+Duration       : 480 min
+Output dir     : collectOF/
+  MES -> collectOF/sessions_mes/YYYY-MM-DD/{trade,quote}_HHMMSS.parquet
+  MNQ -> collectOF/sessions_mnq/YYYY-MM-DD/{trade,quote}_HHMMSS.parquet
+  YM -> collectOF/sessions_dow/YYYY-MM-DD/{trade,quote}_HHMMSS.parquet
+Ticks          : DESACTIVES (--no-ticks)
+============================================================
+
+[OK] Connecte a IB
+[OK] 3 futures souscrits (L2 + L1 (ticks desactives))
+[INFO] Warmup 3s...
+
+[RUN] Collecte en cours -> collectOF/
+[RUN] Rotation toutes les 30s
+
+[RUN] 1.0min | chunks=2
+  MES  bid=7587.50 ask=7587.75 spread=0.2500 imb=+0.27 ofi1m=+0.00 trades=0 quotes=817 err=0
+  MNQ  bid=29847.50 ask=29848.25 spread=0.7500 imb=+0.16 ofi1m=+0.00 trades=0 quotes=4992 err=0
+  YM   bid=52859.00 ask=52861.00 spread=2.0000 imb=+0.62 ofi1m=+0.00 trades=0 quotes=590 err=0
+[RUN] 2.0min | chunks=4
+  MES  bid=7587.00 ask=7587.25 spread=0.2500 imb=+0.22 ofi1m=+0.00 trades=0 quotes=1609 err=0
+  MNQ  bid=29846.00 ask=29846.75 spread=0.7500 imb=-0.12 ofi1m=+0.00 trades=0 quotes=9454 err=0
+  YM   bid=52848.00 ask=52851.00 spread=3.0000 imb=+0.07 ofi1m=+0.00 trades=0 quotes=964 err=0
+[RUN] 3.0min | chunks=6
+  MES  bid=7585.75 ask=7586.25 spread=0.5000 imb=+0.04 ofi1m=+0.00 trades=0 quotes=2219 err=0
+  MNQ  bid=29837.50 ask=29838.50 spread=1.0000 imb=-0.06 ofi1m=+0.00 trades=0 quotes=13602 err=0
+  YM   bid=52840.00 ask=52842.00 spread=2.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=1396 err=0
+[RUN] 4.0min | chunks=8
+  MES  bid=7587.00 ask=7587.25 spread=0.2500 imb=+0.09 ofi1m=+0.00 trades=0 quotes=3000 err=0
+  MNQ  bid=29849.25 ask=29850.00 spread=0.7500 imb=-0.21 ofi1m=+0.00 trades=0 quotes=18104 err=0
+  YM   bid=52842.00 ask=52844.00 spread=2.0000 imb=+0.12 ofi1m=+0.00 trades=0 quotes=1868 err=0
+[RUN] 5.0min | chunks=10
+  MES  bid=7585.75 ask=7586.00 spread=0.2500 imb=+0.33 ofi1m=+0.00 trades=0 quotes=3624 err=0
+  MNQ  bid=29836.00 ask=29836.50 spread=0.5000 imb=+0.19 ofi1m=+0.00 trades=0 quotes=22051 err=0
+  YM   bid=52837.00 ask=52839.00 spread=2.0000 imb=+0.03 ofi1m=+0.00 trades=0 quotes=2268 err=0
+[RUN] 6.0min | chunks=12
+  MES  bid=7586.00 ask=7586.25 spread=0.2500 imb=+0.21 ofi1m=+0.00 trades=0 quotes=4607 err=0
+  MNQ  bid=29833.00 ask=29833.75 spread=0.7500 imb=+0.06 ofi1m=+0.00 trades=0 quotes=27729 err=0
+  YM   bid=52840.00 ask=52843.00 spread=3.0000 imb=-0.11 ofi1m=+0.00 trades=0 quotes=2838 err=0
+[RUN] 7.0min | chunks=14
+  MES  bid=7585.50 ask=7585.75 spread=0.2500 imb=+0.14 ofi1m=+0.00 trades=0 quotes=5288 err=0
+  MNQ  bid=29825.50 ask=29826.00 spread=0.5000 imb=-0.17 ofi1m=+0.00 trades=0 quotes=31461 err=0
+  YM   bid=52839.00 ask=52842.00 spread=3.0000 imb=+0.04 ofi1m=+0.00 trades=0 quotes=3205 err=0
+[RUN] 8.0min | chunks=16
+  MES  bid=7584.75 ask=7585.00 spread=0.2500 imb=+0.41 ofi1m=+0.00 trades=0 quotes=6036 err=0
+  MNQ  bid=29823.50 ask=29824.25 spread=0.7500 imb=+0.06 ofi1m=+0.00 trades=0 quotes=36151 err=0
+  YM   bid=52835.00 ask=52838.00 spread=3.0000 imb=-0.03 ofi1m=+0.00 trades=0 quotes=3606 err=0
+[RUN] 9.0min | chunks=18
+  MES  bid=7588.50 ask=7588.75 spread=0.2500 imb=-0.43 ofi1m=+0.00 trades=0 quotes=6750 err=0
+  MNQ  bid=29841.75 ask=29842.25 spread=0.5000 imb=+0.10 ofi1m=+0.00 trades=0 quotes=40384 err=0
+  YM   bid=52865.00 ask=52869.00 spread=4.0000 imb=-0.14 ofi1m=+0.00 trades=0 quotes=4101 err=0
+[RUN] 10.0min | chunks=20
+  MES  bid=7590.25 ask=7591.25 spread=1.0000 imb=-0.17 ofi1m=+0.00 trades=0 quotes=8047 err=0
+  MNQ  bid=29854.75 ask=29854.75 spread=0.0000 imb=+0.11 ofi1m=+0.00 trades=0 quotes=48218 err=0
+  YM   bid=52882.00 ask=52884.00 spread=2.0000 imb=-0.04 ofi1m=+0.00 trades=0 quotes=5031 err=0
+[RUN] 11.0min | chunks=22
+  MES  bid=7589.50 ask=7589.75 spread=0.2500 imb=+0.12 ofi1m=+0.00 trades=0 quotes=9318 err=0
+  MNQ  bid=29845.00 ask=29845.50 spread=0.5000 imb=-0.23 ofi1m=+0.00 trades=0 quotes=54113 err=0
+  YM   bid=52878.00 ask=52882.00 spread=4.0000 imb=-0.36 ofi1m=+0.00 trades=0 quotes=5631 err=0
+[RUN] 12.0min | chunks=24
+  MES  bid=7589.00 ask=7589.25 spread=0.2500 imb=-0.15 ofi1m=+0.00 trades=0 quotes=10286 err=0
+  MNQ  bid=29834.50 ask=29835.25 spread=0.7500 imb=+0.25 ofi1m=+0.00 trades=0 quotes=59158 err=0
+  YM   bid=52880.00 ask=52883.00 spread=3.0000 imb=-0.19 ofi1m=+0.00 trades=0 quotes=6134 err=0
+[RUN] 13.0min | chunks=26
+  MES  bid=7589.75 ask=7590.00 spread=0.2500 imb=-0.21 ofi1m=+0.00 trades=0 quotes=11046 err=0
+  MNQ  bid=29837.75 ask=29838.25 spread=0.5000 imb=-0.05 ofi1m=+0.00 trades=0 quotes=63963 err=0
+  YM   bid=52886.00 ask=52889.00 spread=3.0000 imb=-0.30 ofi1m=+0.00 trades=0 quotes=6588 err=0
+[RUN] 14.0min | chunks=28
+  MES  bid=7589.75 ask=7590.00 spread=0.2500 imb=+0.25 ofi1m=+0.00 trades=0 quotes=12128 err=0
+  MNQ  bid=29835.75 ask=29836.25 spread=0.5000 imb=-0.28 ofi1m=+0.00 trades=0 quotes=70652 err=0
+  YM   bid=52898.00 ask=52899.00 spread=1.0000 imb=+0.09 ofi1m=+0.00 trades=0 quotes=7351 err=0
+[RUN] 15.0min | chunks=30
+  MES  bid=7589.00 ask=7589.25 spread=0.2500 imb=+0.08 ofi1m=+0.00 trades=0 quotes=12933 err=0
+  MNQ  bid=29826.25 ask=29826.75 spread=0.5000 imb=-0.12 ofi1m=+0.00 trades=0 quotes=76083 err=0
+  YM   bid=52893.00 ask=52896.00 spread=3.0000 imb=+0.15 ofi1m=+0.00 trades=0 quotes=7839 err=0
+[RUN] 16.0min | chunks=32
+  MES  bid=7590.25 ask=7590.50 spread=0.2500 imb=-0.26 ofi1m=+0.00 trades=0 quotes=13623 err=0
+  MNQ  bid=29828.75 ask=29829.25 spread=0.5000 imb=+0.13 ofi1m=+0.00 trades=0 quotes=81003 err=0
+  YM   bid=52902.00 ask=52905.00 spread=3.0000 imb=+0.19 ofi1m=+0.00 trades=0 quotes=8235 err=0
+[RUN] 17.0min | chunks=34
+  MES  bid=7590.50 ask=7590.75 spread=0.2500 imb=-0.25 ofi1m=+0.00 trades=0 quotes=14256 err=0
+  MNQ  bid=29826.50 ask=29827.00 spread=0.5000 imb=-0.07 ofi1m=+0.00 trades=0 quotes=86323 err=0
+  YM   bid=52902.00 ask=52904.00 spread=2.0000 imb=+0.12 ofi1m=+0.00 trades=0 quotes=8637 err=0
+[RUN] 18.0min | chunks=36
+  MES  bid=7590.25 ask=7590.50 spread=0.2500 imb=+0.09 ofi1m=+0.00 trades=0 quotes=14782 err=0
+  MNQ  bid=29824.25 ask=29825.00 spread=0.7500 imb=-0.02 ofi1m=+0.00 trades=0 quotes=89957 err=0
+  YM   bid=52903.00 ask=52905.00 spread=2.0000 imb=+0.08 ofi1m=+0.00 trades=0 quotes=8964 err=0
+[RUN] 19.0min | chunks=38
+  MES  bid=7589.25 ask=7589.50 spread=0.2500 imb=+0.21 ofi1m=+0.00 trades=0 quotes=15720 err=0
+  MNQ  bid=29822.75 ask=29823.25 spread=0.5000 imb=+0.21 ofi1m=+0.00 trades=0 quotes=96695 err=0
+  YM   bid=52892.00 ask=52892.00 spread=0.0000 imb=+0.08 ofi1m=+0.00 trades=0 quotes=9511 err=0
+[RUN] 20.0min | chunks=39
+  MES  bid=7589.50 ask=7589.75 spread=0.2500 imb=-0.16 ofi1m=+0.00 trades=0 quotes=16186 err=0
+  MNQ  bid=29826.00 ask=29826.50 spread=0.5000 imb=+0.20 ofi1m=+0.00 trades=0 quotes=101190 err=0
+  YM   bid=52884.00 ask=52887.00 spread=3.0000 imb=-0.07 ofi1m=+0.00 trades=0 quotes=9824 err=0
+[RUN] 21.0min | chunks=41
+  MES  bid=7589.75 ask=7590.00 spread=0.2500 imb=+0.00 ofi1m=+0.00 trades=0 quotes=16646 err=0
+  MNQ  bid=29828.00 ask=29828.50 spread=0.5000 imb=-0.06 ofi1m=+0.00 trades=0 quotes=104173 err=0
+  YM   bid=52886.00 ask=52888.00 spread=2.0000 imb=+0.12 ofi1m=+0.00 trades=0 quotes=10132 err=0
+[RUN] 22.0min | chunks=43
+  MES  bid=7589.25 ask=7589.75 spread=0.5000 imb=+0.15 ofi1m=+0.00 trades=0 quotes=17349 err=0
+  MNQ  bid=29828.50 ask=29829.00 spread=0.5000 imb=+0.10 ofi1m=+0.00 trades=0 quotes=108202 err=0
+  YM   bid=52889.00 ask=52888.00 spread=-1.0000 imb=+0.08 ofi1m=+0.00 trades=0 quotes=10508 err=0
+[RUN] 23.1min | chunks=45
+  MES  bid=7589.75 ask=7590.00 spread=0.2500 imb=+0.12 ofi1m=+0.00 trades=0 quotes=18296 err=0
+  MNQ  bid=29830.00 ask=29830.25 spread=0.2500 imb=+0.11 ofi1m=+0.00 trades=0 quotes=113732 err=0
+  YM   bid=52887.00 ask=52889.00 spread=2.0000 imb=-0.08 ofi1m=+0.00 trades=0 quotes=10889 err=0
+[RUN] 24.1min | chunks=47
+  MES  bid=7589.50 ask=7589.75 spread=0.2500 imb=+0.05 ofi1m=+0.00 trades=0 quotes=19071 err=0
+  MNQ  bid=29825.25 ask=29825.75 spread=0.5000 imb=+0.03 ofi1m=+0.00 trades=0 quotes=118930 err=0
+  YM   bid=52891.00 ask=52894.00 spread=3.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=11348 err=0
+[RUN] 25.1min | chunks=49
+  MES  bid=7589.50 ask=7589.75 spread=0.2500 imb=+0.05 ofi1m=+0.00 trades=0 quotes=19942 err=0
+  MNQ  bid=29827.75 ask=29828.25 spread=0.5000 imb=-0.11 ofi1m=+0.00 trades=0 quotes=123241 err=0
+  YM   bid=52893.00 ask=52896.00 spread=3.0000 imb=-0.17 ofi1m=+0.00 trades=0 quotes=11831 err=0
+[RUN] 26.1min | chunks=51
+  MES  bid=7589.50 ask=7589.75 spread=0.2500 imb=-0.13 ofi1m=+0.00 trades=0 quotes=20624 err=0
+  MNQ  bid=29827.50 ask=29828.00 spread=0.5000 imb=+0.22 ofi1m=+0.00 trades=0 quotes=127674 err=0
+  YM   bid=52888.00 ask=52890.00 spread=2.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=12223 err=0
+[RUN] 27.1min | chunks=53
+  MES  bid=7589.00 ask=7589.25 spread=0.2500 imb=+0.42 ofi1m=+0.00 trades=0 quotes=21310 err=0
+  MNQ  bid=29821.50 ask=29822.00 spread=0.5000 imb=-0.38 ofi1m=+0.00 trades=0 quotes=131816 err=0
+  YM   bid=52887.00 ask=52890.00 spread=3.0000 imb=-0.08 ofi1m=+0.00 trades=0 quotes=12491 err=0
+[RUN] 28.1min | chunks=55
+  MES  bid=7588.00 ask=7588.25 spread=0.2500 imb=-0.03 ofi1m=+0.00 trades=0 quotes=22102 err=0
+  MNQ  bid=29808.25 ask=29808.75 spread=0.5000 imb=-0.20 ofi1m=+0.00 trades=0 quotes=137461 err=0
+  YM   bid=52884.00 ask=52887.00 spread=3.0000 imb=+0.09 ofi1m=+0.00 trades=0 quotes=12823 err=0
+[RUN] 29.1min | chunks=57
+  MES  bid=7588.25 ask=7588.50 spread=0.2500 imb=+0.24 ofi1m=+0.00 trades=0 quotes=22868 err=0
+  MNQ  bid=29807.00 ask=29807.50 spread=0.5000 imb=-0.11 ofi1m=+0.00 trades=0 quotes=143508 err=0
+  YM   bid=52883.00 ask=52885.00 spread=2.0000 imb=-0.04 ofi1m=+0.00 trades=0 quotes=13228 err=0
+[RUN] 30.1min | chunks=59
+  MES  bid=7588.00 ask=7588.50 spread=0.5000 imb=+0.05 ofi1m=+0.00 trades=0 quotes=23844 err=0
+  MNQ  bid=29799.25 ask=29799.75 spread=0.5000 imb=-0.23 ofi1m=+0.00 trades=0 quotes=150649 err=0
+  YM   bid=52885.00 ask=52888.00 spread=3.0000 imb=+0.28 ofi1m=+0.00 trades=0 quotes=13742 err=0
+[RUN] 31.1min | chunks=61
+  MES  bid=7589.25 ask=7589.50 spread=0.2500 imb=+0.18 ofi1m=+0.00 trades=0 quotes=24715 err=0
+  MNQ  bid=29811.00 ask=29811.25 spread=0.2500 imb=+0.22 ofi1m=+0.00 trades=0 quotes=157917 err=0
+  YM   bid=52893.00 ask=52895.00 spread=2.0000 imb=-0.13 ofi1m=+0.00 trades=0 quotes=14296 err=0
+[RUN] 32.1min | chunks=63
+  MES  bid=7590.25 ask=7590.50 spread=0.2500 imb=-0.18 ofi1m=+0.00 trades=0 quotes=25523 err=0
+  MNQ  bid=29818.00 ask=29818.50 spread=0.5000 imb=-0.02 ofi1m=+0.00 trades=0 quotes=164055 err=0
+  YM   bid=52895.00 ask=52897.00 spread=2.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=14699 err=0
+[RUN] 33.1min | chunks=65
+  MES  bid=7588.00 ask=7588.25 spread=0.2500 imb=-0.15 ofi1m=+0.00 trades=0 quotes=26284 err=0
+  MNQ  bid=29800.75 ask=29801.25 spread=0.5000 imb=-0.18 ofi1m=+0.00 trades=0 quotes=171066 err=0
+  YM   bid=52882.00 ask=52884.00 spread=2.0000 imb=+0.18 ofi1m=+0.00 trades=0 quotes=15137 err=0
+[RUN] 34.1min | chunks=67
+  MES  bid=7587.50 ask=7587.75 spread=0.2500 imb=+0.17 ofi1m=+0.00 trades=0 quotes=27185 err=0
+  MNQ  bid=29793.75 ask=29794.50 spread=0.7500 imb=-0.09 ofi1m=+0.00 trades=0 quotes=179423 err=0
+  YM   bid=52882.00 ask=52885.00 spread=3.0000 imb=+0.27 ofi1m=+0.00 trades=0 quotes=15843 err=0
+[RUN] 35.1min | chunks=69
+  MES  bid=7589.25 ask=7589.50 spread=0.2500 imb=+0.31 ofi1m=+0.00 trades=0 quotes=27834 err=0
+  MNQ  bid=29813.25 ask=29813.75 spread=0.5000 imb=+0.31 ofi1m=+0.00 trades=0 quotes=185331 err=0
+  YM   bid=52892.00 ask=52896.00 spread=4.0000 imb=-0.08 ofi1m=+0.00 trades=0 quotes=16250 err=0
+[RUN] 36.1min | chunks=71
+  MES  bid=7589.00 ask=7589.25 spread=0.2500 imb=-0.04 ofi1m=+0.00 trades=0 quotes=28511 err=0
+  MNQ  bid=29811.75 ask=29812.50 spread=0.7500 imb=-0.12 ofi1m=+0.00 trades=0 quotes=190740 err=0
+  YM   bid=52890.00 ask=52892.00 spread=2.0000 imb=-0.33 ofi1m=+0.00 trades=0 quotes=16608 err=0
+[RUN] 37.1min | chunks=73
+  MES  bid=7590.75 ask=7591.00 spread=0.2500 imb=+0.10 ofi1m=+0.00 trades=0 quotes=29149 err=0
+  MNQ  bid=29823.75 ask=29824.25 spread=0.5000 imb=-0.07 ofi1m=+0.00 trades=0 quotes=197692 err=0
+  YM   bid=52901.00 ask=52903.00 spread=2.0000 imb=-0.33 ofi1m=+0.00 trades=0 quotes=17032 err=0
+[RUN] 38.1min | chunks=75
+  MES  bid=7590.00 ask=7590.25 spread=0.2500 imb=-0.18 ofi1m=+0.00 trades=0 quotes=29851 err=0
+  MNQ  bid=29813.25 ask=29813.50 spread=0.2500 imb=-0.11 ofi1m=+0.00 trades=0 quotes=204459 err=0
+  YM   bid=52899.00 ask=52901.00 spread=2.0000 imb=+0.14 ofi1m=+0.00 trades=0 quotes=17548 err=0
+[RUN] 39.1min | chunks=77
+  MES  bid=7589.00 ask=7589.25 spread=0.2500 imb=-0.11 ofi1m=+0.00 trades=0 quotes=30591 err=0
+  MNQ  bid=29803.25 ask=29804.00 spread=0.7500 imb=-0.21 ofi1m=+0.00 trades=0 quotes=209322 err=0
+  YM   bid=52895.00 ask=52897.00 spread=2.0000 imb=-0.13 ofi1m=+0.00 trades=0 quotes=17957 err=0
+[RUN] 40.1min | chunks=79
+  MES  bid=7589.00 ask=7589.25 spread=0.2500 imb=+0.25 ofi1m=+0.00 trades=0 quotes=31353 err=0
+  MNQ  bid=29801.50 ask=29802.00 spread=0.5000 imb=-0.02 ofi1m=+0.00 trades=0 quotes=214823 err=0
+  YM   bid=52900.00 ask=52902.00 spread=2.0000 imb=+0.21 ofi1m=+0.00 trades=0 quotes=18401 err=0
+[RUN] 41.1min | chunks=81
+  MES  bid=7588.75 ask=7589.00 spread=0.2500 imb=+0.17 ofi1m=+0.00 trades=0 quotes=32205 err=0
+  MNQ  bid=29797.00 ask=29797.50 spread=0.5000 imb=-0.10 ofi1m=+0.00 trades=0 quotes=221668 err=0
+  YM   bid=52901.00 ask=52905.00 spread=4.0000 imb=+0.14 ofi1m=+0.00 trades=0 quotes=18789 err=0
+[RUN] 42.1min | chunks=83
+  MES  bid=7589.00 ask=7589.25 spread=0.2500 imb=-0.06 ofi1m=+0.00 trades=0 quotes=33035 err=0
+  MNQ  bid=29799.50 ask=29800.25 spread=0.7500 imb=+0.15 ofi1m=+0.00 trades=0 quotes=227765 err=0
+  YM   bid=52899.00 ask=52902.00 spread=3.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=19297 err=0
+[RUN] 43.1min | chunks=85
+  MES  bid=7590.00 ask=7590.25 spread=0.2500 imb=-0.05 ofi1m=+0.00 trades=0 quotes=33551 err=0
+  MNQ  bid=29808.75 ask=29809.25 spread=0.5000 imb=-0.13 ofi1m=+0.00 trades=0 quotes=232717 err=0
+  YM   bid=52918.00 ask=52920.00 spread=2.0000 imb=-0.03 ofi1m=+0.00 trades=0 quotes=19718 err=0
+[RUN] 44.1min | chunks=87
+  MES  bid=7590.00 ask=7590.25 spread=0.2500 imb=-0.08 ofi1m=+0.00 trades=0 quotes=34050 err=0
+  MNQ  bid=29808.50 ask=29809.00 spread=0.5000 imb=+0.20 ofi1m=+0.00 trades=0 quotes=236299 err=0
+  YM   bid=52920.00 ask=52922.00 spread=2.0000 imb=-0.31 ofi1m=+0.00 trades=0 quotes=20018 err=0
+[RUN] 45.1min | chunks=89
+  MES  bid=7590.25 ask=7590.50 spread=0.2500 imb=-0.06 ofi1m=+0.00 trades=0 quotes=34425 err=0
+  MNQ  bid=29809.00 ask=29810.00 spread=1.0000 imb=+0.10 ofi1m=+0.00 trades=0 quotes=239604 err=0
+  YM   bid=52930.00 ask=52933.00 spread=3.0000 imb=-0.06 ofi1m=+0.00 trades=0 quotes=20480 err=0
+[RUN] 46.1min | chunks=91
+  MES  bid=7591.00 ask=7591.25 spread=0.2500 imb=-0.21 ofi1m=+0.00 trades=0 quotes=35028 err=0
+  MNQ  bid=29815.25 ask=29815.00 spread=-0.2500 imb=-0.10 ofi1m=+0.00 trades=0 quotes=243529 err=0
+  YM   bid=52934.00 ask=52936.00 spread=2.0000 imb=-0.32 ofi1m=+0.00 trades=0 quotes=20874 err=0
+[RUN] 47.1min | chunks=93
+  MES  bid=7590.25 ask=7590.75 spread=0.5000 imb=-0.03 ofi1m=+0.00 trades=0 quotes=35785 err=0
+  MNQ  bid=29809.00 ask=29809.50 spread=0.5000 imb=+0.25 ofi1m=+0.00 trades=0 quotes=248970 err=0
+  YM   bid=52926.00 ask=52928.00 spread=2.0000 imb=+0.04 ofi1m=+0.00 trades=0 quotes=21389 err=0
+[RUN] 48.1min | chunks=95
+  MES  bid=7590.75 ask=7591.00 spread=0.2500 imb=-0.07 ofi1m=+0.00 trades=0 quotes=36459 err=0
+  MNQ  bid=29808.50 ask=29809.25 spread=0.7500 imb=-0.06 ofi1m=+0.00 trades=0 quotes=252246 err=0
+  YM   bid=52924.00 ask=52926.00 spread=2.0000 imb=-0.17 ofi1m=+0.00 trades=0 quotes=21810 err=0
+[RUN] 49.1min | chunks=97
+  MES  bid=7590.50 ask=7590.75 spread=0.2500 imb=-0.09 ofi1m=+0.00 trades=0 quotes=37038 err=0
+  MNQ  bid=29815.00 ask=29815.50 spread=0.5000 imb=+0.08 ofi1m=+0.00 trades=0 quotes=256285 err=0
+  YM   bid=52912.00 ask=52915.00 spread=3.0000 imb=+0.12 ofi1m=+0.00 trades=0 quotes=22153 err=0
+[RUN] 50.1min | chunks=99
+  MES  bid=7591.25 ask=7591.50 spread=0.2500 imb=-0.13 ofi1m=+0.00 trades=0 quotes=37540 err=0
+  MNQ  bid=29820.50 ask=29821.00 spread=0.5000 imb=-0.11 ofi1m=+0.00 trades=0 quotes=261273 err=0
+  YM   bid=52918.00 ask=52920.00 spread=2.0000 imb=-0.07 ofi1m=+0.00 trades=0 quotes=22479 err=0
+[RUN] 51.1min | chunks=101
+  MES  bid=7591.75 ask=7592.00 spread=0.2500 imb=-0.05 ofi1m=+0.00 trades=0 quotes=38053 err=0
+  MNQ  bid=29826.00 ask=29826.50 spread=0.5000 imb=+0.05 ofi1m=+0.00 trades=0 quotes=266587 err=0
+  YM   bid=52928.00 ask=52931.00 spread=3.0000 imb=+0.33 ofi1m=+0.00 trades=0 quotes=22918 err=0
+[RUN] 52.1min | chunks=103
+  MES  bid=7591.25 ask=7591.50 spread=0.2500 imb=-0.08 ofi1m=+0.00 trades=0 quotes=38544 err=0
+  MNQ  bid=29823.25 ask=29823.75 spread=0.5000 imb=-0.06 ofi1m=+0.00 trades=0 quotes=270999 err=0
+  YM   bid=52926.00 ask=52926.00 spread=0.0000 imb=-0.30 ofi1m=+0.00 trades=0 quotes=23132 err=0
+[RUN] 53.1min | chunks=105
+  MES  bid=7591.75 ask=7592.00 spread=0.2500 imb=+0.07 ofi1m=+0.00 trades=0 quotes=39196 err=0
+  MNQ  bid=29831.75 ask=29832.25 spread=0.5000 imb=-0.04 ofi1m=+0.00 trades=0 quotes=275408 err=0
+  YM   bid=52917.00 ask=52919.00 spread=2.0000 imb=-0.20 ofi1m=+0.00 trades=0 quotes=23365 err=0
+[RUN] 54.1min | chunks=107
+  MES  bid=7591.75 ask=7592.00 spread=0.2500 imb=-0.26 ofi1m=+0.00 trades=0 quotes=39658 err=0
+  MNQ  bid=29826.00 ask=29826.50 spread=0.5000 imb=+0.21 ofi1m=+0.00 trades=0 quotes=280290 err=0
+  YM   bid=52923.00 ask=52926.00 spread=3.0000 imb=-0.23 ofi1m=+0.00 trades=0 quotes=23713 err=0
+[RUN] 55.1min | chunks=109
+  MES  bid=7592.75 ask=7593.00 spread=0.2500 imb=-0.14 ofi1m=+0.00 trades=0 quotes=40572 err=0
+  MNQ  bid=29839.00 ask=29839.50 spread=0.5000 imb=+0.26 ofi1m=+0.00 trades=0 quotes=287373 err=0
+  YM   bid=52916.00 ask=52917.00 spread=1.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=24189 err=0
+[RUN] 56.1min | chunks=111
+  MES  bid=7593.50 ask=7593.75 spread=0.2500 imb=+0.10 ofi1m=+0.00 trades=0 quotes=41698 err=0
+  MNQ  bid=29848.25 ask=29848.75 spread=0.5000 imb=-0.06 ofi1m=+0.00 trades=0 quotes=297212 err=0
+  YM   bid=52916.00 ask=52920.00 spread=4.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=24690 err=0
+[RUN] 57.1min | chunks=113
+  MES  bid=7590.75 ask=7591.00 spread=0.2500 imb=+0.14 ofi1m=+0.00 trades=0 quotes=42415 err=0
+  MNQ  bid=29833.50 ask=29834.00 spread=0.5000 imb=-0.05 ofi1m=+0.00 trades=0 quotes=305412 err=0
+  YM   bid=52901.00 ask=52900.00 spread=-1.0000 imb=+0.41 ofi1m=+0.00 trades=0 quotes=25236 err=0
+[RUN] 58.1min | chunks=115
+  MES  bid=7589.75 ask=7590.25 spread=0.5000 imb=-0.05 ofi1m=+0.00 trades=0 quotes=44126 err=0
+  MNQ  bid=29813.00 ask=29813.50 spread=0.5000 imb=+0.24 ofi1m=+0.00 trades=0 quotes=320770 err=0
+  YM   bid=52902.00 ask=52905.00 spread=3.0000 imb=-0.14 ofi1m=+0.00 trades=0 quotes=26142 err=0
+[RUN] 59.1min | chunks=117
+  MES  bid=7591.50 ask=7591.75 spread=0.2500 imb=-0.09 ofi1m=+0.00 trades=0 quotes=45393 err=0
+  MNQ  bid=29817.50 ask=29818.75 spread=1.2500 imb=+0.18 ofi1m=+0.00 trades=0 quotes=330333 err=0
+  YM   bid=52906.00 ask=52908.00 spread=2.0000 imb=+0.17 ofi1m=+0.00 trades=0 quotes=26938 err=0
+[RUN] 60.1min | chunks=119
+  MES  bid=7593.75 ask=7594.00 spread=0.2500 imb=-0.27 ofi1m=+0.00 trades=0 quotes=50059 err=0
+  MNQ  bid=29820.50 ask=29821.50 spread=1.0000 imb=-0.13 ofi1m=+0.00 trades=0 quotes=363244 err=0
+  YM   bid=52900.00 ask=52902.00 spread=2.0000 imb=-0.04 ofi1m=+0.00 trades=0 quotes=33348 err=0
+[RUN] 61.1min | chunks=121
+  MES  bid=7596.50 ask=7596.75 spread=0.2500 imb=+0.31 ofi1m=+0.00 trades=0 quotes=55614 err=0
+  MNQ  bid=29877.50 ask=29878.00 spread=0.5000 imb=+0.17 ofi1m=+0.00 trades=0 quotes=427409 err=0
+  YM   bid=52879.00 ask=52881.00 spread=2.0000 imb=+0.31 ofi1m=+0.00 trades=0 quotes=43077 err=0
+[RUN] 62.1min | chunks=123
+  MES  bid=7596.75 ask=7597.00 spread=0.2500 imb=-0.13 ofi1m=+0.00 trades=0 quotes=61060 err=0
+  MNQ  bid=29885.00 ask=29885.25 spread=0.2500 imb=+0.04 ofi1m=+0.00 trades=0 quotes=491523 err=0
+  YM   bid=52867.00 ask=52870.00 spread=3.0000 imb=+0.04 ofi1m=+0.00 trades=0 quotes=52199 err=0
+[RUN] 63.1min | chunks=125
+  MES  bid=7598.75 ask=7599.00 spread=0.2500 imb=-0.09 ofi1m=+0.00 trades=0 quotes=64840 err=0
+  MNQ  bid=29899.25 ask=29899.75 spread=0.5000 imb=+0.06 ofi1m=+0.00 trades=0 quotes=545584 err=0
+  YM   bid=52843.00 ask=52844.00 spread=1.0000 imb=-0.09 ofi1m=+0.00 trades=0 quotes=59516 err=0
+[RUN] 64.1min | chunks=127
+  MES  bid=7598.25 ask=7598.75 spread=0.5000 imb=-0.14 ofi1m=+0.00 trades=0 quotes=68429 err=0
+  MNQ  bid=29909.50 ask=29910.00 spread=0.5000 imb=-0.36 ofi1m=+0.00 trades=0 quotes=595604 err=0
+  YM   bid=52811.00 ask=52811.00 spread=0.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=65845 err=0
+[RUN] 65.1min | chunks=129
+  MES  bid=7600.25 ask=7600.50 spread=0.2500 imb=-0.24 ofi1m=+0.00 trades=0 quotes=71397 err=0
+  MNQ  bid=29922.75 ask=29923.25 spread=0.5000 imb=-0.03 ofi1m=+0.00 trades=0 quotes=639233 err=0
+  YM   bid=52816.00 ask=52818.00 spread=2.0000 imb=+0.03 ofi1m=+0.00 trades=0 quotes=71963 err=0
+[RUN] 66.1min | chunks=131
+  MES  bid=7599.00 ask=7599.25 spread=0.2500 imb=+0.08 ofi1m=+0.00 trades=0 quotes=74522 err=0
+  MNQ  bid=29890.00 ask=29890.50 spread=0.5000 imb=+0.02 ofi1m=+0.00 trades=0 quotes=687637 err=0
+  YM   bid=52815.00 ask=52817.00 spread=2.0000 imb=+0.08 ofi1m=+0.00 trades=0 quotes=77981 err=0
+[RUN] 67.1min | chunks=133
+  MES  bid=7603.00 ask=7603.25 spread=0.2500 imb=+0.23 ofi1m=+0.00 trades=0 quotes=78200 err=0
+  MNQ  bid=29933.75 ask=29934.50 spread=0.7500 imb=+0.09 ofi1m=+0.00 trades=0 quotes=741033 err=0
+  YM   bid=52797.00 ask=52799.00 spread=2.0000 imb=-0.04 ofi1m=+0.00 trades=0 quotes=83974 err=0
+[RUN] 68.1min | chunks=135
+  MES  bid=7600.75 ask=7601.00 spread=0.2500 imb=+0.21 ofi1m=+0.00 trades=0 quotes=81162 err=0
+  MNQ  bid=29897.50 ask=29898.25 spread=0.7500 imb=-0.18 ofi1m=+0.00 trades=0 quotes=786251 err=0
+  YM   bid=52820.00 ask=52824.00 spread=4.0000 imb=-0.10 ofi1m=+0.00 trades=0 quotes=88871 err=0
+[RUN] 69.1min | chunks=137
+  MES  bid=7598.50 ask=7598.75 spread=0.2500 imb=+0.31 ofi1m=+0.00 trades=0 quotes=84615 err=0
+  MNQ  bid=29869.25 ask=29869.75 spread=0.5000 imb=-0.15 ofi1m=+0.00 trades=0 quotes=835698 err=0
+  YM   bid=52835.00 ask=52837.00 spread=2.0000 imb=+0.12 ofi1m=+0.00 trades=0 quotes=93888 err=0
+[RUN] 70.1min | chunks=139
+  MES  bid=7593.50 ask=7593.75 spread=0.2500 imb=+0.36 ofi1m=+0.00 trades=0 quotes=88506 err=0
+  MNQ  bid=29833.25 ask=29833.50 spread=0.2500 imb=+0.12 ofi1m=+0.00 trades=0 quotes=889130 err=0
+  YM   bid=52854.00 ask=52858.00 spread=4.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=98821 err=0
+[RUN] 71.1min | chunks=141
+  MES  bid=7594.50 ask=7594.75 spread=0.2500 imb=-0.37 ofi1m=+0.00 trades=0 quotes=93696 err=0
+  MNQ  bid=29843.00 ask=29843.50 spread=0.5000 imb=+0.15 ofi1m=+0.00 trades=0 quotes=950247 err=0
+  YM   bid=52819.00 ask=52820.00 spread=1.0000 imb=+0.10 ofi1m=+0.00 trades=0 quotes=104640 err=0
+[RUN] 72.1min | chunks=143
+  MES  bid=7592.25 ask=7592.50 spread=0.2500 imb=-0.04 ofi1m=+0.00 trades=0 quotes=98083 err=0
+  MNQ  bid=29843.00 ask=29843.50 spread=0.5000 imb=-0.21 ofi1m=+0.00 trades=0 quotes=1004019 err=0
+  YM   bid=52809.00 ask=52811.00 spread=2.0000 imb=-0.33 ofi1m=+0.00 trades=0 quotes=109326 err=0
+[RUN] 73.1min | chunks=145
+  MES  bid=7591.50 ask=7591.75 spread=0.2500 imb=+0.11 ofi1m=+0.00 trades=0 quotes=102063 err=0
+  MNQ  bid=29840.00 ask=29840.50 spread=0.5000 imb=+0.01 ofi1m=+0.00 trades=0 quotes=1058109 err=0
+  YM   bid=52805.00 ask=52807.00 spread=2.0000 imb=-0.15 ofi1m=+0.00 trades=0 quotes=112894 err=0
+[RUN] 74.1min | chunks=147
+  MES  bid=7595.00 ask=7595.50 spread=0.5000 imb=+0.14 ofi1m=+0.00 trades=0 quotes=106629 err=0
+  MNQ  bid=29857.50 ask=29858.00 spread=0.5000 imb=+0.25 ofi1m=+0.00 trades=0 quotes=1110692 err=0
+  YM   bid=52832.00 ask=52834.00 spread=2.0000 imb=-0.10 ofi1m=+0.00 trades=0 quotes=116655 err=0
+[RUN] 75.1min | chunks=149
+  MES  bid=7594.50 ask=7594.75 spread=0.2500 imb=-0.10 ofi1m=+0.00 trades=0 quotes=111331 err=0
+  MNQ  bid=29871.75 ask=29872.25 spread=0.5000 imb=-0.13 ofi1m=+0.00 trades=0 quotes=1164730 err=0
+  YM   bid=52823.00 ask=52825.00 spread=2.0000 imb=+0.09 ofi1m=+0.00 trades=0 quotes=120508 err=0
+[RUN] 76.1min | chunks=151
+  MES  bid=7595.75 ask=7596.00 spread=0.2500 imb=+0.01 ofi1m=+0.00 trades=0 quotes=116291 err=0
+  MNQ  bid=29874.75 ask=29875.25 spread=0.5000 imb=+0.09 ofi1m=+0.00 trades=0 quotes=1220256 err=0
+  YM   bid=52813.00 ask=52815.00 spread=2.0000 imb=+0.07 ofi1m=+0.00 trades=0 quotes=124342 err=0
+[RUN] 77.1min | chunks=153
+  MES  bid=7598.50 ask=7598.75 spread=0.2500 imb=-0.05 ofi1m=+0.00 trades=0 quotes=120277 err=0
+  MNQ  bid=29897.50 ask=29898.00 spread=0.5000 imb=+0.15 ofi1m=+0.00 trades=0 quotes=1268645 err=0
+  YM   bid=52812.00 ask=52813.00 spread=1.0000 imb=-0.15 ofi1m=+0.00 trades=0 quotes=127748 err=0
+[RUN] 78.1min | chunks=155
+  MES  bid=7599.00 ask=7599.50 spread=0.5000 imb=-0.08 ofi1m=+0.00 trades=0 quotes=123421 err=0
+  MNQ  bid=29901.50 ask=29902.25 spread=0.7500 imb=+0.00 ofi1m=+0.00 trades=0 quotes=1307812 err=0
+  YM   bid=52811.00 ask=52814.00 spread=3.0000 imb=-0.11 ofi1m=+0.00 trades=0 quotes=130604 err=0
+[RUN] 79.1min | chunks=157
+  MES  bid=7602.75 ask=7603.00 spread=0.2500 imb=-0.12 ofi1m=+0.00 trades=0 quotes=126394 err=0
+  MNQ  bid=29937.25 ask=29937.75 spread=0.5000 imb=+0.16 ofi1m=+0.00 trades=0 quotes=1346211 err=0
+  YM   bid=52810.00 ask=52812.00 spread=2.0000 imb=-0.18 ofi1m=+0.00 trades=0 quotes=133264 err=0
+[RUN] 80.1min | chunks=159
+  MES  bid=7600.25 ask=7600.50 spread=0.2500 imb=+0.27 ofi1m=+0.00 trades=0 quotes=129328 err=0
+  MNQ  bid=29923.00 ask=29923.50 spread=0.5000 imb=-0.19 ofi1m=+0.00 trades=0 quotes=1386369 err=0
+  YM   bid=52781.00 ask=52783.00 spread=2.0000 imb=-0.25 ofi1m=+0.00 trades=0 quotes=136337 err=0
+[RUN] 81.2min | chunks=161
+  MES  bid=7601.50 ask=7601.75 spread=0.2500 imb=+0.14 ofi1m=+0.00 trades=0 quotes=133155 err=0
+  MNQ  bid=29934.50 ask=29935.00 spread=0.5000 imb=-0.10 ofi1m=+0.00 trades=0 quotes=1426410 err=0
+  YM   bid=52799.00 ask=52801.00 spread=2.0000 imb=-0.10 ofi1m=+0.00 trades=0 quotes=139884 err=0
+[RUN] 82.2min | chunks=163
+  MES  bid=7602.50 ask=7602.75 spread=0.2500 imb=+0.10 ofi1m=+0.00 trades=0 quotes=135983 err=0
+  MNQ  bid=29956.50 ask=29957.00 spread=0.5000 imb=+0.07 ofi1m=+0.00 trades=0 quotes=1465076 err=0
+  YM   bid=52804.00 ask=52806.00 spread=2.0000 imb=-0.31 ofi1m=+0.00 trades=0 quotes=142798 err=0
+[RUN] 83.2min | chunks=165
+  MES  bid=7603.50 ask=7603.75 spread=0.2500 imb=+0.09 ofi1m=+0.00 trades=0 quotes=138323 err=0
+  MNQ  bid=29961.50 ask=29962.00 spread=0.5000 imb=+0.08 ofi1m=+0.00 trades=0 quotes=1498182 err=0
+  YM   bid=52814.00 ask=52816.00 spread=2.0000 imb=-0.21 ofi1m=+0.00 trades=0 quotes=145102 err=0
+[RUN] 84.2min | chunks=167
+  MES  bid=7603.25 ask=7603.50 spread=0.2500 imb=-0.19 ofi1m=+0.00 trades=0 quotes=140825 err=0
+  MNQ  bid=29947.25 ask=29947.75 spread=0.5000 imb=+0.07 ofi1m=+0.00 trades=0 quotes=1532264 err=0
+  YM   bid=52830.00 ask=52832.00 spread=2.0000 imb=-0.44 ofi1m=+0.00 trades=0 quotes=147394 err=0
+[RUN] 85.2min | chunks=169
+  MES  bid=7598.75 ask=7599.00 spread=0.2500 imb=+0.07 ofi1m=+0.00 trades=0 quotes=144562 err=0
+  MNQ  bid=29913.00 ask=29913.50 spread=0.5000 imb=-0.32 ofi1m=+0.00 trades=0 quotes=1571444 err=0
+  YM   bid=52807.00 ask=52809.00 spread=2.0000 imb=+0.23 ofi1m=+0.00 trades=0 quotes=150298 err=0
+[RUN] 86.2min | chunks=171
+  MES  bid=7599.50 ask=7599.75 spread=0.2500 imb=-0.34 ofi1m=+0.00 trades=0 quotes=148637 err=0
+  MNQ  bid=29915.00 ask=29916.00 spread=1.0000 imb=+0.11 ofi1m=+0.00 trades=0 quotes=1611011 err=0
+  YM   bid=52814.00 ask=52817.00 spread=3.0000 imb=+0.03 ofi1m=+0.00 trades=0 quotes=152476 err=0
+[RUN] 87.2min | chunks=173
+  MES  bid=7602.75 ask=7603.00 spread=0.2500 imb=+0.11 ofi1m=+0.00 trades=0 quotes=152175 err=0
+  MNQ  bid=29928.75 ask=29929.25 spread=0.5000 imb=+0.15 ofi1m=+0.00 trades=0 quotes=1649097 err=0
+  YM   bid=52825.00 ask=52828.00 spread=3.0000 imb=-0.12 ofi1m=+0.00 trades=0 quotes=154782 err=0
+[RUN] 88.2min | chunks=175
+  MES  bid=7603.75 ask=7604.00 spread=0.2500 imb=-0.50 ofi1m=+0.00 trades=0 quotes=155422 err=0
+  MNQ  bid=29950.25 ask=29950.75 spread=0.5000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=1688914 err=0
+  YM   bid=52797.00 ask=52798.00 spread=1.0000 imb=+0.07 ofi1m=+0.00 trades=0 quotes=157310 err=0
+[RUN] 89.2min | chunks=177
+  MES  bid=7603.25 ask=7603.50 spread=0.2500 imb=+0.03 ofi1m=+0.00 trades=0 quotes=158122 err=0
+  MNQ  bid=29938.00 ask=29938.50 spread=0.5000 imb=+0.36 ofi1m=+0.00 trades=0 quotes=1724835 err=0
+  YM   bid=52795.00 ask=52797.00 spread=2.0000 imb=+0.09 ofi1m=+0.00 trades=0 quotes=159577 err=0
+[RUN] 90.2min | chunks=179
+  MES  bid=7602.50 ask=7602.75 spread=0.2500 imb=+0.06 ofi1m=+0.00 trades=0 quotes=162169 err=0
+  MNQ  bid=29926.50 ask=29927.00 spread=0.5000 imb=+0.18 ofi1m=+0.00 trades=0 quotes=1766353 err=0
+  YM   bid=52815.00 ask=52819.00 spread=4.0000 imb=-0.13 ofi1m=+0.00 trades=0 quotes=163147 err=0
+[RUN] 91.2min | chunks=181
+  MES  bid=7601.50 ask=7601.75 spread=0.2500 imb=-0.09 ofi1m=+0.00 trades=0 quotes=166561 err=0
+  MNQ  bid=29928.50 ask=29929.00 spread=0.5000 imb=-0.04 ofi1m=+0.00 trades=0 quotes=1808994 err=0
+  YM   bid=52800.00 ask=52805.00 spread=5.0000 imb=+0.03 ofi1m=+0.00 trades=0 quotes=166626 err=0
+[RUN] 92.2min | chunks=183
+  MES  bid=7604.75 ask=7605.00 spread=0.2500 imb=+0.19 ofi1m=+0.00 trades=0 quotes=169883 err=0
+  MNQ  bid=29948.00 ask=29948.50 spread=0.5000 imb=-0.21 ofi1m=+0.00 trades=0 quotes=1846359 err=0
+  YM   bid=52827.00 ask=52829.00 spread=2.0000 imb=-0.27 ofi1m=+0.00 trades=0 quotes=169580 err=0
+[RUN] 93.2min | chunks=185
+  MES  bid=7604.75 ask=7605.00 spread=0.2500 imb=-0.22 ofi1m=+0.00 trades=0 quotes=173073 err=0
+  MNQ  bid=29950.50 ask=29951.25 spread=0.7500 imb=+0.29 ofi1m=+0.00 trades=0 quotes=1882972 err=0
+  YM   bid=52799.00 ask=52801.00 spread=2.0000 imb=+0.28 ofi1m=+0.00 trades=0 quotes=172106 err=0
+[RUN] 94.2min | chunks=187
+  MES  bid=7602.50 ask=7602.75 spread=0.2500 imb=+0.43 ofi1m=+0.00 trades=0 quotes=175511 err=0
+  MNQ  bid=29933.75 ask=29934.25 spread=0.5000 imb=+0.11 ofi1m=+0.00 trades=0 quotes=1913695 err=0
+  YM   bid=52807.00 ask=52809.00 spread=2.0000 imb=+0.19 ofi1m=+0.00 trades=0 quotes=174339 err=0
+[RUN] 95.2min | chunks=189
+  MES  bid=7603.00 ask=7603.25 spread=0.2500 imb=+0.22 ofi1m=+0.00 trades=0 quotes=177996 err=0
+  MNQ  bid=29947.25 ask=29947.75 spread=0.5000 imb=-0.15 ofi1m=+0.00 trades=0 quotes=1945327 err=0
+  YM   bid=52814.00 ask=52816.00 spread=2.0000 imb=-0.27 ofi1m=+0.00 trades=0 quotes=176626 err=0
+[RUN] 96.2min | chunks=191
+  MES  bid=7602.50 ask=7603.00 spread=0.5000 imb=+0.12 ofi1m=+0.00 trades=0 quotes=180885 err=0
+  MNQ  bid=29945.25 ask=29946.00 spread=0.7500 imb=+0.21 ofi1m=+0.00 trades=0 quotes=1977450 err=0
+  YM   bid=52820.00 ask=52822.00 spread=2.0000 imb=-0.31 ofi1m=+0.00 trades=0 quotes=179154 err=0
+[RUN] 97.2min | chunks=193
+  MES  bid=7599.25 ask=7599.50 spread=0.2500 imb=-0.01 ofi1m=+0.00 trades=0 quotes=184571 err=0
+  MNQ  bid=29927.00 ask=29927.50 spread=0.5000 imb=-0.02 ofi1m=+0.00 trades=0 quotes=2015311 err=0
+  YM   bid=52812.00 ask=52814.00 spread=2.0000 imb=+0.03 ofi1m=+0.00 trades=0 quotes=182092 err=0
+[RUN] 98.2min | chunks=195
+  MES  bid=7597.25 ask=7597.50 spread=0.2500 imb=+0.07 ofi1m=+0.00 trades=0 quotes=188175 err=0
+  MNQ  bid=29914.25 ask=29914.75 spread=0.5000 imb=+0.07 ofi1m=+0.00 trades=0 quotes=2050401 err=0
+  YM   bid=52794.00 ask=52796.00 spread=2.0000 imb=+0.20 ofi1m=+0.00 trades=0 quotes=184541 err=0
+[RUN] 99.2min | chunks=197
+  MES  bid=7601.50 ask=7601.75 spread=0.2500 imb=+0.06 ofi1m=+0.00 trades=0 quotes=191861 err=0
+  MNQ  bid=29944.00 ask=29944.50 spread=0.5000 imb=-0.38 ofi1m=+0.00 trades=0 quotes=2086025 err=0
+  YM   bid=52792.00 ask=52794.00 spread=2.0000 imb=+0.05 ofi1m=+0.00 trades=0 quotes=186933 err=0
+[RUN] 100.2min | chunks=199
+  MES  bid=7601.75 ask=7602.00 spread=0.2500 imb=+0.21 ofi1m=+0.00 trades=0 quotes=195209 err=0
+  MNQ  bid=29950.75 ask=29951.25 spread=0.5000 imb=-0.28 ofi1m=+0.00 trades=0 quotes=2120345 err=0
+  YM   bid=52768.00 ask=52770.00 spread=2.0000 imb=-0.03 ofi1m=+0.00 trades=0 quotes=189750 err=0
+[RUN] 101.2min | chunks=201
+  MES  bid=7600.00 ask=7600.25 spread=0.2500 imb=+0.05 ofi1m=+0.00 trades=0 quotes=198040 err=0
+  MNQ  bid=29938.25 ask=29938.75 spread=0.5000 imb=+0.12 ofi1m=+0.00 trades=0 quotes=2153200 err=0
+  YM   bid=52752.00 ask=52754.00 spread=2.0000 imb=-0.26 ofi1m=+0.00 trades=0 quotes=192095 err=0
+[RUN] 102.2min | chunks=203
+  MES  bid=7600.75 ask=7601.00 spread=0.2500 imb=-0.15 ofi1m=+0.00 trades=0 quotes=200566 err=0
+  MNQ  bid=29944.50 ask=29945.00 spread=0.5000 imb=+0.16 ofi1m=+0.00 trades=0 quotes=2185062 err=0
+  YM   bid=52761.00 ask=52763.00 spread=2.0000 imb=+0.06 ofi1m=+0.00 trades=0 quotes=194397 err=0
+[RUN] 103.2min | chunks=205
+  MES  bid=7601.25 ask=7601.50 spread=0.2500 imb=+0.03 ofi1m=+0.00 trades=0 quotes=202704 err=0
+  MNQ  bid=29953.25 ask=29953.75 spread=0.5000 imb=+0.10 ofi1m=+0.00 trades=0 quotes=2213865 err=0
+  YM   bid=52753.00 ask=52755.00 spread=2.0000 imb=-0.09 ofi1m=+0.00 trades=0 quotes=196511 err=0
+[RUN] 104.2min | chunks=207
+  MES  bid=7599.00 ask=7599.25 spread=0.2500 imb=+0.09 ofi1m=+0.00 trades=0 quotes=204992 err=0
+  MNQ  bid=29943.50 ask=29944.00 spread=0.5000 imb=+0.25 ofi1m=+0.00 trades=0 quotes=2241237 err=0
+  YM   bid=52718.00 ask=52719.00 spread=1.0000 imb=-0.10 ofi1m=+0.00 trades=0 quotes=198366 err=0
+[RUN] 105.2min | chunks=209
+  MES  bid=7597.25 ask=7597.50 spread=0.2500 imb=-0.37 ofi1m=+0.00 trades=0 quotes=208389 err=0
+  MNQ  bid=29926.75 ask=29927.25 spread=0.5000 imb=-0.14 ofi1m=+0.00 trades=0 quotes=2276298 err=0
+  YM   bid=52727.00 ask=52729.00 spread=2.0000 imb=-0.08 ofi1m=+0.00 trades=0 quotes=201136 err=0
+[RUN] 106.2min | chunks=211
+  MES  bid=7597.75 ask=7598.00 spread=0.2500 imb=-0.09 ofi1m=+0.00 trades=0 quotes=211860 err=0
+  MNQ  bid=29912.50 ask=29912.75 spread=0.2500 imb=+0.16 ofi1m=+0.00 trades=0 quotes=2312552 err=0
+  YM   bid=52758.00 ask=52760.00 spread=2.0000 imb=+0.21 ofi1m=+0.00 trades=0 quotes=203434 err=0
+[RUN] 107.2min | chunks=213
+  MES  bid=7600.00 ask=7600.25 spread=0.2500 imb=-0.25 ofi1m=+0.00 trades=0 quotes=215585 err=0
+  MNQ  bid=29930.50 ask=29930.75 spread=0.2500 imb=+0.19 ofi1m=+0.00 trades=0 quotes=2350081 err=0
+  YM   bid=52774.00 ask=52776.00 spread=2.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=205840 err=0
+[RUN] 108.2min | chunks=215
+  MES  bid=7600.75 ask=7601.00 spread=0.2500 imb=-0.21 ofi1m=+0.00 trades=0 quotes=218923 err=0
+  MNQ  bid=29938.75 ask=29939.50 spread=0.7500 imb=-0.02 ofi1m=+0.00 trades=0 quotes=2387643 err=0
+  YM   bid=52787.00 ask=52789.00 spread=2.0000 imb=-0.12 ofi1m=+0.00 trades=0 quotes=208283 err=0
+[RUN] 109.2min | chunks=217
+  MES  bid=7597.25 ask=7597.50 spread=0.2500 imb=-0.25 ofi1m=+0.00 trades=0 quotes=222475 err=0
+  MNQ  bid=29901.25 ask=29902.00 spread=0.7500 imb=-0.05 ofi1m=+0.00 trades=0 quotes=2426539 err=0
+  YM   bid=52799.00 ask=52801.00 spread=2.0000 imb=+0.11 ofi1m=+0.00 trades=0 quotes=210350 err=0
+[RUN] 110.2min | chunks=219
+  MES  bid=7598.75 ask=7599.00 spread=0.2500 imb=+0.09 ofi1m=+0.00 trades=0 quotes=225929 err=0
+  MNQ  bid=29899.25 ask=29899.75 spread=0.5000 imb=-0.19 ofi1m=+0.00 trades=0 quotes=2463130 err=0
+  YM   bid=52835.00 ask=52837.00 spread=2.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=212782 err=0
+[RUN] 111.2min | chunks=221
+  MES  bid=7596.50 ask=7596.75 spread=0.2500 imb=+0.29 ofi1m=+0.00 trades=0 quotes=229852 err=0
+  MNQ  bid=29874.25 ask=29874.75 spread=0.5000 imb=+0.01 ofi1m=+0.00 trades=0 quotes=2503320 err=0
+  YM   bid=52841.00 ask=52843.00 spread=2.0000 imb=-0.10 ofi1m=+0.00 trades=0 quotes=215014 err=0
+[RUN] 112.2min | chunks=223
+  MES  bid=7596.00 ask=7596.25 spread=0.2500 imb=+0.07 ofi1m=+0.00 trades=0 quotes=234300 err=0
+  MNQ  bid=29872.00 ask=29872.50 spread=0.5000 imb=-0.02 ofi1m=+0.00 trades=0 quotes=2546519 err=0
+  YM   bid=52842.00 ask=52843.00 spread=1.0000 imb=+0.24 ofi1m=+0.00 trades=0 quotes=217668 err=0
+[RUN] 113.2min | chunks=225
+  MES  bid=7595.75 ask=7596.75 spread=1.0000 imb=+0.01 ofi1m=+0.00 trades=0 quotes=237562 err=0
+  MNQ  bid=29873.75 ask=29874.25 spread=0.5000 imb=-0.18 ofi1m=+0.00 trades=0 quotes=2585680 err=0
+  YM   bid=52836.00 ask=52839.00 spread=3.0000 imb=-0.09 ofi1m=+0.00 trades=0 quotes=219920 err=0
+[RUN] 114.2min | chunks=227
+  MES  bid=7599.25 ask=7599.50 spread=0.2500 imb=-0.08 ofi1m=+0.00 trades=0 quotes=240744 err=0
+  MNQ  bid=29905.75 ask=29906.00 spread=0.2500 imb=+0.26 ofi1m=+0.00 trades=0 quotes=2626197 err=0
+  YM   bid=52832.00 ask=52834.00 spread=2.0000 imb=+0.09 ofi1m=+0.00 trades=0 quotes=222325 err=0
+[RUN] 115.2min | chunks=229
+  MES  bid=7593.75 ask=7594.00 spread=0.2500 imb=+0.16 ofi1m=+0.00 trades=0 quotes=244410 err=0
+  MNQ  bid=29864.75 ask=29865.50 spread=0.7500 imb=-0.23 ofi1m=+0.00 trades=0 quotes=2668341 err=0
+  YM   bid=52812.00 ask=52813.00 spread=1.0000 imb=+0.03 ofi1m=+0.00 trades=0 quotes=224273 err=0
+[RUN] 116.2min | chunks=231
+  MES  bid=7597.25 ask=7597.50 spread=0.2500 imb=+0.10 ofi1m=+0.00 trades=0 quotes=248351 err=0
+  MNQ  bid=29899.25 ask=29899.75 spread=0.5000 imb=-0.18 ofi1m=+0.00 trades=0 quotes=2712210 err=0
+  YM   bid=52822.00 ask=52824.00 spread=2.0000 imb=+0.28 ofi1m=+0.00 trades=0 quotes=226541 err=0
+[RUN] 117.2min | chunks=233
+  MES  bid=7598.25 ask=7598.50 spread=0.2500 imb=-0.22 ofi1m=+0.00 trades=0 quotes=251219 err=0
+  MNQ  bid=29899.50 ask=29899.75 spread=0.2500 imb=+0.02 ofi1m=+0.00 trades=0 quotes=2746721 err=0
+  YM   bid=52844.00 ask=52846.00 spread=2.0000 imb=-0.19 ofi1m=+0.00 trades=0 quotes=228458 err=0
+[RUN] 118.2min | chunks=235
+  MES  bid=7601.50 ask=7601.75 spread=0.2500 imb=-0.33 ofi1m=+0.00 trades=0 quotes=254356 err=0
+  MNQ  bid=29929.00 ask=29929.25 spread=0.2500 imb=-0.11 ofi1m=+0.00 trades=0 quotes=2787754 err=0
+  YM   bid=52841.00 ask=52843.00 spread=2.0000 imb=-0.20 ofi1m=+0.00 trades=0 quotes=230517 err=0
+[RUN] 119.3min | chunks=237
+  MES  bid=7600.75 ask=7601.00 spread=0.2500 imb=+0.30 ofi1m=+0.00 trades=0 quotes=257402 err=0
+  MNQ  bid=29926.50 ask=29926.75 spread=0.2500 imb=-0.17 ofi1m=+0.00 trades=0 quotes=2823606 err=0
+  YM   bid=52846.00 ask=52845.00 spread=-1.0000 imb=-0.03 ofi1m=+0.00 trades=0 quotes=232446 err=0
+[RUN] 120.3min | chunks=239
+  MES  bid=7599.50 ask=7599.75 spread=0.2500 imb=+0.09 ofi1m=+0.00 trades=0 quotes=261079 err=0
+  MNQ  bid=29914.25 ask=29914.75 spread=0.5000 imb=+0.11 ofi1m=+0.00 trades=0 quotes=2863528 err=0
+  YM   bid=52834.00 ask=52837.00 spread=3.0000 imb=-0.08 ofi1m=+0.00 trades=0 quotes=234993 err=0
+[RUN] 121.3min | chunks=241
+  MES  bid=7599.75 ask=7600.00 spread=0.2500 imb=-0.20 ofi1m=+0.00 trades=0 quotes=263866 err=0
+  MNQ  bid=29924.50 ask=29925.25 spread=0.7500 imb=-0.15 ofi1m=+0.00 trades=0 quotes=2899830 err=0
+  YM   bid=52823.00 ask=52825.00 spread=2.0000 imb=-0.06 ofi1m=+0.00 trades=0 quotes=236831 err=0
+[RUN] 122.3min | chunks=243
+  MES  bid=7601.75 ask=7602.25 spread=0.5000 imb=-0.07 ofi1m=+0.00 trades=0 quotes=266439 err=0
+  MNQ  bid=29953.75 ask=29954.25 spread=0.5000 imb=+0.08 ofi1m=+0.00 trades=0 quotes=2935704 err=0
+  YM   bid=52832.00 ask=52835.00 spread=3.0000 imb=+0.15 ofi1m=+0.00 trades=0 quotes=238592 err=0
+[RUN] 123.3min | chunks=245
+  MES  bid=7571.75 ask=7572.25 spread=0.5000 imb=-0.14 ofi1m=+0.00 trades=0 quotes=294479 err=0
+  MNQ  bid=29788.75 ask=29790.00 spread=1.2500 imb=+0.43 ofi1m=+0.00 trades=0 quotes=2987827 err=0
+  YM   bid=52635.00 ask=52639.00 spread=4.0000 imb=-0.20 ofi1m=+0.00 trades=0 quotes=261416 err=0
+[RUN] 124.3min | chunks=247
+  MES  bid=7584.25 ask=7585.00 spread=0.7500 imb=-0.16 ofi1m=+0.00 trades=0 quotes=319108 err=0
+  MNQ  bid=29865.75 ask=29866.75 spread=1.0000 imb=-0.20 ofi1m=+0.00 trades=0 quotes=3063123 err=0
+  YM   bid=52722.00 ask=52725.00 spread=3.0000 imb=-0.18 ofi1m=+0.00 trades=0 quotes=276132 err=0
+[RUN] 125.3min | chunks=249
+  MES  bid=7584.75 ask=7585.25 spread=0.5000 imb=+0.02 ofi1m=+0.00 trades=0 quotes=334080 err=0
+  MNQ  bid=29877.50 ask=29878.50 spread=1.0000 imb=-0.14 ofi1m=+0.00 trades=0 quotes=3118011 err=0
+  YM   bid=52711.00 ask=52714.00 spread=3.0000 imb=-0.17 ofi1m=+0.00 trades=0 quotes=286277 err=0
+[RUN] 126.3min | chunks=251
+  MES  bid=7584.25 ask=7584.50 spread=0.2500 imb=-0.08 ofi1m=+0.00 trades=0 quotes=348195 err=0
+  MNQ  bid=29866.50 ask=29867.75 spread=1.2500 imb=-0.32 ofi1m=+0.00 trades=0 quotes=3172988 err=0
+  YM   bid=52729.00 ask=52732.00 spread=3.0000 imb=-0.29 ofi1m=+0.00 trades=0 quotes=295589 err=0
+[RUN] 127.3min | chunks=253
+  MES  bid=7587.25 ask=7587.50 spread=0.2500 imb=-0.33 ofi1m=+0.00 trades=0 quotes=357180 err=0
+  MNQ  bid=29873.75 ask=29874.75 spread=1.0000 imb=-0.08 ofi1m=+0.00 trades=0 quotes=3216490 err=0
+  YM   bid=52756.00 ask=52761.00 spread=5.0000 imb=+0.24 ofi1m=+0.00 trades=0 quotes=301594 err=0
+[RUN] 128.3min | chunks=255
+  MES  bid=7588.75 ask=7589.00 spread=0.2500 imb=+0.05 ofi1m=+0.00 trades=0 quotes=364798 err=0
+  MNQ  bid=29871.50 ask=29872.25 spread=0.7500 imb=+0.00 ofi1m=+0.00 trades=0 quotes=3256036 err=0
+  YM   bid=52781.00 ask=52783.00 spread=2.0000 imb=+0.08 ofi1m=+0.00 trades=0 quotes=306813 err=0
+[RUN] 129.3min | chunks=257
+  MES  bid=7588.50 ask=7588.75 spread=0.2500 imb=+0.12 ofi1m=+0.00 trades=0 quotes=371619 err=0
+  MNQ  bid=29878.75 ask=29879.50 spread=0.7500 imb=-0.02 ofi1m=+0.00 trades=0 quotes=3293671 err=0
+  YM   bid=52762.00 ask=52764.00 spread=2.0000 imb=-0.07 ofi1m=+0.00 trades=0 quotes=311177 err=0
+[RUN] 130.3min | chunks=259
+  MES  bid=7587.75 ask=7588.00 spread=0.2500 imb=-0.47 ofi1m=+0.00 trades=0 quotes=378221 err=0
+  MNQ  bid=29871.50 ask=29872.00 spread=0.5000 imb=+0.31 ofi1m=+0.00 trades=0 quotes=3332138 err=0
+  YM   bid=52764.00 ask=52765.00 spread=1.0000 imb=+0.04 ofi1m=+0.00 trades=0 quotes=314825 err=0
+[RUN] 131.3min | chunks=261
+  MES  bid=7587.00 ask=7587.25 spread=0.2500 imb=-0.05 ofi1m=+0.00 trades=0 quotes=385666 err=0
+  MNQ  bid=29851.00 ask=29851.50 spread=0.5000 imb=-0.21 ofi1m=+0.00 trades=0 quotes=3379443 err=0
+  YM   bid=52778.00 ask=52780.00 spread=2.0000 imb=+0.07 ofi1m=+0.00 trades=0 quotes=318746 err=0
+[RUN] 132.3min | chunks=263
+  MES  bid=7587.50 ask=7587.75 spread=0.2500 imb=+0.02 ofi1m=+0.00 trades=0 quotes=391432 err=0
+  MNQ  bid=29857.50 ask=29858.00 spread=0.5000 imb=-0.29 ofi1m=+0.00 trades=0 quotes=3418980 err=0
+  YM   bid=52791.00 ask=52793.00 spread=2.0000 imb=+0.04 ofi1m=+0.00 trades=0 quotes=321787 err=0
+[RUN] 133.3min | chunks=265
+  MES  bid=7588.75 ask=7589.00 spread=0.2500 imb=-0.05 ofi1m=+0.00 trades=0 quotes=397287 err=0
+  MNQ  bid=29861.50 ask=29862.25 spread=0.7500 imb=+0.10 ofi1m=+0.00 trades=0 quotes=3459248 err=0
+  YM   bid=52800.00 ask=52802.00 spread=2.0000 imb=-0.07 ofi1m=+0.00 trades=0 quotes=324835 err=0
+[RUN] 134.3min | chunks=267
+  MES  bid=7591.75 ask=7592.25 spread=0.5000 imb=-0.32 ofi1m=+0.00 trades=0 quotes=402678 err=0
+  MNQ  bid=29884.00 ask=29884.50 spread=0.5000 imb=+0.16 ofi1m=+0.00 trades=0 quotes=3494156 err=0
+  YM   bid=52823.00 ask=52825.00 spread=2.0000 imb=+0.11 ofi1m=+0.00 trades=0 quotes=327279 err=0
+[RUN] 135.3min | chunks=269
+  MES  bid=7592.50 ask=7592.75 spread=0.2500 imb=-0.14 ofi1m=+0.00 trades=0 quotes=408273 err=0
+  MNQ  bid=29886.25 ask=29886.75 spread=0.5000 imb=+0.02 ofi1m=+0.00 trades=0 quotes=3534389 err=0
+  YM   bid=52826.00 ask=52829.00 spread=3.0000 imb=-0.15 ofi1m=+0.00 trades=0 quotes=330504 err=0
+[RUN] 136.3min | chunks=271
+  MES  bid=7591.75 ask=7592.00 spread=0.2500 imb=-0.29 ofi1m=+0.00 trades=0 quotes=412834 err=0
+  MNQ  bid=29878.25 ask=29878.75 spread=0.5000 imb=+0.06 ofi1m=+0.00 trades=0 quotes=3570319 err=0
+  YM   bid=52814.00 ask=52817.00 spread=3.0000 imb=-0.04 ofi1m=+0.00 trades=0 quotes=333079 err=0
+[RUN] 137.3min | chunks=273
+  MES  bid=7591.75 ask=7592.00 spread=0.2500 imb=-0.25 ofi1m=+0.00 trades=0 quotes=416650 err=0
+  MNQ  bid=29883.50 ask=29884.00 spread=0.5000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=3600564 err=0
+  YM   bid=52819.00 ask=52823.00 spread=4.0000 imb=+0.18 ofi1m=+0.00 trades=0 quotes=335105 err=0
+[RUN] 138.3min | chunks=275
+  MES  bid=7591.00 ask=7591.25 spread=0.2500 imb=+0.21 ofi1m=+0.00 trades=0 quotes=420301 err=0
+  MNQ  bid=29881.00 ask=29881.50 spread=0.5000 imb=-0.21 ofi1m=+0.00 trades=0 quotes=3628002 err=0
+  YM   bid=52810.00 ask=52816.00 spread=6.0000 imb=+0.10 ofi1m=+0.00 trades=0 quotes=336920 err=0
+[RUN] 139.3min | chunks=277
+  MES  bid=7594.25 ask=7594.50 spread=0.2500 imb=-0.10 ofi1m=+0.00 trades=0 quotes=424632 err=0
+  MNQ  bid=29893.00 ask=29893.25 spread=0.2500 imb=-0.06 ofi1m=+0.00 trades=0 quotes=3658931 err=0
+  YM   bid=52823.00 ask=52820.00 spread=-3.0000 imb=+0.12 ofi1m=+0.00 trades=0 quotes=339642 err=0
+[RUN] 140.3min | chunks=279
+  MES  bid=7596.75 ask=7597.00 spread=0.2500 imb=-0.05 ofi1m=+0.00 trades=0 quotes=429393 err=0
+  MNQ  bid=29901.50 ask=29902.00 spread=0.5000 imb=+0.31 ofi1m=+0.00 trades=0 quotes=3694231 err=0
+  YM   bid=52833.00 ask=52835.00 spread=2.0000 imb=-0.08 ofi1m=+0.00 trades=0 quotes=342185 err=0
+[RUN] 141.3min | chunks=281
+  MES  bid=7596.50 ask=7596.75 spread=0.2500 imb=-0.07 ofi1m=+0.00 trades=0 quotes=433748 err=0
+  MNQ  bid=29895.75 ask=29896.50 spread=0.7500 imb=-0.03 ofi1m=+0.00 trades=0 quotes=3730157 err=0
+  YM   bid=52848.00 ask=52850.00 spread=2.0000 imb=-0.14 ofi1m=+0.00 trades=0 quotes=344669 err=0
+[RUN] 142.3min | chunks=283
+  MES  bid=7595.75 ask=7596.00 spread=0.2500 imb=-0.28 ofi1m=+0.00 trades=0 quotes=437645 err=0
+  MNQ  bid=29893.00 ask=29893.25 spread=0.2500 imb=-0.13 ofi1m=+0.00 trades=0 quotes=3761478 err=0
+  YM   bid=52825.00 ask=52829.00 spread=4.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=346894 err=0
+[RUN] 143.3min | chunks=285
+  MES  bid=7592.00 ask=7592.25 spread=0.2500 imb=+0.24 ofi1m=+0.00 trades=0 quotes=441436 err=0
+  MNQ  bid=29853.75 ask=29854.25 spread=0.5000 imb=-0.01 ofi1m=+0.00 trades=0 quotes=3793727 err=0
+  YM   bid=52827.00 ask=52830.00 spread=3.0000 imb=-0.20 ofi1m=+0.00 trades=0 quotes=349026 err=0
+[RUN] 144.3min | chunks=287
+  MES  bid=7592.50 ask=7592.75 spread=0.2500 imb=+0.24 ofi1m=+0.00 trades=0 quotes=444825 err=0
+  MNQ  bid=29857.00 ask=29857.50 spread=0.5000 imb=+0.17 ofi1m=+0.00 trades=0 quotes=3826495 err=0
+  YM   bid=52834.00 ask=52836.00 spread=2.0000 imb=-0.32 ofi1m=+0.00 trades=0 quotes=350872 err=0
+[RUN] 145.3min | chunks=289
+  MES  bid=7590.25 ask=7590.50 spread=0.2500 imb=-0.34 ofi1m=+0.00 trades=0 quotes=449206 err=0
+  MNQ  bid=29849.25 ask=29849.75 spread=0.5000 imb=-0.09 ofi1m=+0.00 trades=0 quotes=3861950 err=0
+  YM   bid=52813.00 ask=52815.00 spread=2.0000 imb=+0.10 ofi1m=+0.00 trades=0 quotes=353241 err=0
+[RUN] 146.3min | chunks=291
+  MES  bid=7585.75 ask=7586.00 spread=0.2500 imb=-0.16 ofi1m=+0.00 trades=0 quotes=454698 err=0
+  MNQ  bid=29825.25 ask=29826.00 spread=0.7500 imb=+0.18 ofi1m=+0.00 trades=0 quotes=3903677 err=0
+  YM   bid=52789.00 ask=52791.00 spread=2.0000 imb=+0.08 ofi1m=+0.00 trades=0 quotes=356265 err=0
+[RUN] 147.3min | chunks=293
+  MES  bid=7585.50 ask=7585.75 spread=0.2500 imb=-0.13 ofi1m=+0.00 trades=0 quotes=460168 err=0
+  MNQ  bid=29830.75 ask=29831.00 spread=0.2500 imb=-0.05 ofi1m=+0.00 trades=0 quotes=3945982 err=0
+  YM   bid=52787.00 ask=52790.00 spread=3.0000 imb=-0.14 ofi1m=+0.00 trades=0 quotes=359030 err=0
+[RUN] 148.3min | chunks=295
+  MES  bid=7584.50 ask=7585.00 spread=0.5000 imb=+0.10 ofi1m=+0.00 trades=0 quotes=465965 err=0
+  MNQ  bid=29825.75 ask=29826.25 spread=0.5000 imb=+0.06 ofi1m=+0.00 trades=0 quotes=3985775 err=0
+  YM   bid=52765.00 ask=52767.00 spread=2.0000 imb=+0.15 ofi1m=+0.00 trades=0 quotes=361827 err=0
+[RUN] 149.3min | chunks=297
+  MES  bid=7583.25 ask=7583.75 spread=0.5000 imb=-0.21 ofi1m=+0.00 trades=0 quotes=470039 err=0
+  MNQ  bid=29814.50 ask=29815.00 spread=0.5000 imb=+0.23 ofi1m=+0.00 trades=0 quotes=4017839 err=0
+  YM   bid=52774.00 ask=52776.00 spread=2.0000 imb=-0.14 ofi1m=+0.00 trades=0 quotes=363529 err=0
+[RUN] 150.3min | chunks=299
+  MES  bid=7582.75 ask=7583.00 spread=0.2500 imb=+0.03 ofi1m=+0.00 trades=0 quotes=475496 err=0
+  MNQ  bid=29804.25 ask=29804.75 spread=0.5000 imb=-0.07 ofi1m=+0.00 trades=0 quotes=4059221 err=0
+  YM   bid=52791.00 ask=52793.00 spread=2.0000 imb=-0.14 ofi1m=+0.00 trades=0 quotes=366072 err=0
+[RUN] 151.3min | chunks=301
+  MES  bid=7583.25 ask=7583.75 spread=0.5000 imb=+0.08 ofi1m=+0.00 trades=0 quotes=481096 err=0
+  MNQ  bid=29806.25 ask=29806.75 spread=0.5000 imb=-0.08 ofi1m=+0.00 trades=0 quotes=4105030 err=0
+  YM   bid=52803.00 ask=52804.00 spread=1.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=368698 err=0
+[RUN] 152.3min | chunks=303
+  MES  bid=7584.00 ask=7584.25 spread=0.2500 imb=-0.31 ofi1m=+0.00 trades=0 quotes=485723 err=0
+  MNQ  bid=29819.00 ask=29819.50 spread=0.5000 imb=-0.29 ofi1m=+0.00 trades=0 quotes=4142130 err=0
+  YM   bid=52799.00 ask=52801.00 spread=2.0000 imb=+0.26 ofi1m=+0.00 trades=0 quotes=370835 err=0
+[RUN] 153.3min | chunks=305
+  MES  bid=7583.00 ask=7583.25 spread=0.2500 imb=+0.13 ofi1m=+0.00 trades=0 quotes=490272 err=0
+  MNQ  bid=29810.00 ask=29810.25 spread=0.2500 imb=-0.14 ofi1m=+0.00 trades=0 quotes=4177616 err=0
+  YM   bid=52805.00 ask=52807.00 spread=2.0000 imb=-0.04 ofi1m=+0.00 trades=0 quotes=372940 err=0
+[RUN] 154.3min | chunks=307
+  MES  bid=7583.25 ask=7583.50 spread=0.2500 imb=-0.36 ofi1m=+0.00 trades=0 quotes=495613 err=0
+  MNQ  bid=29804.50 ask=29805.00 spread=0.5000 imb=+0.06 ofi1m=+0.00 trades=0 quotes=4220973 err=0
+  YM   bid=52815.00 ask=52817.00 spread=2.0000 imb=-0.33 ofi1m=+0.00 trades=0 quotes=375334 err=0
+[RUN] 155.3min | chunks=309
+  MES  bid=7581.00 ask=7581.25 spread=0.2500 imb=-0.18 ofi1m=+0.00 trades=0 quotes=501620 err=0
+  MNQ  bid=29796.75 ask=29797.25 spread=0.5000 imb=+0.17 ofi1m=+0.00 trades=0 quotes=4265344 err=0
+  YM   bid=52803.00 ask=52806.00 spread=3.0000 imb=-0.06 ofi1m=+0.00 trades=0 quotes=377868 err=0
+[RUN] 156.3min | chunks=311
+  MES  bid=7579.75 ask=7580.00 spread=0.2500 imb=-0.39 ofi1m=+0.00 trades=0 quotes=505892 err=0
+  MNQ  bid=29790.00 ask=29790.50 spread=0.5000 imb=-0.17 ofi1m=+0.00 trades=0 quotes=4302092 err=0
+  YM   bid=52804.00 ask=52806.00 spread=2.0000 imb=-0.14 ofi1m=+0.00 trades=0 quotes=379707 err=0
+[RUN] 157.3min | chunks=313
+  MES  bid=7585.25 ask=7585.50 spread=0.2500 imb=-0.14 ofi1m=+0.00 trades=0 quotes=510648 err=0
+  MNQ  bid=29832.25 ask=29832.75 spread=0.5000 imb=+0.14 ofi1m=+0.00 trades=0 quotes=4340306 err=0
+  YM   bid=52813.00 ask=52816.00 spread=3.0000 imb=+0.11 ofi1m=+0.00 trades=0 quotes=382001 err=0
+[RUN] 158.3min | chunks=315
+  MES  bid=7588.00 ask=7588.25 spread=0.2500 imb=-0.24 ofi1m=+0.00 trades=0 quotes=515009 err=0
+  MNQ  bid=29851.50 ask=29852.00 spread=0.5000 imb=+0.38 ofi1m=+0.00 trades=0 quotes=4377600 err=0
+  YM   bid=52824.00 ask=52828.00 spread=4.0000 imb=-0.18 ofi1m=+0.00 trades=0 quotes=384013 err=0
+[RUN] 159.3min | chunks=317
+  MES  bid=7587.75 ask=7588.00 spread=0.2500 imb=+0.12 ofi1m=+0.00 trades=0 quotes=518340 err=0
+  MNQ  bid=29849.00 ask=29849.50 spread=0.5000 imb=+0.30 ofi1m=+0.00 trades=0 quotes=4406632 err=0
+  YM   bid=52826.00 ask=52828.00 spread=2.0000 imb=-0.19 ofi1m=+0.00 trades=0 quotes=385407 err=0
+[RUN] 160.3min | chunks=319
+  MES  bid=7592.00 ask=7592.25 spread=0.2500 imb=-0.13 ofi1m=+0.00 trades=0 quotes=522865 err=0
+  MNQ  bid=29878.25 ask=29878.50 spread=0.2500 imb=-0.04 ofi1m=+0.00 trades=0 quotes=4444589 err=0
+  YM   bid=52837.00 ask=52839.00 spread=2.0000 imb=+0.22 ofi1m=+0.00 trades=0 quotes=387547 err=0
+[RUN] 161.3min | chunks=321
+  MES  bid=7590.00 ask=7590.25 spread=0.2500 imb=-0.13 ofi1m=+0.00 trades=0 quotes=526799 err=0
+  MNQ  bid=29866.75 ask=29867.25 spread=0.5000 imb=+0.03 ofi1m=+0.00 trades=0 quotes=4476486 err=0
+  YM   bid=52829.00 ask=52831.00 spread=2.0000 imb=-0.30 ofi1m=+0.00 trades=0 quotes=389207 err=0
+[RUN] 162.3min | chunks=323
+  MES  bid=7590.50 ask=7590.75 spread=0.2500 imb=+0.16 ofi1m=+0.00 trades=0 quotes=529736 err=0
+  MNQ  bid=29873.50 ask=29874.00 spread=0.5000 imb=+0.23 ofi1m=+0.00 trades=0 quotes=4502329 err=0
+  YM   bid=52827.00 ask=52829.00 spread=2.0000 imb=+0.10 ofi1m=+0.00 trades=0 quotes=390622 err=0
+[RUN] 163.3min | chunks=325
+  MES  bid=7592.00 ask=7592.50 spread=0.5000 imb=+0.02 ofi1m=+0.00 trades=0 quotes=532588 err=0
+  MNQ  bid=29882.75 ask=29883.25 spread=0.5000 imb=+0.15 ofi1m=+0.00 trades=0 quotes=4529808 err=0
+  YM   bid=52835.00 ask=52837.00 spread=2.0000 imb=+0.31 ofi1m=+0.00 trades=0 quotes=392236 err=0
+[RUN] 164.3min | chunks=327
+  MES  bid=7591.75 ask=7592.00 spread=0.2500 imb=+0.05 ofi1m=+0.00 trades=0 quotes=535063 err=0
+  MNQ  bid=29876.75 ask=29877.00 spread=0.2500 imb=-0.08 ofi1m=+0.00 trades=0 quotes=4553726 err=0
+  YM   bid=52844.00 ask=52846.00 spread=2.0000 imb=+0.06 ofi1m=+0.00 trades=0 quotes=393585 err=0
+[RUN] 165.3min | chunks=329
+  MES  bid=7595.00 ask=7595.25 spread=0.2500 imb=+0.21 ofi1m=+0.00 trades=0 quotes=538706 err=0
+  MNQ  bid=29898.50 ask=29899.00 spread=0.5000 imb=+0.21 ofi1m=+0.00 trades=0 quotes=4583996 err=0
+  YM   bid=52874.00 ask=52873.00 spread=-1.0000 imb=-0.14 ofi1m=+0.00 trades=0 quotes=395831 err=0
+[RUN] 166.4min | chunks=331
+  MES  bid=7599.50 ask=7599.75 spread=0.2500 imb=+0.33 ofi1m=+0.00 trades=0 quotes=542754 err=0
+  MNQ  bid=29930.00 ask=29930.25 spread=0.2500 imb=-0.24 ofi1m=+0.00 trades=0 quotes=4618038 err=0
+  YM   bid=52883.00 ask=52885.00 spread=2.0000 imb=+0.05 ofi1m=+0.00 trades=0 quotes=398743 err=0
+[RUN] 167.4min | chunks=333
+  MES  bid=7601.25 ask=7601.50 spread=0.2500 imb=-0.16 ofi1m=+0.00 trades=0 quotes=547922 err=0
+  MNQ  bid=29939.75 ask=29940.25 spread=0.5000 imb=-0.07 ofi1m=+0.00 trades=0 quotes=4654255 err=0
+  YM   bid=52891.00 ask=52893.00 spread=2.0000 imb=-0.03 ofi1m=+0.00 trades=0 quotes=401833 err=0
+[RUN] 168.4min | chunks=335
+  MES  bid=7598.75 ask=7599.00 spread=0.2500 imb=+0.24 ofi1m=+0.00 trades=0 quotes=551039 err=0
+  MNQ  bid=29922.50 ask=29922.75 spread=0.2500 imb=+0.14 ofi1m=+0.00 trades=0 quotes=4682094 err=0
+  YM   bid=52892.00 ask=52894.00 spread=2.0000 imb=-0.10 ofi1m=+0.00 trades=0 quotes=403994 err=0
+[RUN] 169.4min | chunks=337
+  MES  bid=7596.75 ask=7597.00 spread=0.2500 imb=-0.22 ofi1m=+0.00 trades=0 quotes=554159 err=0
+  MNQ  bid=29909.50 ask=29910.00 spread=0.5000 imb=-0.22 ofi1m=+0.00 trades=0 quotes=4707793 err=0
+  YM   bid=52880.00 ask=52887.00 spread=7.0000 imb=-0.03 ofi1m=+0.00 trades=0 quotes=405675 err=0
+[RUN] 170.4min | chunks=339
+  MES  bid=7598.50 ask=7598.75 spread=0.2500 imb=-0.13 ofi1m=+0.00 trades=0 quotes=556768 err=0
+  MNQ  bid=29931.00 ask=29931.50 spread=0.5000 imb=+0.07 ofi1m=+0.00 trades=0 quotes=4731314 err=0
+  YM   bid=52865.00 ask=52869.00 spread=4.0000 imb=+0.06 ofi1m=+0.00 trades=0 quotes=407155 err=0
+[RUN] 171.4min | chunks=341
+  MES  bid=7598.75 ask=7599.00 spread=0.2500 imb=-0.05 ofi1m=+0.00 trades=0 quotes=559651 err=0
+  MNQ  bid=29934.00 ask=29934.50 spread=0.5000 imb=+0.15 ofi1m=+0.00 trades=0 quotes=4756885 err=0
+  YM   bid=52862.00 ask=52864.00 spread=2.0000 imb=+0.56 ofi1m=+0.00 trades=0 quotes=408912 err=0
+[RUN] 172.4min | chunks=343
+  MES  bid=7598.25 ask=7598.50 spread=0.2500 imb=-0.10 ofi1m=+0.00 trades=0 quotes=561552 err=0
+  MNQ  bid=29934.75 ask=29935.00 spread=0.2500 imb=+0.15 ofi1m=+0.00 trades=0 quotes=4776914 err=0
+  YM   bid=52852.00 ask=52853.00 spread=1.0000 imb=+0.53 ofi1m=+0.00 trades=0 quotes=410240 err=0
+[RUN] 173.4min | chunks=345
+  MES  bid=7598.75 ask=7599.25 spread=0.5000 imb=-0.00 ofi1m=+0.00 trades=0 quotes=563996 err=0
+  MNQ  bid=29929.00 ask=29929.50 spread=0.5000 imb=+0.04 ofi1m=+0.00 trades=0 quotes=4799108 err=0
+  YM   bid=52872.00 ask=52876.00 spread=4.0000 imb=-0.03 ofi1m=+0.00 trades=0 quotes=411633 err=0
+[RUN] 174.4min | chunks=347
+  MES  bid=7601.00 ask=7601.25 spread=0.2500 imb=-0.11 ofi1m=+0.00 trades=0 quotes=568324 err=0
+  MNQ  bid=29941.75 ask=29942.25 spread=0.5000 imb=+0.08 ofi1m=+0.00 trades=0 quotes=4828765 err=0
+  YM   bid=52884.00 ask=52886.00 spread=2.0000 imb=+0.14 ofi1m=+0.00 trades=0 quotes=414779 err=0
+[RUN] 175.4min | chunks=349
+  MES  bid=7603.75 ask=7604.50 spread=0.7500 imb=-0.14 ofi1m=+0.00 trades=0 quotes=571306 err=0
+  MNQ  bid=29959.00 ask=29959.75 spread=0.7500 imb=-0.05 ofi1m=+0.00 trades=0 quotes=4851962 err=0
+  YM   bid=52902.00 ask=52904.00 spread=2.0000 imb=+0.15 ofi1m=+0.00 trades=0 quotes=416474 err=0
+[RUN] 176.4min | chunks=351
+  MES  bid=7606.00 ask=7606.25 spread=0.2500 imb=+0.02 ofi1m=+0.00 trades=0 quotes=574699 err=0
+  MNQ  bid=29970.50 ask=29971.00 spread=0.5000 imb=+0.06 ofi1m=+0.00 trades=0 quotes=4878067 err=0
+  YM   bid=52919.00 ask=52922.00 spread=3.0000 imb=-0.13 ofi1m=+0.00 trades=0 quotes=418584 err=0
+[RUN] 177.4min | chunks=353
+  MES  bid=7606.00 ask=7606.25 spread=0.2500 imb=-0.40 ofi1m=+0.00 trades=0 quotes=577551 err=0
+  MNQ  bid=29981.50 ask=29982.00 spread=0.5000 imb=+0.23 ofi1m=+0.00 trades=0 quotes=4901052 err=0
+  YM   bid=52905.00 ask=52907.00 spread=2.0000 imb=-0.29 ofi1m=+0.00 trades=0 quotes=420514 err=0
+[RUN] 178.4min | chunks=355
+  MES  bid=7604.00 ask=7604.25 spread=0.2500 imb=+0.17 ofi1m=+0.00 trades=0 quotes=579964 err=0
+  MNQ  bid=29975.50 ask=29976.00 spread=0.5000 imb=-0.06 ofi1m=+0.00 trades=0 quotes=4923057 err=0
+  YM   bid=52886.00 ask=52888.00 spread=2.0000 imb=+0.33 ofi1m=+0.00 trades=0 quotes=421904 err=0
+[RUN] 179.4min | chunks=357
+  MES  bid=7603.75 ask=7604.00 spread=0.2500 imb=+0.00 ofi1m=+0.00 trades=0 quotes=582152 err=0
+  MNQ  bid=29969.75 ask=29969.75 spread=0.0000 imb=-0.08 ofi1m=+0.00 trades=0 quotes=4943858 err=0
+  YM   bid=52897.00 ask=52900.00 spread=3.0000 imb=-0.08 ofi1m=+0.00 trades=0 quotes=423322 err=0
+[RUN] 180.4min | chunks=359
+  MES  bid=7603.75 ask=7604.00 spread=0.2500 imb=+0.31 ofi1m=+0.00 trades=0 quotes=584806 err=0
+  MNQ  bid=29976.50 ask=29977.00 spread=0.5000 imb=+0.09 ofi1m=+0.00 trades=0 quotes=4969723 err=0
+  YM   bid=52887.00 ask=52888.00 spread=1.0000 imb=+0.17 ofi1m=+0.00 trades=0 quotes=425272 err=0
+[RUN] 181.4min | chunks=361
+  MES  bid=7601.75 ask=7602.00 spread=0.2500 imb=+0.33 ofi1m=+0.00 trades=0 quotes=587917 err=0
+  MNQ  bid=29966.00 ask=29966.75 spread=0.7500 imb=+0.06 ofi1m=+0.00 trades=0 quotes=4996044 err=0
+  YM   bid=52882.00 ask=52884.00 spread=2.0000 imb=+0.08 ofi1m=+0.00 trades=0 quotes=427024 err=0
+[RUN] 182.4min | chunks=363
+  MES  bid=7603.75 ask=7604.25 spread=0.5000 imb=+0.31 ofi1m=+0.00 trades=0 quotes=591307 err=0
+  MNQ  bid=29986.25 ask=29986.75 spread=0.5000 imb=-0.15 ofi1m=+0.00 trades=0 quotes=5024320 err=0
+  YM   bid=52885.00 ask=52887.00 spread=2.0000 imb=-0.04 ofi1m=+0.00 trades=0 quotes=428823 err=0
+[RUN] 183.4min | chunks=365
+  MES  bid=7603.50 ask=7604.00 spread=0.5000 imb=-0.11 ofi1m=+0.00 trades=0 quotes=593932 err=0
+  MNQ  bid=29984.75 ask=29985.25 spread=0.5000 imb=+0.31 ofi1m=+0.00 trades=0 quotes=5045320 err=0
+  YM   bid=52883.00 ask=52885.00 spread=2.0000 imb=+0.12 ofi1m=+0.00 trades=0 quotes=430092 err=0
+[RUN] 184.4min | chunks=367
+  MES  bid=7602.25 ask=7603.00 spread=0.7500 imb=-0.02 ofi1m=+0.00 trades=0 quotes=596107 err=0
+  MNQ  bid=29977.75 ask=29978.25 spread=0.5000 imb=-0.09 ofi1m=+0.00 trades=0 quotes=5064854 err=0
+  YM   bid=52877.00 ask=52879.00 spread=2.0000 imb=-0.16 ofi1m=+0.00 trades=0 quotes=431421 err=0
+[RUN] 185.4min | chunks=369
+  MES  bid=7599.50 ask=7600.00 spread=0.5000 imb=+0.27 ofi1m=+0.00 trades=0 quotes=599568 err=0
+  MNQ  bid=29960.50 ask=29961.00 spread=0.5000 imb=-0.16 ofi1m=+0.00 trades=0 quotes=5090540 err=0
+  YM   bid=52869.00 ask=52871.00 spread=2.0000 imb=+0.16 ofi1m=+0.00 trades=0 quotes=433310 err=0
+[RUN] 186.4min | chunks=371
+  MES  bid=7599.50 ask=7599.75 spread=0.2500 imb=+0.23 ofi1m=+0.00 trades=0 quotes=603040 err=0
+  MNQ  bid=29955.25 ask=29955.50 spread=0.2500 imb=+0.17 ofi1m=+0.00 trades=0 quotes=5119796 err=0
+  YM   bid=52873.00 ask=52876.00 spread=3.0000 imb=+0.04 ofi1m=+0.00 trades=0 quotes=435214 err=0
+[RUN] 187.4min | chunks=373
+  MES  bid=7600.25 ask=7600.75 spread=0.5000 imb=-0.14 ofi1m=+0.00 trades=0 quotes=605442 err=0
+  MNQ  bid=29953.75 ask=29954.25 spread=0.5000 imb=-0.07 ofi1m=+0.00 trades=0 quotes=5142107 err=0
+  YM   bid=52872.00 ask=52876.00 spread=4.0000 imb=-0.25 ofi1m=+0.00 trades=0 quotes=436455 err=0
+[RUN] 188.4min | chunks=375
+  MES  bid=7602.25 ask=7602.50 spread=0.2500 imb=-0.16 ofi1m=+0.00 trades=0 quotes=607644 err=0
+  MNQ  bid=29962.25 ask=29962.75 spread=0.5000 imb=-0.09 ofi1m=+0.00 trades=0 quotes=5163330 err=0
+  YM   bid=52875.00 ask=52876.00 spread=1.0000 imb=-0.10 ofi1m=+0.00 trades=0 quotes=437491 err=0
+[RUN] 189.4min | chunks=377
+  MES  bid=7596.00 ask=7596.25 spread=0.2500 imb=+0.12 ofi1m=+0.00 trades=0 quotes=610227 err=0
+  MNQ  bid=29914.50 ask=29915.00 spread=0.5000 imb=+0.22 ofi1m=+0.00 trades=0 quotes=5192122 err=0
+  YM   bid=52856.00 ask=52859.00 spread=3.0000 imb=+0.23 ofi1m=+0.00 trades=0 quotes=438920 err=0
+[RUN] 190.4min | chunks=379
+  MES  bid=7596.50 ask=7596.75 spread=0.2500 imb=+0.21 ofi1m=+0.00 trades=0 quotes=613263 err=0
+  MNQ  bid=29914.75 ask=29915.00 spread=0.2500 imb=+0.06 ofi1m=+0.00 trades=0 quotes=5221420 err=0
+  YM   bid=52849.00 ask=52853.00 spread=4.0000 imb=+0.17 ofi1m=+0.00 trades=0 quotes=440588 err=0
+[RUN] 191.4min | chunks=381
+  MES  bid=7591.50 ask=7591.75 spread=0.2500 imb=-0.18 ofi1m=+0.00 trades=0 quotes=617233 err=0
+  MNQ  bid=29869.50 ask=29869.75 spread=0.2500 imb=-0.02 ofi1m=+0.00 trades=0 quotes=5256949 err=0
+  YM   bid=52852.00 ask=52855.00 spread=3.0000 imb=-0.10 ofi1m=+0.00 trades=0 quotes=442429 err=0
+[RUN] 192.4min | chunks=383
+  MES  bid=7587.25 ask=7587.75 spread=0.5000 imb=-0.21 ofi1m=+0.00 trades=0 quotes=622769 err=0
+  MNQ  bid=29843.50 ask=29844.00 spread=0.5000 imb=+0.21 ofi1m=+0.00 trades=0 quotes=5301429 err=0
+  YM   bid=52844.00 ask=52846.00 spread=2.0000 imb=-0.20 ofi1m=+0.00 trades=0 quotes=445063 err=0
+[RUN] 193.4min | chunks=385
+  MES  bid=7589.75 ask=7590.00 spread=0.2500 imb=-0.05 ofi1m=+0.00 trades=0 quotes=628754 err=0
+  MNQ  bid=29853.25 ask=29853.75 spread=0.5000 imb=+0.21 ofi1m=+0.00 trades=0 quotes=5345682 err=0
+  YM   bid=52855.00 ask=52857.00 spread=2.0000 imb=+0.09 ofi1m=+0.00 trades=0 quotes=447951 err=0
+[RUN] 194.4min | chunks=387
+  MES  bid=7593.25 ask=7593.50 spread=0.2500 imb=+0.09 ofi1m=+0.00 trades=0 quotes=633193 err=0
+  MNQ  bid=29881.25 ask=29881.75 spread=0.5000 imb=-0.06 ofi1m=+0.00 trades=0 quotes=5383792 err=0
+  YM   bid=52872.00 ask=52874.00 spread=2.0000 imb=-0.29 ofi1m=+0.00 trades=0 quotes=449857 err=0
+[RUN] 195.4min | chunks=389
+  MES  bid=7589.25 ask=7589.50 spread=0.2500 imb=-0.05 ofi1m=+0.00 trades=0 quotes=638138 err=0
+  MNQ  bid=29855.75 ask=29856.50 spread=0.7500 imb=+0.25 ofi1m=+0.00 trades=0 quotes=5424345 err=0
+  YM   bid=52853.00 ask=52856.00 spread=3.0000 imb=+0.04 ofi1m=+0.00 trades=0 quotes=451881 err=0
+[RUN] 196.4min | chunks=391
+  MES  bid=7590.75 ask=7591.00 spread=0.2500 imb=+0.01 ofi1m=+0.00 trades=0 quotes=643270 err=0
+  MNQ  bid=29879.00 ask=29879.50 spread=0.5000 imb=+0.10 ofi1m=+0.00 trades=0 quotes=5466396 err=0
+  YM   bid=52838.00 ask=52840.00 spread=2.0000 imb=-0.08 ofi1m=+0.00 trades=0 quotes=454054 err=0
+[RUN] 197.4min | chunks=393
+  MES  bid=7594.00 ask=7594.25 spread=0.2500 imb=-0.28 ofi1m=+0.00 trades=0 quotes=647129 err=0
+  MNQ  bid=29891.00 ask=29891.25 spread=0.2500 imb=-0.12 ofi1m=+0.00 trades=0 quotes=5500169 err=0
+  YM   bid=52854.00 ask=52856.00 spread=2.0000 imb=+0.03 ofi1m=+0.00 trades=0 quotes=455866 err=0
+[RUN] 198.4min | chunks=395
+  MES  bid=7594.00 ask=7594.25 spread=0.2500 imb=+0.18 ofi1m=+0.00 trades=0 quotes=649967 err=0
+  MNQ  bid=29889.25 ask=29889.75 spread=0.5000 imb=+0.18 ofi1m=+0.00 trades=0 quotes=5526204 err=0
+  YM   bid=52856.00 ask=52858.00 spread=2.0000 imb=-0.07 ofi1m=+0.00 trades=0 quotes=457066 err=0
+[RUN] 199.4min | chunks=397
+  MES  bid=7597.00 ask=7597.00 spread=0.0000 imb=+0.02 ofi1m=+0.00 trades=0 quotes=653267 err=0
+  MNQ  bid=29913.75 ask=29914.25 spread=0.5000 imb=+0.33 ofi1m=+0.00 trades=0 quotes=5556710 err=0
+  YM   bid=52852.00 ask=52855.00 spread=3.0000 imb=+0.24 ofi1m=+0.00 trades=0 quotes=458520 err=0
+[RUN] 200.4min | chunks=399
+  MES  bid=7596.50 ask=7596.75 spread=0.2500 imb=+0.10 ofi1m=+0.00 trades=0 quotes=655912 err=0
+  MNQ  bid=29908.50 ask=29909.00 spread=0.5000 imb=-0.07 ofi1m=+0.00 trades=0 quotes=5580859 err=0
+  YM   bid=52854.00 ask=52856.00 spread=2.0000 imb=+0.20 ofi1m=+0.00 trades=0 quotes=459440 err=0
+[RUN] 201.4min | chunks=401
+  MES  bid=7597.50 ask=7597.75 spread=0.2500 imb=-0.15 ofi1m=+0.00 trades=0 quotes=658343 err=0
+  MNQ  bid=29918.00 ask=29918.50 spread=0.5000 imb=+0.05 ofi1m=+0.00 trades=0 quotes=5602507 err=0
+  YM   bid=52849.00 ask=52851.00 spread=2.0000 imb=-0.31 ofi1m=+0.00 trades=0 quotes=460621 err=0
+[RUN] 202.4min | chunks=403
+  MES  bid=7598.50 ask=7598.75 spread=0.2500 imb=+0.16 ofi1m=+0.00 trades=0 quotes=661099 err=0
+  MNQ  bid=29926.50 ask=29927.00 spread=0.5000 imb=-0.04 ofi1m=+0.00 trades=0 quotes=5626314 err=0
+  YM   bid=52862.00 ask=52865.00 spread=3.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=462106 err=0
+[RUN] 203.4min | chunks=405
+  MES  bid=7599.00 ask=7599.50 spread=0.5000 imb=-0.09 ofi1m=+0.00 trades=0 quotes=663174 err=0
+  MNQ  bid=29927.00 ask=29927.75 spread=0.7500 imb=-0.20 ofi1m=+0.00 trades=0 quotes=5644951 err=0
+  YM   bid=52867.00 ask=52869.00 spread=2.0000 imb=-0.15 ofi1m=+0.00 trades=0 quotes=462958 err=0
+[RUN] 204.4min | chunks=407
+  MES  bid=7600.25 ask=7600.50 spread=0.2500 imb=+0.07 ofi1m=+0.00 trades=0 quotes=665110 err=0
+  MNQ  bid=29934.50 ask=29935.00 spread=0.5000 imb=+0.15 ofi1m=+0.00 trades=0 quotes=5663709 err=0
+  YM   bid=52884.00 ask=52886.00 spread=2.0000 imb=-0.12 ofi1m=+0.00 trades=0 quotes=464007 err=0
+[RUN] 205.5min | chunks=409
+  MES  bid=7599.25 ask=7599.50 spread=0.2500 imb=+0.28 ofi1m=+0.00 trades=0 quotes=666970 err=0
+  MNQ  bid=29926.75 ask=29927.25 spread=0.5000 imb=-0.06 ofi1m=+0.00 trades=0 quotes=5683378 err=0
+  YM   bid=52880.00 ask=52882.00 spread=2.0000 imb=-0.41 ofi1m=+0.00 trades=0 quotes=465147 err=0
+[RUN] 206.5min | chunks=411
+  MES  bid=7599.75 ask=7600.00 spread=0.2500 imb=-0.16 ofi1m=+0.00 trades=0 quotes=668528 err=0
+  MNQ  bid=29925.25 ask=29926.00 spread=0.7500 imb=+0.33 ofi1m=+0.00 trades=0 quotes=5700884 err=0
+  YM   bid=52886.00 ask=52889.00 spread=3.0000 imb=-0.10 ofi1m=+0.00 trades=0 quotes=466240 err=0
+[RUN] 207.5min | chunks=413
+  MES  bid=7598.75 ask=7599.00 spread=0.2500 imb=-0.05 ofi1m=+0.00 trades=0 quotes=670529 err=0
+  MNQ  bid=29927.00 ask=29927.50 spread=0.5000 imb=-0.28 ofi1m=+0.00 trades=0 quotes=5720446 err=0
+  YM   bid=52870.00 ask=52874.00 spread=4.0000 imb=-0.15 ofi1m=+0.00 trades=0 quotes=467338 err=0
+[RUN] 208.5min | chunks=415
+  MES  bid=7599.25 ask=7599.50 spread=0.2500 imb=-0.25 ofi1m=+0.00 trades=0 quotes=671880 err=0
+  MNQ  bid=29929.25 ask=29929.75 spread=0.5000 imb=-0.13 ofi1m=+0.00 trades=0 quotes=5735405 err=0
+  YM   bid=52872.00 ask=52874.00 spread=2.0000 imb=-0.12 ofi1m=+0.00 trades=0 quotes=468250 err=0
+[RUN] 209.5min | chunks=417
+  MES  bid=7599.75 ask=7600.00 spread=0.2500 imb=-0.14 ofi1m=+0.00 trades=0 quotes=673376 err=0
+  MNQ  bid=29942.25 ask=29942.75 spread=0.5000 imb=+0.12 ofi1m=+0.00 trades=0 quotes=5751687 err=0
+  YM   bid=52865.00 ask=52867.00 spread=2.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=469164 err=0
+[RUN] 210.5min | chunks=419
+  MES  bid=7603.00 ask=7603.25 spread=0.2500 imb=-0.18 ofi1m=+0.00 trades=0 quotes=675598 err=0
+  MNQ  bid=29969.00 ask=29969.50 spread=0.5000 imb=-0.05 ofi1m=+0.00 trades=0 quotes=5774391 err=0
+  YM   bid=52883.00 ask=52885.00 spread=2.0000 imb=+0.24 ofi1m=+0.00 trades=0 quotes=470578 err=0
+[RUN] 211.5min | chunks=421
+  MES  bid=7602.25 ask=7602.50 spread=0.2500 imb=+0.26 ofi1m=+0.00 trades=0 quotes=678106 err=0
+  MNQ  bid=29963.25 ask=29964.00 spread=0.7500 imb=+0.09 ofi1m=+0.00 trades=0 quotes=5797073 err=0
+  YM   bid=52873.00 ask=52875.00 spread=2.0000 imb=-0.11 ofi1m=+0.00 trades=0 quotes=472446 err=0
+[RUN] 212.5min | chunks=423
+  MES  bid=7603.25 ask=7603.50 spread=0.2500 imb=+0.21 ofi1m=+0.00 trades=0 quotes=679644 err=0
+  MNQ  bid=29969.50 ask=29969.75 spread=0.2500 imb=+0.14 ofi1m=+0.00 trades=0 quotes=5813212 err=0
+  YM   bid=52871.00 ask=52873.00 spread=2.0000 imb=+0.06 ofi1m=+0.00 trades=0 quotes=473341 err=0
+[RUN] 213.5min | chunks=425
+  MES  bid=7603.00 ask=7603.25 spread=0.2500 imb=+0.15 ofi1m=+0.00 trades=0 quotes=680968 err=0
+  MNQ  bid=29970.50 ask=29971.00 spread=0.5000 imb=-0.14 ofi1m=+0.00 trades=0 quotes=5827860 err=0
+  YM   bid=52863.00 ask=52866.00 spread=3.0000 imb=+0.24 ofi1m=+0.00 trades=0 quotes=474164 err=0
+[RUN] 214.5min | chunks=427
+  MES  bid=7603.00 ask=7603.25 spread=0.2500 imb=-0.04 ofi1m=+0.00 trades=0 quotes=682824 err=0
+  MNQ  bid=29979.50 ask=29980.25 spread=0.7500 imb=-0.03 ofi1m=+0.00 trades=0 quotes=5846186 err=0
+  YM   bid=52853.00 ask=52855.00 spread=2.0000 imb=+0.24 ofi1m=+0.00 trades=0 quotes=475347 err=0
+[RUN] 215.5min | chunks=429
+  MES  bid=7602.75 ask=7603.00 spread=0.2500 imb=+0.09 ofi1m=+0.00 trades=0 quotes=684634 err=0
+  MNQ  bid=29978.50 ask=29979.25 spread=0.7500 imb=+0.10 ofi1m=+0.00 trades=0 quotes=5864742 err=0
+  YM   bid=52849.00 ask=52851.00 spread=2.0000 imb=-0.12 ofi1m=+0.00 trades=0 quotes=476382 err=0
+[RUN] 216.5min | chunks=431
+  MES  bid=7602.00 ask=7602.25 spread=0.2500 imb=+0.19 ofi1m=+0.00 trades=0 quotes=686357 err=0
+  MNQ  bid=29978.50 ask=29978.75 spread=0.2500 imb=+0.05 ofi1m=+0.00 trades=0 quotes=5882044 err=0
+  YM   bid=52833.00 ask=52835.00 spread=2.0000 imb=+0.14 ofi1m=+0.00 trades=0 quotes=477409 err=0
+[RUN] 217.5min | chunks=433
+  MES  bid=7602.00 ask=7602.25 spread=0.2500 imb=-0.01 ofi1m=+0.00 trades=0 quotes=687921 err=0
+  MNQ  bid=29979.00 ask=29979.50 spread=0.5000 imb=-0.24 ofi1m=+0.00 trades=0 quotes=5897495 err=0
+  YM   bid=52835.00 ask=52837.00 spread=2.0000 imb=+0.09 ofi1m=+0.00 trades=0 quotes=478582 err=0
+[RUN] 218.5min | chunks=435
+  MES  bid=7600.75 ask=7601.00 spread=0.2500 imb=+0.16 ofi1m=+0.00 trades=0 quotes=689239 err=0
+  MNQ  bid=29970.00 ask=29970.50 spread=0.5000 imb=-0.20 ofi1m=+0.00 trades=0 quotes=5912020 err=0
+  YM   bid=52833.00 ask=52835.00 spread=2.0000 imb=+0.32 ofi1m=+0.00 trades=0 quotes=479405 err=0
+[RUN] 219.5min | chunks=437
+  MES  bid=7600.75 ask=7601.00 spread=0.2500 imb=+0.42 ofi1m=+0.00 trades=0 quotes=690867 err=0
+  MNQ  bid=29966.50 ask=29967.25 spread=0.7500 imb=+0.13 ofi1m=+0.00 trades=0 quotes=5926791 err=0
+  YM   bid=52841.00 ask=52843.00 spread=2.0000 imb=-0.07 ofi1m=+0.00 trades=0 quotes=480177 err=0
+[RUN] 220.5min | chunks=439
+  MES  bid=7602.50 ask=7602.75 spread=0.2500 imb=-0.14 ofi1m=+0.00 trades=0 quotes=692616 err=0
+  MNQ  bid=29979.75 ask=29980.00 spread=0.2500 imb=+0.13 ofi1m=+0.00 trades=0 quotes=5943300 err=0
+  YM   bid=52846.00 ask=52848.00 spread=2.0000 imb=+0.22 ofi1m=+0.00 trades=0 quotes=480999 err=0
+[RUN] 221.5min | chunks=441
+  MES  bid=7603.25 ask=7603.50 spread=0.2500 imb=+0.16 ofi1m=+0.00 trades=0 quotes=694109 err=0
+  MNQ  bid=29983.00 ask=29983.25 spread=0.2500 imb=+0.08 ofi1m=+0.00 trades=0 quotes=5957097 err=0
+  YM   bid=52859.00 ask=52860.00 spread=1.0000 imb=-0.26 ofi1m=+0.00 trades=0 quotes=482011 err=0
+[RUN] 222.5min | chunks=443
+  MES  bid=7601.75 ask=7602.00 spread=0.2500 imb=-0.14 ofi1m=+0.00 trades=0 quotes=696984 err=0
+  MNQ  bid=29969.00 ask=29969.50 spread=0.5000 imb=-0.45 ofi1m=+0.00 trades=0 quotes=5979740 err=0
+  YM   bid=52851.00 ask=52853.00 spread=2.0000 imb=+0.22 ofi1m=+0.00 trades=0 quotes=483783 err=0
+[RUN] 223.5min | chunks=445
+  MES  bid=7603.25 ask=7603.50 spread=0.2500 imb=+0.22 ofi1m=+0.00 trades=0 quotes=698409 err=0
+  MNQ  bid=29979.75 ask=29980.25 spread=0.5000 imb=+0.03 ofi1m=+0.00 trades=0 quotes=5993556 err=0
+  YM   bid=52861.00 ask=52863.00 spread=2.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=484570 err=0
+[RUN] 224.5min | chunks=447
+  MES  bid=7603.50 ask=7604.00 spread=0.5000 imb=+0.05 ofi1m=+0.00 trades=0 quotes=699561 err=0
+  MNQ  bid=29982.25 ask=29982.75 spread=0.5000 imb=-0.19 ofi1m=+0.00 trades=0 quotes=6006570 err=0
+  YM   bid=52864.00 ask=52863.00 spread=-1.0000 imb=+0.13 ofi1m=+0.00 trades=0 quotes=485229 err=0
+[RUN] 225.5min | chunks=449
+  MES  bid=7605.75 ask=7606.00 spread=0.2500 imb=-0.33 ofi1m=+0.00 trades=0 quotes=701066 err=0
+  MNQ  bid=29995.25 ask=29995.75 spread=0.5000 imb=-0.32 ofi1m=+0.00 trades=0 quotes=6024547 err=0
+  YM   bid=52874.00 ask=52876.00 spread=2.0000 imb=-0.33 ofi1m=+0.00 trades=0 quotes=485958 err=0
+[RUN] 226.5min | chunks=451
+  MES  bid=7608.50 ask=7608.75 spread=0.2500 imb=-0.10 ofi1m=+0.00 trades=0 quotes=702774 err=0
+  MNQ  bid=30008.75 ask=30009.00 spread=0.2500 imb=+0.13 ofi1m=+0.00 trades=0 quotes=6043904 err=0
+  YM   bid=52889.00 ask=52892.00 spread=3.0000 imb=+0.13 ofi1m=+0.00 trades=0 quotes=487193 err=0
+[RUN] 227.5min | chunks=453
+  MES  bid=7607.00 ask=7607.25 spread=0.2500 imb=-0.12 ofi1m=+0.00 trades=0 quotes=704471 err=0
+  MNQ  bid=30007.75 ask=30008.25 spread=0.5000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=6061455 err=0
+  YM   bid=52872.00 ask=52874.00 spread=2.0000 imb=+0.10 ofi1m=+0.00 trades=0 quotes=488253 err=0
+[RUN] 228.5min | chunks=455
+  MES  bid=7606.75 ask=7607.25 spread=0.5000 imb=+0.13 ofi1m=+0.00 trades=0 quotes=705830 err=0
+  MNQ  bid=30005.50 ask=30006.00 spread=0.5000 imb=+0.11 ofi1m=+0.00 trades=0 quotes=6077133 err=0
+  YM   bid=52874.00 ask=52873.00 spread=-1.0000 imb=+0.08 ofi1m=+0.00 trades=0 quotes=489007 err=0
+[RUN] 229.5min | chunks=457
+  MES  bid=7606.25 ask=7606.50 spread=0.2500 imb=+0.17 ofi1m=+0.00 trades=0 quotes=707305 err=0
+  MNQ  bid=30006.75 ask=30007.00 spread=0.2500 imb=-0.19 ofi1m=+0.00 trades=0 quotes=6092368 err=0
+  YM   bid=52854.00 ask=52856.00 spread=2.0000 imb=+0.33 ofi1m=+0.00 trades=0 quotes=489908 err=0
+[RUN] 230.5min | chunks=459
+  MES  bid=7606.75 ask=7607.00 spread=0.2500 imb=-0.06 ofi1m=+0.00 trades=0 quotes=708912 err=0
+  MNQ  bid=30017.75 ask=30018.00 spread=0.2500 imb=-0.10 ofi1m=+0.00 trades=0 quotes=6110664 err=0
+  YM   bid=52842.00 ask=52844.00 spread=2.0000 imb=+0.12 ofi1m=+0.00 trades=0 quotes=490698 err=0
+[RUN] 231.5min | chunks=461
+  MES  bid=7604.50 ask=7604.75 spread=0.2500 imb=+0.01 ofi1m=+0.00 trades=0 quotes=710338 err=0
+  MNQ  bid=30006.00 ask=30006.50 spread=0.5000 imb=+0.27 ofi1m=+0.00 trades=0 quotes=6129452 err=0
+  YM   bid=52831.00 ask=52833.00 spread=2.0000 imb=-0.10 ofi1m=+0.00 trades=0 quotes=491727 err=0
+[RUN] 232.5min | chunks=463
+  MES  bid=7605.25 ask=7605.50 spread=0.2500 imb=-0.28 ofi1m=+0.00 trades=0 quotes=711967 err=0
+  MNQ  bid=30007.50 ask=30008.00 spread=0.5000 imb=-0.14 ofi1m=+0.00 trades=0 quotes=6145493 err=0
+  YM   bid=52838.00 ask=52840.00 spread=2.0000 imb=+0.41 ofi1m=+0.00 trades=0 quotes=492747 err=0
+[RUN] 233.5min | chunks=465
+  MES  bid=7606.25 ask=7606.50 spread=0.2500 imb=-0.26 ofi1m=+0.00 trades=0 quotes=712995 err=0
+  MNQ  bid=30018.00 ask=30018.50 spread=0.5000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=6159771 err=0
+  YM   bid=52828.00 ask=52832.00 spread=4.0000 imb=-0.03 ofi1m=+0.00 trades=0 quotes=493450 err=0
+[RUN] 234.5min | chunks=467
+  MES  bid=7606.00 ask=7606.25 spread=0.2500 imb=-0.01 ofi1m=+0.00 trades=0 quotes=714437 err=0
+  MNQ  bid=30015.00 ask=30015.25 spread=0.2500 imb=+0.14 ofi1m=+0.00 trades=0 quotes=6171988 err=0
+  YM   bid=52831.00 ask=52833.00 spread=2.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=494167 err=0
+[RUN] 235.5min | chunks=469
+  MES  bid=7604.50 ask=7604.75 spread=0.2500 imb=+0.14 ofi1m=+0.00 trades=0 quotes=715604 err=0
+  MNQ  bid=30002.00 ask=30002.50 spread=0.5000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=6188028 err=0
+  YM   bid=52832.00 ask=52836.00 spread=4.0000 imb=+0.14 ofi1m=+0.00 trades=0 quotes=494940 err=0
+[RUN] 236.5min | chunks=471
+  MES  bid=7604.50 ask=7604.75 spread=0.2500 imb=-0.06 ofi1m=+0.00 trades=0 quotes=717125 err=0
+  MNQ  bid=30015.50 ask=30016.00 spread=0.5000 imb=-0.03 ofi1m=+0.00 trades=0 quotes=6203680 err=0
+  YM   bid=52827.00 ask=52829.00 spread=2.0000 imb=-0.16 ofi1m=+0.00 trades=0 quotes=495785 err=0
+[RUN] 237.5min | chunks=473
+  MES  bid=7605.00 ask=7605.25 spread=0.2500 imb=-0.06 ofi1m=+0.00 trades=0 quotes=718265 err=0
+  MNQ  bid=30025.50 ask=30025.75 spread=0.2500 imb=+0.02 ofi1m=+0.00 trades=0 quotes=6219152 err=0
+  YM   bid=52825.00 ask=52827.00 spread=2.0000 imb=+0.09 ofi1m=+0.00 trades=0 quotes=496873 err=0
+[RUN] 238.5min | chunks=475
+  MES  bid=7604.25 ask=7604.75 spread=0.5000 imb=-0.06 ofi1m=+0.00 trades=0 quotes=719202 err=0
+  MNQ  bid=30019.25 ask=30020.00 spread=0.7500 imb=+0.06 ofi1m=+0.00 trades=0 quotes=6232427 err=0
+  YM   bid=52830.00 ask=52829.00 spread=-1.0000 imb=-0.26 ofi1m=+0.00 trades=0 quotes=497651 err=0
+[RUN] 239.5min | chunks=477
+  MES  bid=7603.50 ask=7603.75 spread=0.2500 imb=+0.15 ofi1m=+0.00 trades=0 quotes=720314 err=0
+  MNQ  bid=30009.50 ask=30009.75 spread=0.2500 imb=+0.02 ofi1m=+0.00 trades=0 quotes=6245432 err=0
+  YM   bid=52836.00 ask=52838.00 spread=2.0000 imb=+0.15 ofi1m=+0.00 trades=0 quotes=498377 err=0
+[RUN] 240.5min | chunks=479
+  MES  bid=7605.25 ask=7605.50 spread=0.2500 imb=-0.12 ofi1m=+0.00 trades=0 quotes=721698 err=0
+  MNQ  bid=30020.00 ask=30020.25 spread=0.2500 imb=+0.05 ofi1m=+0.00 trades=0 quotes=6260872 err=0
+  YM   bid=52843.00 ask=52845.00 spread=2.0000 imb=-0.09 ofi1m=+0.00 trades=0 quotes=499102 err=0
+[RUN] 241.5min | chunks=481
+  MES  bid=7605.50 ask=7605.75 spread=0.2500 imb=-0.04 ofi1m=+0.00 trades=0 quotes=722770 err=0
+  MNQ  bid=30017.00 ask=30017.50 spread=0.5000 imb=+0.10 ofi1m=+0.00 trades=0 quotes=6272331 err=0
+  YM   bid=52843.00 ask=52846.00 spread=3.0000 imb=-0.22 ofi1m=+0.00 trades=0 quotes=499741 err=0
+[RUN] 242.5min | chunks=483
+  MES  bid=7606.50 ask=7606.75 spread=0.2500 imb=-0.03 ofi1m=+0.00 trades=0 quotes=723506 err=0
+  MNQ  bid=30014.25 ask=30014.75 spread=0.5000 imb=+0.03 ofi1m=+0.00 trades=0 quotes=6281980 err=0
+  YM   bid=52859.00 ask=52861.00 spread=2.0000 imb=+0.17 ofi1m=+0.00 trades=0 quotes=500381 err=0
+[RUN] 243.5min | chunks=485
+  MES  bid=7607.25 ask=7607.50 spread=0.2500 imb=-0.01 ofi1m=+0.00 trades=0 quotes=724420 err=0
+  MNQ  bid=30019.25 ask=30019.75 spread=0.5000 imb=-0.10 ofi1m=+0.00 trades=0 quotes=6292948 err=0
+  YM   bid=52858.00 ask=52861.00 spread=3.0000 imb=+0.05 ofi1m=+0.00 trades=0 quotes=501036 err=0
+[RUN] 244.5min | chunks=487
+  MES  bid=7606.75 ask=7607.00 spread=0.2500 imb=+0.12 ofi1m=+0.00 trades=0 quotes=725324 err=0
+  MNQ  bid=30022.25 ask=30022.50 spread=0.2500 imb=+0.25 ofi1m=+0.00 trades=0 quotes=6302949 err=0
+  YM   bid=52847.00 ask=52849.00 spread=2.0000 imb=-0.06 ofi1m=+0.00 trades=0 quotes=501721 err=0
+[RUN] 245.5min | chunks=489
+  MES  bid=7607.50 ask=7607.75 spread=0.2500 imb=+0.01 ofi1m=+0.00 trades=0 quotes=726170 err=0
+  MNQ  bid=30030.25 ask=30030.50 spread=0.2500 imb=-0.04 ofi1m=+0.00 trades=0 quotes=6313874 err=0
+  YM   bid=52845.00 ask=52847.00 spread=2.0000 imb=-0.03 ofi1m=+0.00 trades=0 quotes=502312 err=0
+[RUN] 246.5min | chunks=491
+  MES  bid=7606.25 ask=7606.50 spread=0.2500 imb=-0.01 ofi1m=+0.00 trades=0 quotes=727168 err=0
+  MNQ  bid=30025.50 ask=30026.00 spread=0.5000 imb=-0.26 ofi1m=+0.00 trades=0 quotes=6326096 err=0
+  YM   bid=52836.00 ask=52837.00 spread=1.0000 imb=+0.14 ofi1m=+0.00 trades=0 quotes=502966 err=0
+[RUN] 247.5min | chunks=493
+  MES  bid=7602.75 ask=7603.00 spread=0.2500 imb=+0.28 ofi1m=+0.00 trades=0 quotes=728999 err=0
+  MNQ  bid=30007.00 ask=30007.25 spread=0.2500 imb=-0.16 ofi1m=+0.00 trades=0 quotes=6342941 err=0
+  YM   bid=52815.00 ask=52818.00 spread=3.0000 imb=+0.27 ofi1m=+0.00 trades=0 quotes=504236 err=0
+[RUN] 248.5min | chunks=495
+  MES  bid=7604.00 ask=7604.25 spread=0.2500 imb=-0.03 ofi1m=+0.00 trades=0 quotes=730299 err=0
+  MNQ  bid=30010.00 ask=30010.25 spread=0.2500 imb=-0.32 ofi1m=+0.00 trades=0 quotes=6355783 err=0
+  YM   bid=52825.00 ask=52828.00 spread=3.0000 imb=-0.06 ofi1m=+0.00 trades=0 quotes=505115 err=0
+[RUN] 249.5min | chunks=497
+  MES  bid=7604.75 ask=7605.00 spread=0.2500 imb=-0.09 ofi1m=+0.00 trades=0 quotes=731174 err=0
+  MNQ  bid=30009.50 ask=30009.75 spread=0.2500 imb=-0.25 ofi1m=+0.00 trades=0 quotes=6366435 err=0
+  YM   bid=52841.00 ask=52843.00 spread=2.0000 imb=+0.07 ofi1m=+0.00 trades=0 quotes=505711 err=0
+[RUN] 250.6min | chunks=499
+  MES  bid=7606.75 ask=7607.00 spread=0.2500 imb=-0.17 ofi1m=+0.00 trades=0 quotes=732303 err=0
+  MNQ  bid=30018.75 ask=30019.00 spread=0.2500 imb=-0.02 ofi1m=+0.00 trades=0 quotes=6378778 err=0
+  YM   bid=52845.00 ask=52849.00 spread=4.0000 imb=-0.07 ofi1m=+0.00 trades=0 quotes=506400 err=0
+[RUN] 251.6min | chunks=501
+  MES  bid=7606.75 ask=7607.00 spread=0.2500 imb=-0.17 ofi1m=+0.00 trades=0 quotes=733370 err=0
+  MNQ  bid=30017.75 ask=30018.25 spread=0.5000 imb=+0.06 ofi1m=+0.00 trades=0 quotes=6388629 err=0
+  YM   bid=52851.00 ask=52854.00 spread=3.0000 imb=-0.19 ofi1m=+0.00 trades=0 quotes=507055 err=0
+[RUN] 252.6min | chunks=503
+  MES  bid=7607.25 ask=7607.50 spread=0.2500 imb=-0.35 ofi1m=+0.00 trades=0 quotes=734254 err=0
+  MNQ  bid=30017.00 ask=30017.50 spread=0.5000 imb=+0.12 ofi1m=+0.00 trades=0 quotes=6397693 err=0
+  YM   bid=52855.00 ask=52858.00 spread=3.0000 imb=-0.09 ofi1m=+0.00 trades=0 quotes=507566 err=0
+[RUN] 253.6min | chunks=505
+  MES  bid=7608.25 ask=7608.50 spread=0.2500 imb=-0.16 ofi1m=+0.00 trades=0 quotes=735130 err=0
+  MNQ  bid=30018.25 ask=30018.50 spread=0.2500 imb=-0.05 ofi1m=+0.00 trades=0 quotes=6408629 err=0
+  YM   bid=52868.00 ask=52870.00 spread=2.0000 imb=-0.03 ofi1m=+0.00 trades=0 quotes=508220 err=0
+[RUN] 254.6min | chunks=507
+  MES  bid=7608.25 ask=7608.50 spread=0.2500 imb=-0.37 ofi1m=+0.00 trades=0 quotes=735981 err=0
+  MNQ  bid=30016.75 ask=30017.00 spread=0.2500 imb=+0.07 ofi1m=+0.00 trades=0 quotes=6418389 err=0
+  YM   bid=52865.00 ask=52865.00 spread=0.0000 imb=+0.03 ofi1m=+0.00 trades=0 quotes=508659 err=0
+[RUN] 255.6min | chunks=509
+  MES  bid=7609.50 ask=7609.75 spread=0.2500 imb=+0.07 ofi1m=+0.00 trades=0 quotes=737309 err=0
+  MNQ  bid=30022.75 ask=30023.25 spread=0.5000 imb=+0.09 ofi1m=+0.00 trades=0 quotes=6431696 err=0
+  YM   bid=52869.00 ask=52871.00 spread=2.0000 imb=-0.03 ofi1m=+0.00 trades=0 quotes=509744 err=0
+[RUN] 256.6min | chunks=511
+  MES  bid=7610.25 ask=7610.50 spread=0.2500 imb=+0.17 ofi1m=+0.00 trades=0 quotes=738641 err=0
+  MNQ  bid=30024.50 ask=30025.25 spread=0.7500 imb=-0.13 ofi1m=+0.00 trades=0 quotes=6443693 err=0
+  YM   bid=52884.00 ask=52887.00 spread=3.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=510629 err=0
+[RUN] 257.6min | chunks=513
+  MES  bid=7610.00 ask=7610.25 spread=0.2500 imb=+0.04 ofi1m=+0.00 trades=0 quotes=739841 err=0
+  MNQ  bid=30027.50 ask=30028.00 spread=0.5000 imb=-0.06 ofi1m=+0.00 trades=0 quotes=6455486 err=0
+  YM   bid=52873.00 ask=52877.00 spread=4.0000 imb=-0.06 ofi1m=+0.00 trades=0 quotes=511460 err=0
+[RUN] 258.6min | chunks=515
+  MES  bid=7610.00 ask=7610.25 spread=0.2500 imb=+0.23 ofi1m=+0.00 trades=0 quotes=740919 err=0
+  MNQ  bid=30025.50 ask=30026.00 spread=0.5000 imb=+0.29 ofi1m=+0.00 trades=0 quotes=6464370 err=0
+  YM   bid=52876.00 ask=52878.00 spread=2.0000 imb=+0.31 ofi1m=+0.00 trades=0 quotes=512033 err=0
+[RUN] 259.6min | chunks=517
+  MES  bid=7610.25 ask=7610.50 spread=0.2500 imb=-0.03 ofi1m=+0.00 trades=0 quotes=742213 err=0
+  MNQ  bid=30021.75 ask=30022.00 spread=0.2500 imb=-0.07 ofi1m=+0.00 trades=0 quotes=6474238 err=0
+  YM   bid=52879.00 ask=52881.00 spread=2.0000 imb=+0.18 ofi1m=+0.00 trades=0 quotes=512682 err=0
+[RUN] 260.6min | chunks=519
+  MES  bid=7611.50 ask=7612.00 spread=0.5000 imb=+0.19 ofi1m=+0.00 trades=0 quotes=743416 err=0
+  MNQ  bid=30036.50 ask=30036.75 spread=0.2500 imb=+0.09 ofi1m=+0.00 trades=0 quotes=6486900 err=0
+  YM   bid=52887.00 ask=52889.00 spread=2.0000 imb=-0.35 ofi1m=+0.00 trades=0 quotes=513754 err=0
+[RUN] 261.6min | chunks=521
+  MES  bid=7611.50 ask=7611.75 spread=0.2500 imb=-0.18 ofi1m=+0.00 trades=0 quotes=744635 err=0
+  MNQ  bid=30036.00 ask=30036.25 spread=0.2500 imb=-0.38 ofi1m=+0.00 trades=0 quotes=6498802 err=0
+  YM   bid=52882.00 ask=52885.00 spread=3.0000 imb=-0.09 ofi1m=+0.00 trades=0 quotes=514621 err=0
+[RUN] 262.6min | chunks=523
+  MES  bid=7612.00 ask=7612.25 spread=0.2500 imb=+0.16 ofi1m=+0.00 trades=0 quotes=745463 err=0
+  MNQ  bid=30039.25 ask=30039.75 spread=0.5000 imb=-0.03 ofi1m=+0.00 trades=0 quotes=6507726 err=0
+  YM   bid=52885.00 ask=52889.00 spread=4.0000 imb=+0.16 ofi1m=+0.00 trades=0 quotes=515216 err=0
+[RUN] 263.6min | chunks=525
+  MES  bid=7611.50 ask=7611.75 spread=0.2500 imb=-0.20 ofi1m=+0.00 trades=0 quotes=746394 err=0
+  MNQ  bid=30031.00 ask=30031.50 spread=0.5000 imb=+0.12 ofi1m=+0.00 trades=0 quotes=6517532 err=0
+  YM   bid=52885.00 ask=52887.00 spread=2.0000 imb=+0.08 ofi1m=+0.00 trades=0 quotes=515802 err=0
+[RUN] 264.6min | chunks=527
+  MES  bid=7612.00 ask=7612.25 spread=0.2500 imb=-0.18 ofi1m=+0.00 trades=0 quotes=747658 err=0
+  MNQ  bid=30025.75 ask=30026.00 spread=0.2500 imb=-0.07 ofi1m=+0.00 trades=0 quotes=6529807 err=0
+  YM   bid=52897.00 ask=52899.00 spread=2.0000 imb=-0.10 ofi1m=+0.00 trades=0 quotes=516545 err=0
+[RUN] 265.6min | chunks=529
+  MES  bid=7611.50 ask=7611.75 spread=0.2500 imb=+0.03 ofi1m=+0.00 trades=0 quotes=748853 err=0
+  MNQ  bid=30015.50 ask=30015.75 spread=0.2500 imb=-0.14 ofi1m=+0.00 trades=0 quotes=6542551 err=0
+  YM   bid=52905.00 ask=52907.00 spread=2.0000 imb=+0.26 ofi1m=+0.00 trades=0 quotes=517253 err=0
+[RUN] 266.6min | chunks=531
+  MES  bid=7611.25 ask=7611.75 spread=0.5000 imb=+0.13 ofi1m=+0.00 trades=0 quotes=749982 err=0
+  MNQ  bid=30017.00 ask=30017.25 spread=0.2500 imb=+0.15 ofi1m=+0.00 trades=0 quotes=6554917 err=0
+  YM   bid=52904.00 ask=52904.00 spread=0.0000 imb=-0.16 ofi1m=+0.00 trades=0 quotes=517945 err=0
+[RUN] 267.6min | chunks=533
+  MES  bid=7611.50 ask=7611.75 spread=0.2500 imb=+0.18 ofi1m=+0.00 trades=0 quotes=750941 err=0
+  MNQ  bid=30022.00 ask=30022.25 spread=0.2500 imb=+0.33 ofi1m=+0.00 trades=0 quotes=6565007 err=0
+  YM   bid=52899.00 ask=52901.00 spread=2.0000 imb=+0.09 ofi1m=+0.00 trades=0 quotes=518454 err=0
+[RUN] 268.6min | chunks=535
+  MES  bid=7613.00 ask=7613.25 spread=0.2500 imb=+0.00 ofi1m=+0.00 trades=0 quotes=751902 err=0
+  MNQ  bid=30032.25 ask=30032.50 spread=0.2500 imb=-0.16 ofi1m=+0.00 trades=0 quotes=6576078 err=0
+  YM   bid=52904.00 ask=52906.00 spread=2.0000 imb=-0.03 ofi1m=+0.00 trades=0 quotes=519275 err=0
+[RUN] 269.6min | chunks=537
+  MES  bid=7612.75 ask=7613.00 spread=0.2500 imb=-0.16 ofi1m=+0.00 trades=0 quotes=752659 err=0
+  MNQ  bid=30027.00 ask=30027.50 spread=0.5000 imb=+0.15 ofi1m=+0.00 trades=0 quotes=6584105 err=0
+  YM   bid=52901.00 ask=52903.00 spread=2.0000 imb=-0.08 ofi1m=+0.00 trades=0 quotes=519948 err=0
+[RUN] 270.6min | chunks=539
+  MES  bid=7611.50 ask=7611.75 spread=0.2500 imb=+0.25 ofi1m=+0.00 trades=0 quotes=753906 err=0
+  MNQ  bid=30024.50 ask=30025.00 spread=0.5000 imb=+0.07 ofi1m=+0.00 trades=0 quotes=6596983 err=0
+  YM   bid=52889.00 ask=52891.00 spread=2.0000 imb=-0.04 ofi1m=+0.00 trades=0 quotes=521037 err=0
+[RUN] 271.6min | chunks=541
+  MES  bid=7610.75 ask=7611.00 spread=0.2500 imb=-0.10 ofi1m=+0.00 trades=0 quotes=754714 err=0
+  MNQ  bid=30020.00 ask=30020.50 spread=0.5000 imb=-0.20 ofi1m=+0.00 trades=0 quotes=6608599 err=0
+  YM   bid=52888.00 ask=52890.00 spread=2.0000 imb=-0.22 ofi1m=+0.00 trades=0 quotes=521893 err=0
+[RUN] 272.6min | chunks=543
+  MES  bid=7610.50 ask=7610.75 spread=0.2500 imb=-0.22 ofi1m=+0.00 trades=0 quotes=755953 err=0
+  MNQ  bid=30013.25 ask=30014.00 spread=0.7500 imb=-0.15 ofi1m=+0.00 trades=0 quotes=6620543 err=0
+  YM   bid=52889.00 ask=52891.00 spread=2.0000 imb=+0.07 ofi1m=+0.00 trades=0 quotes=522842 err=0
+[RUN] 273.6min | chunks=545
+  MES  bid=7609.50 ask=7609.75 spread=0.2500 imb=+0.24 ofi1m=+0.00 trades=0 quotes=756957 err=0
+  MNQ  bid=30006.75 ask=30007.25 spread=0.5000 imb=-0.23 ofi1m=+0.00 trades=0 quotes=6630723 err=0
+  YM   bid=52886.00 ask=52888.00 spread=2.0000 imb=-0.13 ofi1m=+0.00 trades=0 quotes=523460 err=0
+[RUN] 274.6min | chunks=547
+  MES  bid=7609.75 ask=7610.00 spread=0.2500 imb=-0.17 ofi1m=+0.00 trades=0 quotes=758090 err=0
+  MNQ  bid=30009.25 ask=30009.50 spread=0.2500 imb=-0.07 ofi1m=+0.00 trades=0 quotes=6643628 err=0
+  YM   bid=52886.00 ask=52888.00 spread=2.0000 imb=+0.03 ofi1m=+0.00 trades=0 quotes=524234 err=0
+[RUN] 275.6min | chunks=549
+  MES  bid=7609.25 ask=7609.50 spread=0.2500 imb=+0.37 ofi1m=+0.00 trades=0 quotes=759114 err=0
+  MNQ  bid=30005.00 ask=30005.50 spread=0.5000 imb=-0.11 ofi1m=+0.00 trades=0 quotes=6654870 err=0
+  YM   bid=52888.00 ask=52890.00 spread=2.0000 imb=-0.11 ofi1m=+0.00 trades=0 quotes=524874 err=0
+[RUN] 276.6min | chunks=551
+  MES  bid=7610.25 ask=7610.50 spread=0.2500 imb=+0.08 ofi1m=+0.00 trades=0 quotes=760141 err=0
+  MNQ  bid=30017.25 ask=30017.50 spread=0.2500 imb=-0.17 ofi1m=+0.00 trades=0 quotes=6667926 err=0
+  YM   bid=52888.00 ask=52890.00 spread=2.0000 imb=+0.06 ofi1m=+0.00 trades=0 quotes=525517 err=0
+[RUN] 277.6min | chunks=553
+  MES  bid=7609.50 ask=7609.75 spread=0.2500 imb=-0.03 ofi1m=+0.00 trades=0 quotes=761055 err=0
+  MNQ  bid=30009.75 ask=30010.50 spread=0.7500 imb=+0.10 ofi1m=+0.00 trades=0 quotes=6677356 err=0
+  YM   bid=52890.00 ask=52891.00 spread=1.0000 imb=-0.12 ofi1m=+0.00 trades=0 quotes=526036 err=0
+[RUN] 278.6min | chunks=555
+  MES  bid=7610.25 ask=7610.50 spread=0.2500 imb=-0.20 ofi1m=+0.00 trades=0 quotes=761823 err=0
+  MNQ  bid=30018.25 ask=30018.75 spread=0.5000 imb=+0.01 ofi1m=+0.00 trades=0 quotes=6687464 err=0
+  YM   bid=52889.00 ask=52890.00 spread=1.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=526461 err=0
+[RUN] 279.6min | chunks=557
+  MES  bid=7609.50 ask=7609.75 spread=0.2500 imb=+0.12 ofi1m=+0.00 trades=0 quotes=762627 err=0
+  MNQ  bid=30011.50 ask=30012.00 spread=0.5000 imb=+0.41 ofi1m=+0.00 trades=0 quotes=6696888 err=0
+  YM   bid=52889.00 ask=52892.00 spread=3.0000 imb=-0.21 ofi1m=+0.00 trades=0 quotes=526888 err=0
+[RUN] 280.6min | chunks=559
+  MES  bid=7609.50 ask=7609.75 spread=0.2500 imb=+0.07 ofi1m=+0.00 trades=0 quotes=763954 err=0
+  MNQ  bid=30011.75 ask=30012.00 spread=0.2500 imb=-0.13 ofi1m=+0.00 trades=0 quotes=6707786 err=0
+  YM   bid=52883.00 ask=52885.00 spread=2.0000 imb=+0.09 ofi1m=+0.00 trades=0 quotes=527558 err=0
+[RUN] 281.6min | chunks=561
+  MES  bid=7609.00 ask=7609.25 spread=0.2500 imb=+0.33 ofi1m=+0.00 trades=0 quotes=764821 err=0
+  MNQ  bid=30010.75 ask=30011.25 spread=0.5000 imb=-0.02 ofi1m=+0.00 trades=0 quotes=6717839 err=0
+  YM   bid=52880.00 ask=52882.00 spread=2.0000 imb=+0.05 ofi1m=+0.00 trades=0 quotes=528054 err=0
+[RUN] 282.6min | chunks=563
+  MES  bid=7608.75 ask=7609.25 spread=0.5000 imb=+0.21 ofi1m=+0.00 trades=0 quotes=765774 err=0
+  MNQ  bid=30010.25 ask=30011.00 spread=0.7500 imb=+0.02 ofi1m=+0.00 trades=0 quotes=6726720 err=0
+  YM   bid=52880.00 ask=52883.00 spread=3.0000 imb=-0.15 ofi1m=+0.00 trades=0 quotes=528513 err=0
+[RUN] 283.6min | chunks=565
+  MES  bid=7608.25 ask=7608.50 spread=0.2500 imb=+0.29 ofi1m=+0.00 trades=0 quotes=766608 err=0
+  MNQ  bid=30005.75 ask=30006.25 spread=0.5000 imb=+0.12 ofi1m=+0.00 trades=0 quotes=6734603 err=0
+  YM   bid=52887.00 ask=52887.00 spread=0.0000 imb=-0.18 ofi1m=+0.00 trades=0 quotes=528929 err=0
+[RUN] 284.6min | chunks=567
+  MES  bid=7609.75 ask=7610.00 spread=0.2500 imb=+0.17 ofi1m=+0.00 trades=0 quotes=767523 err=0
+  MNQ  bid=30012.75 ask=30013.25 spread=0.5000 imb=+0.07 ofi1m=+0.00 trades=0 quotes=6747613 err=0
+  YM   bid=52902.00 ask=52904.00 spread=2.0000 imb=+0.03 ofi1m=+0.00 trades=0 quotes=529563 err=0
+[RUN] 285.6min | chunks=569
+  MES  bid=7612.00 ask=7612.25 spread=0.2500 imb=+0.20 ofi1m=+0.00 trades=0 quotes=768490 err=0
+  MNQ  bid=30027.00 ask=30027.50 spread=0.5000 imb=-0.11 ofi1m=+0.00 trades=0 quotes=6760639 err=0
+  YM   bid=52910.00 ask=52912.00 spread=2.0000 imb=-0.18 ofi1m=+0.00 trades=0 quotes=530221 err=0
+[RUN] 286.6min | chunks=571
+  MES  bid=7611.75 ask=7612.00 spread=0.2500 imb=-0.21 ofi1m=+0.00 trades=0 quotes=769359 err=0
+  MNQ  bid=30019.25 ask=30019.50 spread=0.2500 imb=+0.24 ofi1m=+0.00 trades=0 quotes=6770006 err=0
+  YM   bid=52916.00 ask=52918.00 spread=2.0000 imb=-0.23 ofi1m=+0.00 trades=0 quotes=530719 err=0
+[RUN] 287.6min | chunks=573
+  MES  bid=7612.00 ask=7612.25 spread=0.2500 imb=-0.03 ofi1m=+0.00 trades=0 quotes=770204 err=0
+  MNQ  bid=30019.25 ask=30019.50 spread=0.2500 imb=-0.03 ofi1m=+0.00 trades=0 quotes=6778483 err=0
+  YM   bid=52923.00 ask=52926.00 spread=3.0000 imb=+0.09 ofi1m=+0.00 trades=0 quotes=531304 err=0
+[RUN] 288.6min | chunks=575
+  MES  bid=7611.50 ask=7611.75 spread=0.2500 imb=+0.30 ofi1m=+0.00 trades=0 quotes=770911 err=0
+  MNQ  bid=30016.50 ask=30017.00 spread=0.5000 imb=+0.01 ofi1m=+0.00 trades=0 quotes=6786541 err=0
+  YM   bid=52913.00 ask=52915.00 spread=2.0000 imb=+0.33 ofi1m=+0.00 trades=0 quotes=531866 err=0
+[RUN] 289.6min | chunks=577
+  MES  bid=7611.50 ask=7611.75 spread=0.2500 imb=-0.04 ofi1m=+0.00 trades=0 quotes=771870 err=0
+  MNQ  bid=30017.25 ask=30017.75 spread=0.5000 imb=-0.07 ofi1m=+0.00 trades=0 quotes=6795908 err=0
+  YM   bid=52909.00 ask=52911.00 spread=2.0000 imb=-0.12 ofi1m=+0.00 trades=0 quotes=532417 err=0
+[RUN] 290.6min | chunks=579
+  MES  bid=7611.25 ask=7611.50 spread=0.2500 imb=+0.20 ofi1m=+0.00 trades=0 quotes=772778 err=0
+  MNQ  bid=30019.25 ask=30019.50 spread=0.2500 imb=+0.00 ofi1m=+0.00 trades=0 quotes=6805103 err=0
+  YM   bid=52900.00 ask=52902.00 spread=2.0000 imb=+0.03 ofi1m=+0.00 trades=0 quotes=533060 err=0
+[RUN] 291.6min | chunks=581
+  MES  bid=7611.25 ask=7611.50 spread=0.2500 imb=-0.10 ofi1m=+0.00 trades=0 quotes=773629 err=0
+  MNQ  bid=30022.25 ask=30022.50 spread=0.2500 imb=-0.43 ofi1m=+0.00 trades=0 quotes=6813058 err=0
+  YM   bid=52893.00 ask=52895.00 spread=2.0000 imb=+0.18 ofi1m=+0.00 trades=0 quotes=533571 err=0
+[RUN] 292.6min | chunks=583
+  MES  bid=7612.25 ask=7612.50 spread=0.2500 imb=-0.26 ofi1m=+0.00 trades=0 quotes=774266 err=0
+  MNQ  bid=30027.75 ask=30028.00 spread=0.2500 imb=-0.12 ofi1m=+0.00 trades=0 quotes=6820685 err=0
+  YM   bid=52901.00 ask=52903.00 spread=2.0000 imb=+0.02 ofi1m=+0.00 trades=0 quotes=534105 err=0
+[RUN] 293.6min | chunks=585
+  MES  bid=7611.50 ask=7611.75 spread=0.2500 imb=-0.06 ofi1m=+0.00 trades=0 quotes=774844 err=0
+  MNQ  bid=30023.75 ask=30024.00 spread=0.2500 imb=-0.02 ofi1m=+0.00 trades=0 quotes=6827393 err=0
+  YM   bid=52900.00 ask=52904.00 spread=4.0000 imb=-0.17 ofi1m=+0.00 trades=0 quotes=534531 err=0
+[RUN] 294.6min | chunks=587
+  MES  bid=7611.75 ask=7612.00 spread=0.2500 imb=-0.09 ofi1m=+0.00 trades=0 quotes=775624 err=0
+  MNQ  bid=30033.25 ask=30033.50 spread=0.2500 imb=+0.07 ofi1m=+0.00 trades=0 quotes=6835876 err=0
+  YM   bid=52895.00 ask=52896.00 spread=1.0000 imb=-0.06 ofi1m=+0.00 trades=0 quotes=535043 err=0
+[RUN] 295.6min | chunks=589
+  MES  bid=7611.75 ask=7612.00 spread=0.2500 imb=-0.02 ofi1m=+0.00 trades=0 quotes=776532 err=0
+  MNQ  bid=30036.75 ask=30037.25 spread=0.5000 imb=+0.09 ofi1m=+0.00 trades=0 quotes=6846761 err=0
+  YM   bid=52888.00 ask=52892.00 spread=4.0000 imb=-0.19 ofi1m=+0.00 trades=0 quotes=535616 err=0
+[RUN] 296.6min | chunks=591
+  MES  bid=7612.25 ask=7612.50 spread=0.2500 imb=-0.02 ofi1m=+0.00 trades=0 quotes=777419 err=0
+  MNQ  bid=30045.75 ask=30046.00 spread=0.2500 imb=+0.15 ofi1m=+0.00 trades=0 quotes=6857019 err=0
+  YM   bid=52886.00 ask=52888.00 spread=2.0000 imb=-0.09 ofi1m=+0.00 trades=0 quotes=536116 err=0
+[RUN] 297.6min | chunks=593
+  MES  bid=7611.75 ask=7612.00 spread=0.2500 imb=+0.05 ofi1m=+0.00 trades=0 quotes=778115 err=0
+  MNQ  bid=30043.00 ask=30043.50 spread=0.5000 imb=+0.05 ofi1m=+0.00 trades=0 quotes=6865342 err=0
+  YM   bid=52888.00 ask=52889.00 spread=1.0000 imb=-0.09 ofi1m=+0.00 trades=0 quotes=536640 err=0
+[RUN] 298.7min | chunks=595
+  MES  bid=7612.75 ask=7613.00 spread=0.2500 imb=-0.12 ofi1m=+0.00 trades=0 quotes=778802 err=0
+  MNQ  bid=30049.25 ask=30049.75 spread=0.5000 imb=-0.05 ofi1m=+0.00 trades=0 quotes=6874033 err=0
+  YM   bid=52893.00 ask=52895.00 spread=2.0000 imb=+0.24 ofi1m=+0.00 trades=0 quotes=537120 err=0
+[RUN] 299.7min | chunks=597
+  MES  bid=7612.75 ask=7613.00 spread=0.2500 imb=-0.14 ofi1m=+0.00 trades=0 quotes=779291 err=0
+  MNQ  bid=30049.00 ask=30049.25 spread=0.2500 imb=-0.09 ofi1m=+0.00 trades=0 quotes=6881188 err=0
+  YM   bid=52898.00 ask=52900.00 spread=2.0000 imb=-0.27 ofi1m=+0.00 trades=0 quotes=537550 err=0
+[RUN] 300.7min | chunks=599
+  MES  bid=7613.25 ask=7613.50 spread=0.2500 imb=-0.07 ofi1m=+0.00 trades=0 quotes=780392 err=0
+  MNQ  bid=30051.00 ask=30051.25 spread=0.2500 imb=-0.12 ofi1m=+0.00 trades=0 quotes=6892933 err=0
+  YM   bid=52899.00 ask=52901.00 spread=2.0000 imb=+0.17 ofi1m=+0.00 trades=0 quotes=538292 err=0
+[RUN] 301.7min | chunks=601
+  MES  bid=7613.50 ask=7613.75 spread=0.2500 imb=-0.31 ofi1m=+0.00 trades=0 quotes=781342 err=0
+  MNQ  bid=30049.25 ask=30050.00 spread=0.7500 imb=+0.16 ofi1m=+0.00 trades=0 quotes=6903676 err=0
+  YM   bid=52903.00 ask=52905.00 spread=2.0000 imb=-0.28 ofi1m=+0.00 trades=0 quotes=538970 err=0
+[RUN] 302.7min | chunks=603
+  MES  bid=7613.25 ask=7613.50 spread=0.2500 imb=+0.05 ofi1m=+0.00 trades=0 quotes=782077 err=0
+  MNQ  bid=30050.50 ask=30051.00 spread=0.5000 imb=+0.27 ofi1m=+0.00 trades=0 quotes=6914588 err=0
+  YM   bid=52904.00 ask=52906.00 spread=2.0000 imb=+0.10 ofi1m=+0.00 trades=0 quotes=539534 err=0
+[RUN] 303.7min | chunks=605
+  MES  bid=7612.25 ask=7612.50 spread=0.2500 imb=+0.37 ofi1m=+0.00 trades=0 quotes=783054 err=0
+  MNQ  bid=30044.25 ask=30044.75 spread=0.5000 imb=-0.03 ofi1m=+0.00 trades=0 quotes=6924246 err=0
+  YM   bid=52904.00 ask=52906.00 spread=2.0000 imb=-0.18 ofi1m=+0.00 trades=0 quotes=540166 err=0
+[RUN] 304.7min | chunks=607
+  MES  bid=7612.75 ask=7613.00 spread=0.2500 imb=+0.10 ofi1m=+0.00 trades=0 quotes=784156 err=0
+  MNQ  bid=30046.00 ask=30046.50 spread=0.5000 imb=+0.05 ofi1m=+0.00 trades=0 quotes=6935197 err=0
+  YM   bid=52910.00 ask=52912.00 spread=2.0000 imb=-0.13 ofi1m=+0.00 trades=0 quotes=540765 err=0
+[RUN] 305.7min | chunks=609
+  MES  bid=7613.50 ask=7613.75 spread=0.2500 imb=-0.31 ofi1m=+0.00 trades=0 quotes=784857 err=0
+  MNQ  bid=30048.75 ask=30049.25 spread=0.5000 imb=-0.04 ofi1m=+0.00 trades=0 quotes=6944981 err=0
+  YM   bid=52913.00 ask=52915.00 spread=2.0000 imb=+0.57 ofi1m=+0.00 trades=0 quotes=541365 err=0
+[RUN] 306.7min | chunks=611
+  MES  bid=7614.75 ask=7615.00 spread=0.2500 imb=-0.33 ofi1m=+0.00 trades=0 quotes=785826 err=0
+  MNQ  bid=30056.50 ask=30056.75 spread=0.2500 imb=+0.27 ofi1m=+0.00 trades=0 quotes=6957375 err=0
+  YM   bid=52923.00 ask=52925.00 spread=2.0000 imb=-0.32 ofi1m=+0.00 trades=0 quotes=542235 err=0
+[RUN] 307.7min | chunks=613
+  MES  bid=7615.75 ask=7616.00 spread=0.2500 imb=+0.07 ofi1m=+0.00 trades=0 quotes=786857 err=0
+  MNQ  bid=30063.00 ask=30063.25 spread=0.2500 imb=+0.08 ofi1m=+0.00 trades=0 quotes=6967632 err=0
+  YM   bid=52925.00 ask=52927.00 spread=2.0000 imb=-0.08 ofi1m=+0.00 trades=0 quotes=543339 err=0
+[RUN] 308.7min | chunks=615
+  MES  bid=7616.00 ask=7616.25 spread=0.2500 imb=-0.06 ofi1m=+0.00 trades=0 quotes=787915 err=0
+  MNQ  bid=30066.50 ask=30067.00 spread=0.5000 imb=-0.37 ofi1m=+0.00 trades=0 quotes=6977558 err=0
+  YM   bid=52921.00 ask=52924.00 spread=3.0000 imb=-0.17 ofi1m=+0.00 trades=0 quotes=544074 err=0
+[RUN] 309.7min | chunks=617
+  MES  bid=7615.25 ask=7615.50 spread=0.2500 imb=+0.05 ofi1m=+0.00 trades=0 quotes=788616 err=0
+  MNQ  bid=30064.00 ask=30064.75 spread=0.7500 imb=+0.42 ofi1m=+0.00 trades=0 quotes=6986374 err=0
+  YM   bid=52909.00 ask=52911.00 spread=2.0000 imb=-0.31 ofi1m=+0.00 trades=0 quotes=544595 err=0
+[RUN] 310.7min | chunks=619
+  MES  bid=7615.25 ask=7615.50 spread=0.2500 imb=+0.33 ofi1m=+0.00 trades=0 quotes=789483 err=0
+  MNQ  bid=30064.75 ask=30065.00 spread=0.2500 imb=+0.00 ofi1m=+0.00 trades=0 quotes=6995313 err=0
+  YM   bid=52910.00 ask=52912.00 spread=2.0000 imb=+0.16 ofi1m=+0.00 trades=0 quotes=545216 err=0
+[RUN] 311.7min | chunks=621
+  MES  bid=7615.00 ask=7615.25 spread=0.2500 imb=+0.22 ofi1m=+0.00 trades=0 quotes=790162 err=0
+  MNQ  bid=30063.75 ask=30064.25 spread=0.5000 imb=+0.12 ofi1m=+0.00 trades=0 quotes=7002681 err=0
+  YM   bid=52907.00 ask=52909.00 spread=2.0000 imb=+0.24 ofi1m=+0.00 trades=0 quotes=545828 err=0
+[RUN] 312.7min | chunks=623
+  MES  bid=7613.75 ask=7614.00 spread=0.2500 imb=-0.01 ofi1m=+0.00 trades=0 quotes=790949 err=0
+  MNQ  bid=30060.25 ask=30060.75 spread=0.5000 imb=+0.18 ofi1m=+0.00 trades=0 quotes=7011330 err=0
+  YM   bid=52906.00 ask=52907.00 spread=1.0000 imb=-0.03 ofi1m=+0.00 trades=0 quotes=546551 err=0
+[RUN] 313.7min | chunks=625
+  MES  bid=7614.25 ask=7614.50 spread=0.2500 imb=+0.04 ofi1m=+0.00 trades=0 quotes=791817 err=0
+  MNQ  bid=30066.00 ask=30066.00 spread=0.0000 imb=-0.09 ofi1m=+0.00 trades=0 quotes=7019321 err=0
+  YM   bid=52911.00 ask=52913.00 spread=2.0000 imb=-0.17 ofi1m=+0.00 trades=0 quotes=547238 err=0
+[RUN] 314.7min | chunks=627
+  MES  bid=7613.75 ask=7614.00 spread=0.2500 imb=+0.41 ofi1m=+0.00 trades=0 quotes=792485 err=0
+  MNQ  bid=30064.00 ask=30064.50 spread=0.5000 imb=-0.02 ofi1m=+0.00 trades=0 quotes=7026244 err=0
+  YM   bid=52906.00 ask=52908.00 spread=2.0000 imb=+0.19 ofi1m=+0.00 trades=0 quotes=547854 err=0
+[RUN] 315.7min | chunks=629
+  MES  bid=7615.25 ask=7615.50 spread=0.2500 imb=+0.01 ofi1m=+0.00 trades=0 quotes=793310 err=0
+  MNQ  bid=30069.25 ask=30069.75 spread=0.5000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=7033980 err=0
+  YM   bid=52911.00 ask=52914.00 spread=3.0000 imb=-0.25 ofi1m=+0.00 trades=0 quotes=548543 err=0
+[RUN] 316.7min | chunks=631
+  MES  bid=7615.00 ask=7615.25 spread=0.2500 imb=-0.21 ofi1m=+0.00 trades=0 quotes=793910 err=0
+  MNQ  bid=30064.00 ask=30064.50 spread=0.5000 imb=+0.07 ofi1m=+0.00 trades=0 quotes=7041156 err=0
+  YM   bid=52917.00 ask=52919.00 spread=2.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=549111 err=0
+[RUN] 317.7min | chunks=633
+  MES  bid=7615.75 ask=7616.00 spread=0.2500 imb=-0.30 ofi1m=+0.00 trades=0 quotes=794388 err=0
+  MNQ  bid=30066.50 ask=30066.75 spread=0.2500 imb=+0.08 ofi1m=+0.00 trades=0 quotes=7046982 err=0
+  YM   bid=52928.00 ask=52930.00 spread=2.0000 imb=+0.29 ofi1m=+0.00 trades=0 quotes=549600 err=0
+[RUN] 318.7min | chunks=635
+  MES  bid=7615.50 ask=7615.75 spread=0.2500 imb=+0.01 ofi1m=+0.00 trades=0 quotes=794954 err=0
+  MNQ  bid=30062.75 ask=30063.00 spread=0.2500 imb=+0.07 ofi1m=+0.00 trades=0 quotes=7053532 err=0
+  YM   bid=52924.00 ask=52926.00 spread=2.0000 imb=+0.12 ofi1m=+0.00 trades=0 quotes=550076 err=0
+[RUN] 319.7min | chunks=637
+  MES  bid=7615.50 ask=7615.75 spread=0.2500 imb=+0.04 ofi1m=+0.00 trades=0 quotes=795392 err=0
+  MNQ  bid=30063.75 ask=30064.25 spread=0.5000 imb=+0.12 ofi1m=+0.00 trades=0 quotes=7059923 err=0
+  YM   bid=52922.00 ask=52924.00 spread=2.0000 imb=-0.12 ofi1m=+0.00 trades=0 quotes=550629 err=0
+[RUN] 320.7min | chunks=639
+  MES  bid=7616.00 ask=7616.25 spread=0.2500 imb=-0.09 ofi1m=+0.00 trades=0 quotes=795769 err=0
+  MNQ  bid=30068.00 ask=30068.25 spread=0.2500 imb=+0.20 ofi1m=+0.00 trades=0 quotes=7065160 err=0
+  YM   bid=52921.00 ask=52922.00 spread=1.0000 imb=-0.29 ofi1m=+0.00 trades=0 quotes=551039 err=0
+[RUN] 321.7min | chunks=641
+  MES  bid=7615.50 ask=7615.75 spread=0.2500 imb=-0.30 ofi1m=+0.00 trades=0 quotes=796348 err=0
+  MNQ  bid=30059.50 ask=30060.00 spread=0.5000 imb=-0.12 ofi1m=+0.00 trades=0 quotes=7072388 err=0
+  YM   bid=52921.00 ask=52923.00 spread=2.0000 imb=+0.05 ofi1m=+0.00 trades=0 quotes=551403 err=0
+[RUN] 322.7min | chunks=643
+  MES  bid=7616.25 ask=7616.50 spread=0.2500 imb=-0.33 ofi1m=+0.00 trades=0 quotes=796866 err=0
+  MNQ  bid=30063.25 ask=30063.75 spread=0.5000 imb=-0.08 ofi1m=+0.00 trades=0 quotes=7078818 err=0
+  YM   bid=52932.00 ask=52934.00 spread=2.0000 imb=-0.04 ofi1m=+0.00 trades=0 quotes=551944 err=0
+[RUN] 323.7min | chunks=645
+  MES  bid=7615.75 ask=7616.00 spread=0.2500 imb=-0.15 ofi1m=+0.00 trades=0 quotes=797459 err=0
+  MNQ  bid=30059.25 ask=30059.50 spread=0.2500 imb=-0.21 ofi1m=+0.00 trades=0 quotes=7084387 err=0
+  YM   bid=52929.00 ask=52931.00 spread=2.0000 imb=+0.35 ofi1m=+0.00 trades=0 quotes=552308 err=0
+[RUN] 324.7min | chunks=647
+  MES  bid=7615.25 ask=7615.50 spread=0.2500 imb=+0.16 ofi1m=+0.00 trades=0 quotes=798191 err=0
+  MNQ  bid=30051.75 ask=30052.00 spread=0.2500 imb=-0.26 ofi1m=+0.00 trades=0 quotes=7093322 err=0
+  YM   bid=52933.00 ask=52935.00 spread=2.0000 imb=-0.14 ofi1m=+0.00 trades=0 quotes=552665 err=0
+[RUN] 325.7min | chunks=649
+  MES  bid=7615.25 ask=7615.50 spread=0.2500 imb=+0.19 ofi1m=+0.00 trades=0 quotes=798905 err=0
+  MNQ  bid=30051.50 ask=30051.75 spread=0.2500 imb=+0.04 ofi1m=+0.00 trades=0 quotes=7101980 err=0
+  YM   bid=52932.00 ask=52934.00 spread=2.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=553305 err=0
+[RUN] 326.7min | chunks=651
+  MES  bid=7615.00 ask=7615.25 spread=0.2500 imb=-0.01 ofi1m=+0.00 trades=0 quotes=799496 err=0
+  MNQ  bid=30048.75 ask=30049.25 spread=0.5000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=7109400 err=0
+  YM   bid=52927.00 ask=52929.00 spread=2.0000 imb=+0.11 ofi1m=+0.00 trades=0 quotes=553723 err=0
+[RUN] 327.7min | chunks=653
+  MES  bid=7614.00 ask=7614.25 spread=0.2500 imb=-0.13 ofi1m=+0.00 trades=0 quotes=800037 err=0
+  MNQ  bid=30040.00 ask=30040.50 spread=0.5000 imb=-0.05 ofi1m=+0.00 trades=0 quotes=7117808 err=0
+  YM   bid=52920.00 ask=52923.00 spread=3.0000 imb=+0.19 ofi1m=+0.00 trades=0 quotes=554381 err=0
+[RUN] 328.7min | chunks=655
+  MES  bid=7612.50 ask=7612.75 spread=0.2500 imb=+0.02 ofi1m=+0.00 trades=0 quotes=800967 err=0
+  MNQ  bid=30033.00 ask=30033.25 spread=0.2500 imb=-0.17 ofi1m=+0.00 trades=0 quotes=7127684 err=0
+  YM   bid=52907.00 ask=52909.00 spread=2.0000 imb=-0.16 ofi1m=+0.00 trades=0 quotes=555049 err=0
+[RUN] 329.7min | chunks=657
+  MES  bid=7612.25 ask=7612.50 spread=0.2500 imb=+0.05 ofi1m=+0.00 trades=0 quotes=801965 err=0
+  MNQ  bid=30035.75 ask=30036.25 spread=0.5000 imb=-0.12 ofi1m=+0.00 trades=0 quotes=7138301 err=0
+  YM   bid=52904.00 ask=52906.00 spread=2.0000 imb=+0.31 ofi1m=+0.00 trades=0 quotes=555627 err=0
+[RUN] 330.7min | chunks=659
+  MES  bid=7613.75 ask=7614.00 spread=0.2500 imb=+0.07 ofi1m=+0.00 trades=0 quotes=803255 err=0
+  MNQ  bid=30044.75 ask=30045.25 spread=0.5000 imb=-0.26 ofi1m=+0.00 trades=0 quotes=7153103 err=0
+  YM   bid=52908.00 ask=52910.00 spread=2.0000 imb=+0.14 ofi1m=+0.00 trades=0 quotes=556487 err=0
+[RUN] 331.7min | chunks=661
+  MES  bid=7612.75 ask=7613.25 spread=0.5000 imb=+0.11 ofi1m=+0.00 trades=0 quotes=804000 err=0
+  MNQ  bid=30045.50 ask=30045.75 spread=0.2500 imb=+0.06 ofi1m=+0.00 trades=0 quotes=7163953 err=0
+  YM   bid=52898.00 ask=52898.00 spread=0.0000 imb=-0.24 ofi1m=+0.00 trades=0 quotes=557275 err=0
+[RUN] 332.7min | chunks=663
+  MES  bid=7613.25 ask=7613.50 spread=0.2500 imb=+0.15 ofi1m=+0.00 trades=0 quotes=805010 err=0
+  MNQ  bid=30048.50 ask=30049.00 spread=0.5000 imb=-0.21 ofi1m=+0.00 trades=0 quotes=7173923 err=0
+  YM   bid=52900.00 ask=52901.00 spread=1.0000 imb=+0.03 ofi1m=+0.00 trades=0 quotes=557935 err=0
+[RUN] 333.7min | chunks=665
+  MES  bid=7613.50 ask=7613.75 spread=0.2500 imb=+0.15 ofi1m=+0.00 trades=0 quotes=805974 err=0
+  MNQ  bid=30049.50 ask=30050.25 spread=0.7500 imb=+0.19 ofi1m=+0.00 trades=0 quotes=7183418 err=0
+  YM   bid=52896.00 ask=52899.00 spread=3.0000 imb=+0.12 ofi1m=+0.00 trades=0 quotes=558590 err=0
+[RUN] 334.7min | chunks=667
+  MES  bid=7613.25 ask=7613.50 spread=0.2500 imb=-0.05 ofi1m=+0.00 trades=0 quotes=806770 err=0
+  MNQ  bid=30048.25 ask=30048.50 spread=0.2500 imb=-0.12 ofi1m=+0.00 trades=0 quotes=7192064 err=0
+  YM   bid=52902.00 ask=52903.00 spread=1.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=559305 err=0
+[RUN] 335.7min | chunks=669
+  MES  bid=7614.75 ask=7615.00 spread=0.2500 imb=-0.12 ofi1m=+0.00 trades=0 quotes=807460 err=0
+  MNQ  bid=30058.25 ask=30058.50 spread=0.2500 imb=+0.18 ofi1m=+0.00 trades=0 quotes=7201986 err=0
+  YM   bid=52905.00 ask=52907.00 spread=2.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=560039 err=0
+[RUN] 336.7min | chunks=671
+  MES  bid=7615.25 ask=7615.50 spread=0.2500 imb=-0.11 ofi1m=+0.00 trades=0 quotes=808147 err=0
+  MNQ  bid=30057.50 ask=30057.75 spread=0.2500 imb=+0.08 ofi1m=+0.00 trades=0 quotes=7210512 err=0
+  YM   bid=52912.00 ask=52914.00 spread=2.0000 imb=-0.29 ofi1m=+0.00 trades=0 quotes=560606 err=0
+[RUN] 337.7min | chunks=673
+  MES  bid=7614.50 ask=7614.75 spread=0.2500 imb=+0.20 ofi1m=+0.00 trades=0 quotes=808861 err=0
+  MNQ  bid=30050.00 ask=30050.50 spread=0.5000 imb=+0.15 ofi1m=+0.00 trades=0 quotes=7219603 err=0
+  YM   bid=52906.00 ask=52908.00 spread=2.0000 imb=+0.39 ofi1m=+0.00 trades=0 quotes=561262 err=0
+[RUN] 338.7min | chunks=675
+  MES  bid=7614.25 ask=7614.50 spread=0.2500 imb=-0.08 ofi1m=+0.00 trades=0 quotes=809447 err=0
+  MNQ  bid=30048.75 ask=30049.25 spread=0.5000 imb=+0.26 ofi1m=+0.00 trades=0 quotes=7228029 err=0
+  YM   bid=52907.00 ask=52909.00 spread=2.0000 imb=-0.20 ofi1m=+0.00 trades=0 quotes=561642 err=0
+[RUN] 339.7min | chunks=677
+  MES  bid=7615.50 ask=7615.75 spread=0.2500 imb=-0.32 ofi1m=+0.00 trades=0 quotes=810067 err=0
+  MNQ  bid=30053.75 ask=30054.25 spread=0.5000 imb=-0.09 ofi1m=+0.00 trades=0 quotes=7236477 err=0
+  YM   bid=52919.00 ask=52921.00 spread=2.0000 imb=-0.24 ofi1m=+0.00 trades=0 quotes=562211 err=0
+[RUN] 340.7min | chunks=679
+  MES  bid=7616.50 ask=7616.75 spread=0.2500 imb=+0.23 ofi1m=+0.00 trades=0 quotes=811919 err=0
+  MNQ  bid=30059.00 ask=30059.25 spread=0.2500 imb=-0.27 ofi1m=+0.00 trades=0 quotes=7249047 err=0
+  YM   bid=52923.00 ask=52925.00 spread=2.0000 imb=+0.03 ofi1m=+0.00 trades=0 quotes=563763 err=0
+[RUN] 341.7min | chunks=681
+  MES  bid=7616.00 ask=7616.25 spread=0.2500 imb=+0.21 ofi1m=+0.00 trades=0 quotes=812819 err=0
+  MNQ  bid=30056.00 ask=30056.50 spread=0.5000 imb=+0.18 ofi1m=+0.00 trades=0 quotes=7257708 err=0
+  YM   bid=52919.00 ask=52922.00 spread=3.0000 imb=+0.03 ofi1m=+0.00 trades=0 quotes=564643 err=0
+[RUN] 342.7min | chunks=683
+  MES  bid=7616.00 ask=7616.25 spread=0.2500 imb=+0.32 ofi1m=+0.00 trades=0 quotes=813630 err=0
+  MNQ  bid=30055.00 ask=30055.50 spread=0.5000 imb=-0.23 ofi1m=+0.00 trades=0 quotes=7266632 err=0
+  YM   bid=52923.00 ask=52925.00 spread=2.0000 imb=-0.17 ofi1m=+0.00 trades=0 quotes=565259 err=0
+[RUN] 343.7min | chunks=685
+  MES  bid=7615.75 ask=7616.00 spread=0.2500 imb=+0.25 ofi1m=+0.00 trades=0 quotes=814583 err=0
+  MNQ  bid=30051.25 ask=30051.50 spread=0.2500 imb=+0.05 ofi1m=+0.00 trades=0 quotes=7274972 err=0
+  YM   bid=52921.00 ask=52923.00 spread=2.0000 imb=-0.20 ofi1m=+0.00 trades=0 quotes=565917 err=0
+[RUN] 344.7min | chunks=687
+  MES  bid=7616.00 ask=7616.25 spread=0.2500 imb=+0.00 ofi1m=+0.00 trades=0 quotes=815173 err=0
+  MNQ  bid=30050.50 ask=30051.00 spread=0.5000 imb=-0.15 ofi1m=+0.00 trades=0 quotes=7281212 err=0
+  YM   bid=52919.00 ask=52921.00 spread=2.0000 imb=-0.19 ofi1m=+0.00 trades=0 quotes=566364 err=0
+[RUN] 345.7min | chunks=689
+  MES  bid=7615.00 ask=7615.25 spread=0.2500 imb=-0.16 ofi1m=+0.00 trades=0 quotes=816206 err=0
+  MNQ  bid=30041.75 ask=30042.25 spread=0.5000 imb=+0.06 ofi1m=+0.00 trades=0 quotes=7290639 err=0
+  YM   bid=52920.00 ask=52924.00 spread=4.0000 imb=-0.12 ofi1m=+0.00 trades=0 quotes=566986 err=0
+[RUN] 346.8min | chunks=691
+  MES  bid=7615.00 ask=7615.25 spread=0.2500 imb=-0.01 ofi1m=+0.00 trades=0 quotes=817017 err=0
+  MNQ  bid=30039.50 ask=30039.75 spread=0.2500 imb=+0.21 ofi1m=+0.00 trades=0 quotes=7301383 err=0
+  YM   bid=52917.00 ask=52919.00 spread=2.0000 imb=-0.05 ofi1m=+0.00 trades=0 quotes=567550 err=0
+[RUN] 347.8min | chunks=693
+  MES  bid=7615.25 ask=7615.50 spread=0.2500 imb=-0.08 ofi1m=+0.00 trades=0 quotes=817773 err=0
+  MNQ  bid=30037.50 ask=30037.75 spread=0.2500 imb=-0.17 ofi1m=+0.00 trades=0 quotes=7310118 err=0
+  YM   bid=52917.00 ask=52919.00 spread=2.0000 imb=-0.06 ofi1m=+0.00 trades=0 quotes=568025 err=0
+[RUN] 348.8min | chunks=695
+  MES  bid=7614.75 ask=7615.00 spread=0.2500 imb=-0.01 ofi1m=+0.00 trades=0 quotes=818483 err=0
+  MNQ  bid=30030.25 ask=30030.75 spread=0.5000 imb=-0.26 ofi1m=+0.00 trades=0 quotes=7322034 err=0
+  YM   bid=52919.00 ask=52920.00 spread=1.0000 imb=+0.18 ofi1m=+0.00 trades=0 quotes=568616 err=0
+[RUN] 349.8min | chunks=697
+  MES  bid=7615.25 ask=7615.50 spread=0.2500 imb=+0.04 ofi1m=+0.00 trades=0 quotes=819283 err=0
+  MNQ  bid=30037.25 ask=30037.50 spread=0.2500 imb=+0.07 ofi1m=+0.00 trades=0 quotes=7332423 err=0
+  YM   bid=52920.00 ask=52922.00 spread=2.0000 imb=+0.02 ofi1m=+0.00 trades=0 quotes=569422 err=0
+[RUN] 350.8min | chunks=699
+  MES  bid=7614.50 ask=7614.75 spread=0.2500 imb=+0.04 ofi1m=+0.00 trades=0 quotes=820150 err=0
+  MNQ  bid=30030.25 ask=30030.75 spread=0.5000 imb=-0.16 ofi1m=+0.00 trades=0 quotes=7342931 err=0
+  YM   bid=52921.00 ask=52923.00 spread=2.0000 imb=-0.10 ofi1m=+0.00 trades=0 quotes=569941 err=0
+[RUN] 351.8min | chunks=701
+  MES  bid=7614.50 ask=7614.75 spread=0.2500 imb=+0.01 ofi1m=+0.00 trades=0 quotes=820721 err=0
+  MNQ  bid=30029.25 ask=30029.50 spread=0.2500 imb=-0.24 ofi1m=+0.00 trades=0 quotes=7350803 err=0
+  YM   bid=52923.00 ask=52925.00 spread=2.0000 imb=+0.05 ofi1m=+0.00 trades=0 quotes=570505 err=0
+[RUN] 352.8min | chunks=703
+  MES  bid=7615.25 ask=7615.50 spread=0.2500 imb=+0.15 ofi1m=+0.00 trades=0 quotes=821340 err=0
+  MNQ  bid=30035.25 ask=30035.75 spread=0.5000 imb=-0.13 ofi1m=+0.00 trades=0 quotes=7360652 err=0
+  YM   bid=52924.00 ask=52926.00 spread=2.0000 imb=+0.18 ofi1m=+0.00 trades=0 quotes=571084 err=0
+[RUN] 353.8min | chunks=705
+  MES  bid=7615.50 ask=7615.75 spread=0.2500 imb=-0.12 ofi1m=+0.00 trades=0 quotes=822141 err=0
+  MNQ  bid=30038.00 ask=30038.25 spread=0.2500 imb=-0.05 ofi1m=+0.00 trades=0 quotes=7370338 err=0
+  YM   bid=52924.00 ask=52926.00 spread=2.0000 imb=+0.16 ofi1m=+0.00 trades=0 quotes=571545 err=0
+[RUN] 354.8min | chunks=707
+  MES  bid=7616.00 ask=7616.25 spread=0.2500 imb=+0.05 ofi1m=+0.00 trades=0 quotes=822938 err=0
+  MNQ  bid=30047.25 ask=30047.50 spread=0.2500 imb=-0.22 ofi1m=+0.00 trades=0 quotes=7380055 err=0
+  YM   bid=52927.00 ask=52930.00 spread=3.0000 imb=-0.12 ofi1m=+0.00 trades=0 quotes=572231 err=0
+[RUN] 355.8min | chunks=709
+  MES  bid=7617.00 ask=7617.75 spread=0.7500 imb=+0.17 ofi1m=+0.00 trades=0 quotes=824577 err=0
+  MNQ  bid=30058.00 ask=30058.50 spread=0.5000 imb=+0.21 ofi1m=+0.00 trades=0 quotes=7391892 err=0
+  YM   bid=52930.00 ask=52932.00 spread=2.0000 imb=-0.06 ofi1m=+0.00 trades=0 quotes=573453 err=0
+[RUN] 356.8min | chunks=711
+  MES  bid=7617.00 ask=7617.50 spread=0.5000 imb=-0.17 ofi1m=+0.00 trades=0 quotes=825440 err=0
+  MNQ  bid=30053.25 ask=30053.75 spread=0.5000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=7400929 err=0
+  YM   bid=52926.00 ask=52930.00 spread=4.0000 imb=+0.21 ofi1m=+0.00 trades=0 quotes=574118 err=0
+[IB ERROR] reqId=-1 symbol=GLOBAL code=2103 msg=La connexion de données de marché est rompue:hfarm
+[RUN] 357.8min | chunks=713
+  MES  bid=7617.50 ask=7617.75 spread=0.2500 imb=-0.06 ofi1m=+0.00 trades=0 quotes=826228 err=0
+  MNQ  bid=30051.25 ask=30051.50 spread=0.2500 imb=+0.23 ofi1m=+0.00 trades=0 quotes=7409184 err=0
+  YM   bid=52933.00 ask=52935.00 spread=2.0000 imb=+0.03 ofi1m=+0.00 trades=0 quotes=574670 err=0
+[RUN] 358.8min | chunks=715
+  MES  bid=7617.00 ask=7617.25 spread=0.2500 imb=-0.22 ofi1m=+0.00 trades=0 quotes=827071 err=0
+  MNQ  bid=30044.75 ask=30045.25 spread=0.5000 imb=-0.06 ofi1m=+0.00 trades=0 quotes=7417888 err=0
+  YM   bid=52933.00 ask=52935.00 spread=2.0000 imb=+0.03 ofi1m=+0.00 trades=0 quotes=575272 err=0
+[RUN] 359.8min | chunks=717
+  MES  bid=7617.25 ask=7617.50 spread=0.2500 imb=+0.12 ofi1m=+0.00 trades=0 quotes=827780 err=0
+  MNQ  bid=30045.50 ask=30046.25 spread=0.7500 imb=-0.07 ofi1m=+0.00 trades=0 quotes=7425767 err=0
+  YM   bid=52938.00 ask=52941.00 spread=3.0000 imb=-0.14 ofi1m=+0.00 trades=0 quotes=575910 err=0
+[RUN] 360.8min | chunks=719
+  MES  bid=7618.25 ask=7618.50 spread=0.2500 imb=-0.11 ofi1m=+0.00 trades=0 quotes=828691 err=0
+  MNQ  bid=30047.75 ask=30048.00 spread=0.2500 imb=+0.24 ofi1m=+0.00 trades=0 quotes=7435188 err=0
+  YM   bid=52951.00 ask=52953.00 spread=2.0000 imb=+0.05 ofi1m=+0.00 trades=0 quotes=576643 err=0
+[RUN] 361.8min | chunks=721
+  MES  bid=7618.00 ask=7618.25 spread=0.2500 imb=-0.03 ofi1m=+0.00 trades=0 quotes=829450 err=0
+  MNQ  bid=30047.50 ask=30048.25 spread=0.7500 imb=+0.11 ofi1m=+0.00 trades=0 quotes=7443149 err=0
+  YM   bid=52942.00 ask=52944.00 spread=2.0000 imb=-0.28 ofi1m=+0.00 trades=0 quotes=577315 err=0
+[RUN] 362.8min | chunks=723
+  MES  bid=7617.00 ask=7617.25 spread=0.2500 imb=+0.00 ofi1m=+0.00 trades=0 quotes=830201 err=0
+  MNQ  bid=30041.00 ask=30041.50 spread=0.5000 imb=+0.09 ofi1m=+0.00 trades=0 quotes=7450816 err=0
+  YM   bid=52935.00 ask=52937.00 spread=2.0000 imb=-0.07 ofi1m=+0.00 trades=0 quotes=577861 err=0
+[RUN] 363.8min | chunks=725
+  MES  bid=7618.50 ask=7618.75 spread=0.2500 imb=-0.18 ofi1m=+0.00 trades=0 quotes=830975 err=0
+  MNQ  bid=30053.25 ask=30053.75 spread=0.5000 imb=-0.01 ofi1m=+0.00 trades=0 quotes=7459265 err=0
+  YM   bid=52942.00 ask=52944.00 spread=2.0000 imb=+0.14 ofi1m=+0.00 trades=0 quotes=578310 err=0
+[RUN] 364.8min | chunks=727
+  MES  bid=7618.50 ask=7618.75 spread=0.2500 imb=-0.38 ofi1m=+0.00 trades=0 quotes=831585 err=0
+  MNQ  bid=30055.00 ask=30055.25 spread=0.2500 imb=+0.00 ofi1m=+0.00 trades=0 quotes=7466666 err=0
+  YM   bid=52935.00 ask=52937.00 spread=2.0000 imb=-0.03 ofi1m=+0.00 trades=0 quotes=578789 err=0
+[RUN] 365.8min | chunks=729
+  MES  bid=7618.25 ask=7618.50 spread=0.2500 imb=-0.23 ofi1m=+0.00 trades=0 quotes=832354 err=0
+  MNQ  bid=30048.75 ask=30049.00 spread=0.2500 imb=+0.23 ofi1m=+0.00 trades=0 quotes=7474354 err=0
+  YM   bid=52940.00 ask=52942.00 spread=2.0000 imb=+0.11 ofi1m=+0.00 trades=0 quotes=579408 err=0
+[RUN] 366.8min | chunks=731
+  MES  bid=7617.75 ask=7618.00 spread=0.2500 imb=-0.04 ofi1m=+0.00 trades=0 quotes=832978 err=0
+  MNQ  bid=30044.25 ask=30044.75 spread=0.5000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=7481674 err=0
+  YM   bid=52937.00 ask=52939.00 spread=2.0000 imb=-0.02 ofi1m=+0.00 trades=0 quotes=579874 err=0
+[IB ERROR] reqId=-1 symbol=GLOBAL code=2103 msg=La connexion de données de marché est rompue:jfarm
+[RUN] 367.8min | chunks=733
+  MES  bid=7617.00 ask=7617.25 spread=0.2500 imb=+0.03 ofi1m=+0.00 trades=0 quotes=833586 err=0
+  MNQ  bid=30037.00 ask=30037.50 spread=0.5000 imb=-0.18 ofi1m=+0.00 trades=0 quotes=7490380 err=0
+  YM   bid=52932.00 ask=52936.00 spread=4.0000 imb=+0.06 ofi1m=+0.00 trades=0 quotes=580327 err=0
+[RUN] 368.8min | chunks=735
+  MES  bid=7616.75 ask=7617.00 spread=0.2500 imb=-0.03 ofi1m=+0.00 trades=0 quotes=834347 err=0
+  MNQ  bid=30035.00 ask=30035.25 spread=0.2500 imb=-0.23 ofi1m=+0.00 trades=0 quotes=7498541 err=0
+  YM   bid=52929.00 ask=52932.00 spread=3.0000 imb=+0.03 ofi1m=+0.00 trades=0 quotes=580839 err=0
+[RUN] 369.8min | chunks=737
+  MES  bid=7617.25 ask=7617.50 spread=0.2500 imb=+0.03 ofi1m=+0.00 trades=0 quotes=835132 err=0
+  MNQ  bid=30040.25 ask=30040.50 spread=0.2500 imb=+0.13 ofi1m=+0.00 trades=0 quotes=7506743 err=0
+  YM   bid=52935.00 ask=52937.00 spread=2.0000 imb=+0.21 ofi1m=+0.00 trades=0 quotes=581423 err=0
+[RUN] 370.8min | chunks=739
+  MES  bid=7618.50 ask=7618.75 spread=0.2500 imb=-0.17 ofi1m=+0.00 trades=0 quotes=835770 err=0
+  MNQ  bid=30046.25 ask=30046.75 spread=0.5000 imb=-0.14 ofi1m=+0.00 trades=0 quotes=7514119 err=0
+  YM   bid=52946.00 ask=52948.00 spread=2.0000 imb=+0.04 ofi1m=+0.00 trades=0 quotes=581934 err=0
+[RUN] 371.8min | chunks=741
+  MES  bid=7618.50 ask=7618.75 spread=0.2500 imb=-0.20 ofi1m=+0.00 trades=0 quotes=836487 err=0
+  MNQ  bid=30046.50 ask=30046.75 spread=0.2500 imb=-0.16 ofi1m=+0.00 trades=0 quotes=7521257 err=0
+  YM   bid=52946.00 ask=52948.00 spread=2.0000 imb=-0.12 ofi1m=+0.00 trades=0 quotes=582403 err=0
+[RUN] 372.8min | chunks=743
+  MES  bid=7619.00 ask=7619.25 spread=0.2500 imb=-0.30 ofi1m=+0.00 trades=0 quotes=837062 err=0
+  MNQ  bid=30045.75 ask=30046.50 spread=0.7500 imb=-0.09 ofi1m=+0.00 trades=0 quotes=7528511 err=0
+  YM   bid=52949.00 ask=52951.00 spread=2.0000 imb=-0.02 ofi1m=+0.00 trades=0 quotes=582889 err=0
+[RUN] 373.8min | chunks=745
+  MES  bid=7618.25 ask=7618.50 spread=0.2500 imb=+0.10 ofi1m=+0.00 trades=0 quotes=837784 err=0
+  MNQ  bid=30039.00 ask=30039.25 spread=0.2500 imb=-0.10 ofi1m=+0.00 trades=0 quotes=7536371 err=0
+  YM   bid=52945.00 ask=52946.00 spread=1.0000 imb=+0.06 ofi1m=+0.00 trades=0 quotes=583437 err=0
+[RUN] 374.8min | chunks=747
+  MES  bid=7618.25 ask=7618.50 spread=0.2500 imb=+0.01 ofi1m=+0.00 trades=0 quotes=838297 err=0
+  MNQ  bid=30038.25 ask=30038.75 spread=0.5000 imb=-0.03 ofi1m=+0.00 trades=0 quotes=7543138 err=0
+  YM   bid=52947.00 ask=52949.00 spread=2.0000 imb=-0.26 ofi1m=+0.00 trades=0 quotes=583917 err=0
+[IB ERROR] reqId=-1 symbol=GLOBAL code=2103 msg=La connexion de données de marché est rompue:afarm
+[RUN] 375.8min | chunks=749
+  MES  bid=7618.25 ask=7618.50 spread=0.2500 imb=+0.03 ofi1m=+0.00 trades=0 quotes=838929 err=0
+  MNQ  bid=30036.25 ask=30037.00 spread=0.7500 imb=+0.12 ofi1m=+0.00 trades=0 quotes=7550261 err=0
+  YM   bid=52948.00 ask=52951.00 spread=3.0000 imb=-0.03 ofi1m=+0.00 trades=0 quotes=584393 err=0
+[RUN] 376.8min | chunks=751
+  MES  bid=7618.75 ask=7619.00 spread=0.2500 imb=-0.18 ofi1m=+0.00 trades=0 quotes=839566 err=0
+  MNQ  bid=30041.50 ask=30041.75 spread=0.2500 imb=-0.30 ofi1m=+0.00 trades=0 quotes=7558218 err=0
+  YM   bid=52946.00 ask=52949.00 spread=3.0000 imb=-0.28 ofi1m=+0.00 trades=0 quotes=584864 err=0
+[RUN] 377.8min | chunks=753
+  MES  bid=7618.75 ask=7619.00 spread=0.2500 imb=-0.15 ofi1m=+0.00 trades=0 quotes=840274 err=0
+  MNQ  bid=30034.75 ask=30035.25 spread=0.5000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=7565727 err=0
+  YM   bid=52950.00 ask=52952.00 spread=2.0000 imb=-0.16 ofi1m=+0.00 trades=0 quotes=585286 err=0
+[RUN] 378.8min | chunks=755
+  MES  bid=7618.50 ask=7618.75 spread=0.2500 imb=-0.05 ofi1m=+0.00 trades=0 quotes=840688 err=0
+  MNQ  bid=30031.75 ask=30032.25 spread=0.5000 imb=+0.30 ofi1m=+0.00 trades=0 quotes=7572154 err=0
+  YM   bid=52949.00 ask=52951.00 spread=2.0000 imb=+0.07 ofi1m=+0.00 trades=0 quotes=585633 err=0
+[RUN] 379.8min | chunks=757
+  MES  bid=7618.50 ask=7619.00 spread=0.5000 imb=-0.10 ofi1m=+0.00 trades=0 quotes=841305 err=0
+  MNQ  bid=30032.25 ask=30032.75 spread=0.5000 imb=-0.24 ofi1m=+0.00 trades=0 quotes=7579323 err=0
+  YM   bid=52945.00 ask=52948.00 spread=3.0000 imb=-0.24 ofi1m=+0.00 trades=0 quotes=586066 err=0
+[RUN] 380.8min | chunks=759
+  MES  bid=7618.25 ask=7618.50 spread=0.2500 imb=-0.27 ofi1m=+0.00 trades=0 quotes=842226 err=0
+  MNQ  bid=30032.50 ask=30033.00 spread=0.5000 imb=+0.02 ofi1m=+0.00 trades=0 quotes=7588131 err=0
+  YM   bid=52943.00 ask=52943.00 spread=0.0000 imb=-0.07 ofi1m=+0.00 trades=0 quotes=586547 err=0
+[RUN] 381.8min | chunks=761
+  MES  bid=7618.25 ask=7618.50 spread=0.2500 imb=+0.02 ofi1m=+0.00 trades=0 quotes=842930 err=0
+  MNQ  bid=30039.00 ask=30039.25 spread=0.2500 imb=+0.19 ofi1m=+0.00 trades=0 quotes=7596654 err=0
+  YM   bid=52932.00 ask=52934.00 spread=2.0000 imb=-0.13 ofi1m=+0.00 trades=0 quotes=586992 err=0
+[RUN] 382.8min | chunks=763
+  MES  bid=7619.25 ask=7619.50 spread=0.2500 imb=-0.18 ofi1m=+0.00 trades=0 quotes=843459 err=0
+  MNQ  bid=30042.75 ask=30043.00 spread=0.2500 imb=-0.18 ofi1m=+0.00 trades=0 quotes=7604373 err=0
+  YM   bid=52941.00 ask=52943.00 spread=2.0000 imb=-0.13 ofi1m=+0.00 trades=0 quotes=587405 err=0
+[RUN] 383.8min | chunks=765
+  MES  bid=7619.00 ask=7619.25 spread=0.2500 imb=-0.21 ofi1m=+0.00 trades=0 quotes=844137 err=0
+  MNQ  bid=30041.25 ask=30041.50 spread=0.2500 imb=-0.25 ofi1m=+0.00 trades=0 quotes=7611208 err=0
+  YM   bid=52938.00 ask=52940.00 spread=2.0000 imb=+0.11 ofi1m=+0.00 trades=0 quotes=587799 err=0
+[RUN] 384.8min | chunks=767
+  MES  bid=7619.25 ask=7619.50 spread=0.2500 imb=-0.54 ofi1m=+0.00 trades=0 quotes=844639 err=0
+  MNQ  bid=30036.00 ask=30036.50 spread=0.5000 imb=-0.13 ofi1m=+0.00 trades=0 quotes=7618242 err=0
+  YM   bid=52944.00 ask=52946.00 spread=2.0000 imb=-0.08 ofi1m=+0.00 trades=0 quotes=588207 err=0
+[RUN] 385.8min | chunks=769
+  MES  bid=7619.50 ask=7619.75 spread=0.2500 imb=-0.44 ofi1m=+0.00 trades=0 quotes=845199 err=0
+  MNQ  bid=30042.00 ask=30042.25 spread=0.2500 imb=+0.08 ofi1m=+0.00 trades=0 quotes=7625699 err=0
+  YM   bid=52940.00 ask=52942.00 spread=2.0000 imb=-0.29 ofi1m=+0.00 trades=0 quotes=588598 err=0
+[RUN] 386.8min | chunks=771
+  MES  bid=7619.25 ask=7619.50 spread=0.2500 imb=-0.16 ofi1m=+0.00 trades=0 quotes=845807 err=0
+  MNQ  bid=30037.50 ask=30037.75 spread=0.2500 imb=+0.14 ofi1m=+0.00 trades=0 quotes=7634607 err=0
+  YM   bid=52944.00 ask=52946.00 spread=2.0000 imb=+0.20 ofi1m=+0.00 trades=0 quotes=589220 err=0
+[RUN] 387.8min | chunks=773
+  MES  bid=7619.25 ask=7619.50 spread=0.2500 imb=-0.16 ofi1m=+0.00 trades=0 quotes=846253 err=0
+  MNQ  bid=30039.50 ask=30039.75 spread=0.2500 imb=-0.39 ofi1m=+0.00 trades=0 quotes=7640826 err=0
+  YM   bid=52947.00 ask=52950.00 spread=3.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=589586 err=0
+[RUN] 388.8min | chunks=775
+  MES  bid=7618.50 ask=7618.75 spread=0.2500 imb=+0.05 ofi1m=+0.00 trades=0 quotes=846927 err=0
+  MNQ  bid=30037.75 ask=30038.25 spread=0.5000 imb=-0.20 ofi1m=+0.00 trades=0 quotes=7648563 err=0
+  YM   bid=52941.00 ask=52941.00 spread=0.0000 imb=-0.17 ofi1m=+0.00 trades=0 quotes=590185 err=0
+[RUN] 389.9min | chunks=777
+  MES  bid=7618.75 ask=7619.00 spread=0.2500 imb=-0.25 ofi1m=+0.00 trades=0 quotes=847534 err=0
+  MNQ  bid=30039.00 ask=30039.25 spread=0.2500 imb=+0.06 ofi1m=+0.00 trades=0 quotes=7656532 err=0
+  YM   bid=52943.00 ask=52945.00 spread=2.0000 imb=+0.06 ofi1m=+0.00 trades=0 quotes=590879 err=0
+[RUN] 390.9min | chunks=779
+  MES  bid=7619.00 ask=7619.25 spread=0.2500 imb=-0.07 ofi1m=+0.00 trades=0 quotes=848114 err=0
+  MNQ  bid=30040.00 ask=30040.50 spread=0.5000 imb=+0.22 ofi1m=+0.00 trades=0 quotes=7665394 err=0
+  YM   bid=52945.00 ask=52947.00 spread=2.0000 imb=+0.18 ofi1m=+0.00 trades=0 quotes=591562 err=0
+[RUN] 391.9min | chunks=781
+  MES  bid=7619.50 ask=7619.75 spread=0.2500 imb=+0.04 ofi1m=+0.00 trades=0 quotes=848646 err=0
+  MNQ  bid=30050.00 ask=30050.25 spread=0.2500 imb=-0.12 ofi1m=+0.00 trades=0 quotes=7674124 err=0
+  YM   bid=52940.00 ask=52943.00 spread=3.0000 imb=-0.09 ofi1m=+0.00 trades=0 quotes=592268 err=0
+[RUN] 392.9min | chunks=783
+  MES  bid=7620.25 ask=7620.50 spread=0.2500 imb=-0.41 ofi1m=+0.00 trades=0 quotes=849246 err=0
+  MNQ  bid=30050.50 ask=30051.25 spread=0.7500 imb=+0.04 ofi1m=+0.00 trades=0 quotes=7680802 err=0
+  YM   bid=52944.00 ask=52946.00 spread=2.0000 imb=+0.20 ofi1m=+0.00 trades=0 quotes=592835 err=0
+[RUN] 393.9min | chunks=785
+  MES  bid=7623.50 ask=7623.75 spread=0.2500 imb=-0.25 ofi1m=+0.00 trades=0 quotes=850702 err=0
+  MNQ  bid=30071.50 ask=30071.75 spread=0.2500 imb=-0.44 ofi1m=+0.00 trades=0 quotes=7694248 err=0
+  YM   bid=52954.00 ask=52956.00 spread=2.0000 imb=+0.12 ofi1m=+0.00 trades=0 quotes=594059 err=0
+[RUN] 394.9min | chunks=787
+  MES  bid=7623.25 ask=7623.50 spread=0.2500 imb=+0.22 ofi1m=+0.00 trades=0 quotes=851841 err=0
+  MNQ  bid=30069.25 ask=30069.50 spread=0.2500 imb=+0.23 ofi1m=+0.00 trades=0 quotes=7705093 err=0
+  YM   bid=52957.00 ask=52959.00 spread=2.0000 imb=+0.11 ofi1m=+0.00 trades=0 quotes=595049 err=0
+[RUN] 395.9min | chunks=789
+  MES  bid=7624.50 ask=7624.75 spread=0.2500 imb=+0.03 ofi1m=+0.00 trades=0 quotes=852678 err=0
+  MNQ  bid=30067.00 ask=30067.50 spread=0.5000 imb=+0.06 ofi1m=+0.00 trades=0 quotes=7714743 err=0
+  YM   bid=52965.00 ask=52968.00 spread=3.0000 imb=-0.13 ofi1m=+0.00 trades=0 quotes=595746 err=0
+[RUN] 396.9min | chunks=791
+  MES  bid=7623.75 ask=7624.00 spread=0.2500 imb=-0.23 ofi1m=+0.00 trades=0 quotes=853600 err=0
+  MNQ  bid=30063.75 ask=30064.50 spread=0.7500 imb=-0.01 ofi1m=+0.00 trades=0 quotes=7724547 err=0
+  YM   bid=52963.00 ask=52964.00 spread=1.0000 imb=-0.22 ofi1m=+0.00 trades=0 quotes=596528 err=0
+[RUN] 397.9min | chunks=793
+  MES  bid=7622.75 ask=7623.00 spread=0.2500 imb=+0.26 ofi1m=+0.00 trades=0 quotes=854327 err=0
+  MNQ  bid=30059.50 ask=30060.00 spread=0.5000 imb=+0.06 ofi1m=+0.00 trades=0 quotes=7731193 err=0
+  YM   bid=52960.00 ask=52962.00 spread=2.0000 imb=+0.18 ofi1m=+0.00 trades=0 quotes=597028 err=0
+[RUN] 398.9min | chunks=795
+  MES  bid=7622.75 ask=7623.00 spread=0.2500 imb=+0.29 ofi1m=+0.00 trades=0 quotes=855139 err=0
+  MNQ  bid=30054.50 ask=30055.00 spread=0.5000 imb=+0.02 ofi1m=+0.00 trades=0 quotes=7739270 err=0
+  YM   bid=52968.00 ask=52968.00 spread=0.0000 imb=+0.10 ofi1m=+0.00 trades=0 quotes=597627 err=0
+[RUN] 399.9min | chunks=797
+  MES  bid=7623.00 ask=7623.25 spread=0.2500 imb=+0.07 ofi1m=+0.00 trades=0 quotes=855831 err=0
+  MNQ  bid=30051.25 ask=30051.75 spread=0.5000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=7747772 err=0
+  YM   bid=52973.00 ask=52975.00 spread=2.0000 imb=-0.27 ofi1m=+0.00 trades=0 quotes=598292 err=0
+[RUN] 400.9min | chunks=799
+  MES  bid=7623.25 ask=7623.50 spread=0.2500 imb=+0.21 ofi1m=+0.00 trades=0 quotes=856697 err=0
+  MNQ  bid=30051.00 ask=30051.50 spread=0.5000 imb=+0.01 ofi1m=+0.00 trades=0 quotes=7756704 err=0
+  YM   bid=52975.00 ask=52976.00 spread=1.0000 imb=+0.14 ofi1m=+0.00 trades=0 quotes=598926 err=0
+[RUN] 401.9min | chunks=801
+  MES  bid=7623.25 ask=7623.50 spread=0.2500 imb=+0.28 ofi1m=+0.00 trades=0 quotes=857378 err=0
+  MNQ  bid=30043.75 ask=30044.00 spread=0.2500 imb=+0.05 ofi1m=+0.00 trades=0 quotes=7764842 err=0
+  YM   bid=52977.00 ask=52980.00 spread=3.0000 imb=+0.05 ofi1m=+0.00 trades=0 quotes=599484 err=0
+[RUN] 402.9min | chunks=803
+  MES  bid=7624.50 ask=7624.75 spread=0.2500 imb=-0.30 ofi1m=+0.00 trades=0 quotes=858217 err=0
+  MNQ  bid=30052.25 ask=30052.75 spread=0.5000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=7774234 err=0
+  YM   bid=52984.00 ask=52985.00 spread=1.0000 imb=+0.05 ofi1m=+0.00 trades=0 quotes=600149 err=0
+[RUN] 403.9min | chunks=805
+  MES  bid=7624.50 ask=7624.75 spread=0.2500 imb=-0.24 ofi1m=+0.00 trades=0 quotes=858896 err=0
+  MNQ  bid=30055.50 ask=30056.00 spread=0.5000 imb=+0.16 ofi1m=+0.00 trades=0 quotes=7781843 err=0
+  YM   bid=52981.00 ask=52983.00 spread=2.0000 imb=-0.02 ofi1m=+0.00 trades=0 quotes=600577 err=0
+[RUN] 404.9min | chunks=807
+  MES  bid=7624.25 ask=7624.50 spread=0.2500 imb=-0.19 ofi1m=+0.00 trades=0 quotes=859276 err=0
+  MNQ  bid=30057.00 ask=30057.25 spread=0.2500 imb=+0.08 ofi1m=+0.00 trades=0 quotes=7789231 err=0
+  YM   bid=52971.00 ask=52973.00 spread=2.0000 imb=-0.27 ofi1m=+0.00 trades=0 quotes=601036 err=0
+[RUN] 405.9min | chunks=809
+  MES  bid=7624.00 ask=7624.25 spread=0.2500 imb=-0.29 ofi1m=+0.00 trades=0 quotes=859920 err=0
+  MNQ  bid=30056.00 ask=30056.25 spread=0.2500 imb=+0.13 ofi1m=+0.00 trades=0 quotes=7797134 err=0
+  YM   bid=52966.00 ask=52968.00 spread=2.0000 imb=+0.17 ofi1m=+0.00 trades=0 quotes=601692 err=0
+[RUN] 406.9min | chunks=811
+  MES  bid=7623.75 ask=7624.00 spread=0.2500 imb=+0.24 ofi1m=+0.00 trades=0 quotes=860539 err=0
+  MNQ  bid=30048.50 ask=30049.00 spread=0.5000 imb=+0.02 ofi1m=+0.00 trades=0 quotes=7805231 err=0
+  YM   bid=52974.00 ask=52976.00 spread=2.0000 imb=-0.10 ofi1m=+0.00 trades=0 quotes=602335 err=0
+[RUN] 407.9min | chunks=813
+  MES  bid=7623.50 ask=7623.75 spread=0.2500 imb=-0.03 ofi1m=+0.00 trades=0 quotes=861303 err=0
+  MNQ  bid=30045.25 ask=30046.00 spread=0.7500 imb=-0.04 ofi1m=+0.00 trades=0 quotes=7816426 err=0
+  YM   bid=52969.00 ask=52970.00 spread=1.0000 imb=-0.12 ofi1m=+0.00 trades=0 quotes=602931 err=0
+[RUN] 408.9min | chunks=815
+  MES  bid=7623.75 ask=7624.00 spread=0.2500 imb=-0.21 ofi1m=+0.00 trades=0 quotes=861793 err=0
+  MNQ  bid=30051.75 ask=30052.00 spread=0.2500 imb=+0.42 ofi1m=+0.00 trades=0 quotes=7824582 err=0
+  YM   bid=52966.00 ask=52968.00 spread=2.0000 imb=-0.14 ofi1m=+0.00 trades=0 quotes=603444 err=0
+[RUN] 409.9min | chunks=817
+  MES  bid=7623.25 ask=7624.00 spread=0.7500 imb=-0.12 ofi1m=+0.00 trades=0 quotes=862458 err=0
+  MNQ  bid=30048.25 ask=30048.75 spread=0.5000 imb=-0.11 ofi1m=+0.00 trades=0 quotes=7831915 err=0
+  YM   bid=52966.00 ask=52969.00 spread=3.0000 imb=+0.23 ofi1m=+0.00 trades=0 quotes=604013 err=0
+[RUN] 410.9min | chunks=819
+  MES  bid=7622.50 ask=7622.75 spread=0.2500 imb=+0.22 ofi1m=+0.00 trades=0 quotes=863225 err=0
+  MNQ  bid=30042.25 ask=30043.00 spread=0.7500 imb=+0.08 ofi1m=+0.00 trades=0 quotes=7840631 err=0
+  YM   bid=52965.00 ask=52967.00 spread=2.0000 imb=-0.02 ofi1m=+0.00 trades=0 quotes=604733 err=0
+[RUN] 411.9min | chunks=821
+  MES  bid=7623.25 ask=7623.50 spread=0.2500 imb=+0.00 ofi1m=+0.00 trades=0 quotes=863873 err=0
+  MNQ  bid=30049.75 ask=30050.00 spread=0.2500 imb=-0.03 ofi1m=+0.00 trades=0 quotes=7848755 err=0
+  YM   bid=52965.00 ask=52967.00 spread=2.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=605239 err=0
+[RUN] 412.9min | chunks=823
+  MES  bid=7622.50 ask=7622.75 spread=0.2500 imb=+0.34 ofi1m=+0.00 trades=0 quotes=864931 err=0
+  MNQ  bid=30044.25 ask=30044.75 spread=0.5000 imb=-0.22 ofi1m=+0.00 trades=0 quotes=7856709 err=0
+  YM   bid=52963.00 ask=52965.00 spread=2.0000 imb=+0.08 ofi1m=+0.00 trades=0 quotes=605814 err=0
+[RUN] 413.9min | chunks=825
+  MES  bid=7622.75 ask=7623.00 spread=0.2500 imb=+0.06 ofi1m=+0.00 trades=0 quotes=865541 err=0
+  MNQ  bid=30041.50 ask=30041.75 spread=0.2500 imb=+0.20 ofi1m=+0.00 trades=0 quotes=7864042 err=0
+  YM   bid=52969.00 ask=52971.00 spread=2.0000 imb=-0.02 ofi1m=+0.00 trades=0 quotes=606403 err=0
+[RUN] 414.9min | chunks=827
+  MES  bid=7623.00 ask=7623.25 spread=0.2500 imb=-0.07 ofi1m=+0.00 trades=0 quotes=866097 err=0
+  MNQ  bid=30038.00 ask=30038.25 spread=0.2500 imb=+0.25 ofi1m=+0.00 trades=0 quotes=7871068 err=0
+  YM   bid=52975.00 ask=52977.00 spread=2.0000 imb=+0.09 ofi1m=+0.00 trades=0 quotes=606927 err=0
+[RUN] 415.9min | chunks=829
+  MES  bid=7623.25 ask=7623.50 spread=0.2500 imb=+0.03 ofi1m=+0.00 trades=0 quotes=866677 err=0
+  MNQ  bid=30039.25 ask=30039.75 spread=0.5000 imb=+0.09 ofi1m=+0.00 trades=0 quotes=7878935 err=0
+  YM   bid=52974.00 ask=52977.00 spread=3.0000 imb=-0.10 ofi1m=+0.00 trades=0 quotes=607471 err=0
+[RUN] 416.9min | chunks=831
+  MES  bid=7623.75 ask=7624.00 spread=0.2500 imb=-0.08 ofi1m=+0.00 trades=0 quotes=867313 err=0
+  MNQ  bid=30049.00 ask=30049.50 spread=0.5000 imb=+0.09 ofi1m=+0.00 trades=0 quotes=7886034 err=0
+  YM   bid=52976.00 ask=52978.00 spread=2.0000 imb=+0.30 ofi1m=+0.00 trades=0 quotes=607906 err=0
+[RUN] 417.9min | chunks=833
+  MES  bid=7623.00 ask=7623.25 spread=0.2500 imb=+0.15 ofi1m=+0.00 trades=0 quotes=868105 err=0
+  MNQ  bid=30047.25 ask=30047.75 spread=0.5000 imb=-0.13 ofi1m=+0.00 trades=0 quotes=7893155 err=0
+  YM   bid=52969.00 ask=52971.00 spread=2.0000 imb=+0.03 ofi1m=+0.00 trades=0 quotes=608413 err=0
+[RUN] 418.9min | chunks=835
+  MES  bid=7623.25 ask=7623.50 spread=0.2500 imb=+0.19 ofi1m=+0.00 trades=0 quotes=868609 err=0
+  MNQ  bid=30047.50 ask=30048.00 spread=0.5000 imb=+0.24 ofi1m=+0.00 trades=0 quotes=7899017 err=0
+  YM   bid=52971.00 ask=52971.00 spread=0.0000 imb=-0.11 ofi1m=+0.00 trades=0 quotes=608933 err=0
+[RUN] 419.9min | chunks=837
+  MES  bid=7623.25 ask=7623.50 spread=0.2500 imb=-0.01 ofi1m=+0.00 trades=0 quotes=869320 err=0
+  MNQ  bid=30053.50 ask=30054.25 spread=0.7500 imb=-0.01 ofi1m=+0.00 trades=0 quotes=7908124 err=0
+  YM   bid=52963.00 ask=52965.00 spread=2.0000 imb=-0.08 ofi1m=+0.00 trades=0 quotes=609705 err=0
+[RUN] 420.9min | chunks=839
+  MES  bid=7622.75 ask=7623.00 spread=0.2500 imb=+0.22 ofi1m=+0.00 trades=0 quotes=870097 err=0
+  MNQ  bid=30055.50 ask=30055.75 spread=0.2500 imb=-0.33 ofi1m=+0.00 trades=0 quotes=7922519 err=0
+  YM   bid=52947.00 ask=52948.00 spread=1.0000 imb=-0.36 ofi1m=+0.00 trades=0 quotes=610664 err=0
+[RUN] 421.9min | chunks=841
+  MES  bid=7621.75 ask=7622.00 spread=0.2500 imb=-0.13 ofi1m=+0.00 trades=0 quotes=870710 err=0
+  MNQ  bid=30050.50 ask=30050.75 spread=0.2500 imb=+0.14 ofi1m=+0.00 trades=0 quotes=7933852 err=0
+  YM   bid=52943.00 ask=52945.00 spread=2.0000 imb=-0.18 ofi1m=+0.00 trades=0 quotes=611403 err=0
+[RUN] 422.9min | chunks=843
+  MES  bid=7622.00 ask=7622.25 spread=0.2500 imb=-0.20 ofi1m=+0.00 trades=0 quotes=872415 err=0
+  MNQ  bid=30053.25 ask=30053.50 spread=0.2500 imb=+0.12 ofi1m=+0.00 trades=0 quotes=7945276 err=0
+  YM   bid=52947.00 ask=52949.00 spread=2.0000 imb=-0.19 ofi1m=+0.00 trades=0 quotes=612828 err=0
+[RUN] 423.9min | chunks=845
+  MES  bid=7622.50 ask=7622.75 spread=0.2500 imb=+0.10 ofi1m=+0.00 trades=0 quotes=873117 err=0
+  MNQ  bid=30053.00 ask=30053.50 spread=0.5000 imb=+0.29 ofi1m=+0.00 trades=0 quotes=7951977 err=0
+  YM   bid=52954.00 ask=52956.00 spread=2.0000 imb=+0.09 ofi1m=+0.00 trades=0 quotes=613535 err=0
+[RUN] 424.9min | chunks=847
+  MES  bid=7622.50 ask=7622.75 spread=0.2500 imb=-0.14 ofi1m=+0.00 trades=0 quotes=873777 err=0
+  MNQ  bid=30051.50 ask=30051.75 spread=0.2500 imb=+0.14 ofi1m=+0.00 trades=0 quotes=7959656 err=0
+  YM   bid=52948.00 ask=52950.00 spread=2.0000 imb=+0.02 ofi1m=+0.00 trades=0 quotes=614163 err=0
+[RUN] 425.9min | chunks=849
+  MES  bid=7622.00 ask=7622.25 spread=0.2500 imb=+0.12 ofi1m=+0.00 trades=0 quotes=874381 err=0
+  MNQ  bid=30051.50 ask=30051.75 spread=0.2500 imb=+0.16 ofi1m=+0.00 trades=0 quotes=7967854 err=0
+  YM   bid=52941.00 ask=52943.00 spread=2.0000 imb=-0.04 ofi1m=+0.00 trades=0 quotes=614758 err=0
+[RUN] 426.9min | chunks=851
+  MES  bid=7623.00 ask=7623.25 spread=0.2500 imb=-0.24 ofi1m=+0.00 trades=0 quotes=875082 err=0
+  MNQ  bid=30056.75 ask=30057.25 spread=0.5000 imb=+0.08 ofi1m=+0.00 trades=0 quotes=7975608 err=0
+  YM   bid=52946.00 ask=52948.00 spread=2.0000 imb=-0.24 ofi1m=+0.00 trades=0 quotes=615470 err=0
+[RUN] 427.9min | chunks=853
+  MES  bid=7623.50 ask=7623.75 spread=0.2500 imb=-0.17 ofi1m=+0.00 trades=0 quotes=875610 err=0
+  MNQ  bid=30059.75 ask=30060.00 spread=0.2500 imb=-0.32 ofi1m=+0.00 trades=0 quotes=7981936 err=0
+  YM   bid=52946.00 ask=52948.00 spread=2.0000 imb=+0.08 ofi1m=+0.00 trades=0 quotes=616006 err=0
+[RUN] 428.9min | chunks=855
+  MES  bid=7623.50 ask=7623.75 spread=0.2500 imb=+0.27 ofi1m=+0.00 trades=0 quotes=876267 err=0
+  MNQ  bid=30061.50 ask=30061.75 spread=0.2500 imb=-0.07 ofi1m=+0.00 trades=0 quotes=7989972 err=0
+  YM   bid=52949.00 ask=52951.00 spread=2.0000 imb=-0.14 ofi1m=+0.00 trades=0 quotes=616727 err=0
+[RUN] 429.9min | chunks=857
+  MES  bid=7623.00 ask=7623.25 spread=0.2500 imb=+0.25 ofi1m=+0.00 trades=0 quotes=876901 err=0
+  MNQ  bid=30059.00 ask=30059.75 spread=0.7500 imb=-0.17 ofi1m=+0.00 trades=0 quotes=7998282 err=0
+  YM   bid=52943.00 ask=52945.00 spread=2.0000 imb=+0.27 ofi1m=+0.00 trades=0 quotes=617556 err=0
+[RUN] 430.9min | chunks=859
+  MES  bid=7624.25 ask=7624.50 spread=0.2500 imb=-0.11 ofi1m=+0.00 trades=0 quotes=877607 err=0
+  MNQ  bid=30060.00 ask=30060.25 spread=0.2500 imb=-0.18 ofi1m=+0.00 trades=0 quotes=8006709 err=0
+  YM   bid=52956.00 ask=52958.00 spread=2.0000 imb=-0.21 ofi1m=+0.00 trades=0 quotes=618603 err=0
+[RUN] 431.9min | chunks=861
+  MES  bid=7624.00 ask=7624.25 spread=0.2500 imb=+0.12 ofi1m=+0.00 trades=0 quotes=878263 err=0
+  MNQ  bid=30059.00 ask=30059.25 spread=0.2500 imb=+0.15 ofi1m=+0.00 trades=0 quotes=8013584 err=0
+  YM   bid=52959.00 ask=52961.00 spread=2.0000 imb=+0.04 ofi1m=+0.00 trades=0 quotes=619246 err=0
+[RUN] 432.9min | chunks=863
+  MES  bid=7624.50 ask=7624.75 spread=0.2500 imb=+0.11 ofi1m=+0.00 trades=0 quotes=878979 err=0
+  MNQ  bid=30063.75 ask=30064.25 spread=0.5000 imb=-0.05 ofi1m=+0.00 trades=0 quotes=8021889 err=0
+  YM   bid=52961.00 ask=52962.00 spread=1.0000 imb=+0.04 ofi1m=+0.00 trades=0 quotes=620252 err=0
+[RUN] 433.9min | chunks=865
+  MES  bid=7624.00 ask=7624.25 spread=0.2500 imb=-0.02 ofi1m=+0.00 trades=0 quotes=879643 err=0
+  MNQ  bid=30059.50 ask=30059.75 spread=0.2500 imb=-0.03 ofi1m=+0.00 trades=0 quotes=8030341 err=0
+  YM   bid=52963.00 ask=52964.00 spread=1.0000 imb=+0.14 ofi1m=+0.00 trades=0 quotes=620936 err=0
+[RUN] 434.9min | chunks=867
+  MES  bid=7623.75 ask=7624.00 spread=0.2500 imb=-0.14 ofi1m=+0.00 trades=0 quotes=880522 err=0
+  MNQ  bid=30055.00 ask=30055.25 spread=0.2500 imb=+0.29 ofi1m=+0.00 trades=0 quotes=8040598 err=0
+  YM   bid=52964.00 ask=52967.00 spread=3.0000 imb=+0.04 ofi1m=+0.00 trades=0 quotes=621860 err=0
+[RUN] 435.9min | chunks=869
+  MES  bid=7624.00 ask=7624.25 spread=0.2500 imb=-0.05 ofi1m=+0.00 trades=0 quotes=881490 err=0
+  MNQ  bid=30050.50 ask=30051.00 spread=0.5000 imb=+0.23 ofi1m=+0.00 trades=0 quotes=8053658 err=0
+  YM   bid=52972.00 ask=52973.00 spread=1.0000 imb=-0.15 ofi1m=+0.00 trades=0 quotes=622607 err=0
+[RUN] 437.0min | chunks=871
+  MES  bid=7624.50 ask=7624.75 spread=0.2500 imb=-0.36 ofi1m=+0.00 trades=0 quotes=882168 err=0
+  MNQ  bid=30053.00 ask=30053.25 spread=0.2500 imb=+0.33 ofi1m=+0.00 trades=0 quotes=8061639 err=0
+  YM   bid=52967.00 ask=52970.00 spread=3.0000 imb=-0.20 ofi1m=+0.00 trades=0 quotes=623314 err=0
+[RUN] 438.0min | chunks=873
+  MES  bid=7623.25 ask=7623.50 spread=0.2500 imb=+0.29 ofi1m=+0.00 trades=0 quotes=882947 err=0
+  MNQ  bid=30047.50 ask=30047.75 spread=0.2500 imb=-0.10 ofi1m=+0.00 trades=0 quotes=8069585 err=0
+  YM   bid=52959.00 ask=52960.00 spread=1.0000 imb=-0.30 ofi1m=+0.00 trades=0 quotes=623930 err=0
+[RUN] 439.0min | chunks=875
+  MES  bid=7623.25 ask=7623.50 spread=0.2500 imb=+0.41 ofi1m=+0.00 trades=0 quotes=883664 err=0
+  MNQ  bid=30047.75 ask=30048.00 spread=0.2500 imb=-0.23 ofi1m=+0.00 trades=0 quotes=8078000 err=0
+  YM   bid=52963.00 ask=52965.00 spread=2.0000 imb=+0.14 ofi1m=+0.00 trades=0 quotes=624738 err=0
+[RUN] 440.0min | chunks=877
+  MES  bid=7626.25 ask=7626.50 spread=0.2500 imb=+0.08 ofi1m=+0.00 trades=0 quotes=885250 err=0
+  MNQ  bid=30061.50 ask=30062.50 spread=1.0000 imb=+0.03 ofi1m=+0.00 trades=0 quotes=8089167 err=0
+  YM   bid=52968.00 ask=52971.00 spread=3.0000 imb=+0.25 ofi1m=+0.00 trades=0 quotes=626378 err=0
+[RUN] 441.0min | chunks=879
+  MES  bid=7626.25 ask=7626.50 spread=0.2500 imb=-0.18 ofi1m=+0.00 trades=0 quotes=886803 err=0
+  MNQ  bid=30061.50 ask=30061.75 spread=0.2500 imb=-0.05 ofi1m=+0.00 trades=0 quotes=8103927 err=0
+  YM   bid=52974.00 ask=52976.00 spread=2.0000 imb=+0.02 ofi1m=+0.00 trades=0 quotes=627682 err=0
+[RUN] 442.0min | chunks=881
+  MES  bid=7625.25 ask=7625.50 spread=0.2500 imb=-0.21 ofi1m=+0.00 trades=0 quotes=888073 err=0
+  MNQ  bid=30055.75 ask=30056.25 spread=0.5000 imb=+0.14 ofi1m=+0.00 trades=0 quotes=8116137 err=0
+  YM   bid=52968.00 ask=52970.00 spread=2.0000 imb=+0.17 ofi1m=+0.00 trades=0 quotes=628777 err=0
+[RUN] 443.0min | chunks=883
+  MES  bid=7624.50 ask=7624.75 spread=0.2500 imb=+0.25 ofi1m=+0.00 trades=0 quotes=889181 err=0
+  MNQ  bid=30050.50 ask=30051.25 spread=0.7500 imb=-0.10 ofi1m=+0.00 trades=0 quotes=8126541 err=0
+  YM   bid=52970.00 ask=52973.00 spread=3.0000 imb=+0.11 ofi1m=+0.00 trades=0 quotes=629780 err=0
+[RUN] 444.0min | chunks=885
+  MES  bid=7623.00 ask=7623.25 spread=0.2500 imb=-0.11 ofi1m=+0.00 trades=0 quotes=890466 err=0
+  MNQ  bid=30041.50 ask=30042.00 spread=0.5000 imb=-0.04 ofi1m=+0.00 trades=0 quotes=8138464 err=0
+  YM   bid=52961.00 ask=52963.00 spread=2.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=630955 err=0
+[RUN] 445.0min | chunks=887
+  MES  bid=7623.00 ask=7623.25 spread=0.2500 imb=-0.25 ofi1m=+0.00 trades=0 quotes=892262 err=0
+  MNQ  bid=30043.25 ask=30043.50 spread=0.2500 imb=+0.25 ofi1m=+0.00 trades=0 quotes=8154158 err=0
+  YM   bid=52955.00 ask=52957.00 spread=2.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=632366 err=0
+[RUN] 446.0min | chunks=889
+  MES  bid=7623.00 ask=7623.50 spread=0.5000 imb=-0.11 ofi1m=+0.00 trades=0 quotes=893457 err=0
+  MNQ  bid=30044.50 ask=30044.75 spread=0.2500 imb=-0.19 ofi1m=+0.00 trades=0 quotes=8166003 err=0
+  YM   bid=52942.00 ask=52944.00 spread=2.0000 imb=-0.02 ofi1m=+0.00 trades=0 quotes=633697 err=0
+[RUN] 447.0min | chunks=891
+  MES  bid=7621.75 ask=7622.00 spread=0.2500 imb=+0.50 ofi1m=+0.00 trades=0 quotes=894521 err=0
+  MNQ  bid=30041.25 ask=30041.75 spread=0.5000 imb=-0.05 ofi1m=+0.00 trades=0 quotes=8177178 err=0
+  YM   bid=52934.00 ask=52936.00 spread=2.0000 imb=+0.16 ofi1m=+0.00 trades=0 quotes=634673 err=0
+[RUN] 448.0min | chunks=893
+  MES  bid=7621.75 ask=7622.00 spread=0.2500 imb=-0.04 ofi1m=+0.00 trades=0 quotes=895541 err=0
+  MNQ  bid=30038.00 ask=30038.25 spread=0.2500 imb=+0.33 ofi1m=+0.00 trades=0 quotes=8189467 err=0
+  YM   bid=52933.00 ask=52935.00 spread=2.0000 imb=-0.07 ofi1m=+0.00 trades=0 quotes=635662 err=0
+[RUN] 449.0min | chunks=895
+  MES  bid=7620.25 ask=7620.50 spread=0.2500 imb=-0.06 ofi1m=+0.00 trades=0 quotes=896771 err=0
+  MNQ  bid=30030.75 ask=30031.00 spread=0.2500 imb=+0.75 ofi1m=+0.00 trades=0 quotes=8203506 err=0
+  YM   bid=52922.00 ask=52925.00 spread=3.0000 imb=-0.14 ofi1m=+0.00 trades=0 quotes=637463 err=0
+[RUN] 450.0min | chunks=897
+  MES  bid=7618.75 ask=7619.00 spread=0.2500 imb=-0.10 ofi1m=+0.00 trades=0 quotes=901834 err=0
+  MNQ  bid=30033.00 ask=30033.50 spread=0.5000 imb=+0.01 ofi1m=+0.00 trades=0 quotes=8236793 err=0
+  YM   bid=52911.00 ask=52914.00 spread=3.0000 imb=+0.03 ofi1m=+0.00 trades=0 quotes=643359 err=0
+[RUN] 451.0min | chunks=899
+  MES  bid=7622.00 ask=7622.25 spread=0.2500 imb=+0.19 ofi1m=+0.00 trades=0 quotes=903487 err=0
+  MNQ  bid=30045.75 ask=30046.25 spread=0.5000 imb=-0.28 ofi1m=+0.00 trades=0 quotes=8247683 err=0
+  YM   bid=52938.00 ask=52940.00 spread=2.0000 imb=-0.09 ofi1m=+0.00 trades=0 quotes=644423 err=0
+[RUN] 452.0min | chunks=901
+  MES  bid=7623.00 ask=7623.25 spread=0.2500 imb=-0.27 ofi1m=+0.00 trades=0 quotes=904725 err=0
+  MNQ  bid=30052.00 ask=30052.50 spread=0.5000 imb=-0.39 ofi1m=+0.00 trades=0 quotes=8255432 err=0
+  YM   bid=52944.00 ask=52946.00 spread=2.0000 imb=-0.08 ofi1m=+0.00 trades=0 quotes=645202 err=0
+[RUN] 453.0min | chunks=903
+  MES  bid=7624.00 ask=7624.50 spread=0.5000 imb=-0.24 ofi1m=+0.00 trades=0 quotes=905413 err=0
+  MNQ  bid=30059.75 ask=30060.50 spread=0.7500 imb=+0.03 ofi1m=+0.00 trades=0 quotes=8259818 err=0
+  YM   bid=52957.00 ask=52959.00 spread=2.0000 imb=+0.03 ofi1m=+0.00 trades=0 quotes=645704 err=0
+[RUN] 454.0min | chunks=905
+  MES  bid=7622.25 ask=7622.50 spread=0.2500 imb=-0.18 ofi1m=+0.00 trades=0 quotes=905906 err=0
+  MNQ  bid=30050.50 ask=30051.25 spread=0.7500 imb=+0.00 ofi1m=+0.00 trades=0 quotes=8264427 err=0
+  YM   bid=52946.00 ask=52948.00 spread=2.0000 imb=-0.04 ofi1m=+0.00 trades=0 quotes=646128 err=0
+[RUN] 455.0min | chunks=907
+  MES  bid=7622.25 ask=7622.50 spread=0.2500 imb=-0.13 ofi1m=+0.00 trades=0 quotes=906429 err=0
+  MNQ  bid=30048.00 ask=30048.50 spread=0.5000 imb=+0.02 ofi1m=+0.00 trades=0 quotes=8268103 err=0
+  YM   bid=52941.00 ask=52944.00 spread=3.0000 imb=+0.31 ofi1m=+0.00 trades=0 quotes=646604 err=0
+[RUN] 456.0min | chunks=909
+  MES  bid=7621.25 ask=7621.50 spread=0.2500 imb=+0.22 ofi1m=+0.00 trades=0 quotes=906884 err=0
+  MNQ  bid=30038.75 ask=30039.00 spread=0.2500 imb=+0.02 ofi1m=+0.00 trades=0 quotes=8271196 err=0
+  YM   bid=52945.00 ask=52947.00 spread=2.0000 imb=-0.04 ofi1m=+0.00 trades=0 quotes=646859 err=0
+[RUN] 457.0min | chunks=911
+  MES  bid=7621.25 ask=7621.50 spread=0.2500 imb=-0.17 ofi1m=+0.00 trades=0 quotes=907419 err=0
+  MNQ  bid=30040.00 ask=30040.25 spread=0.2500 imb=-0.21 ofi1m=+0.00 trades=0 quotes=8275114 err=0
+  YM   bid=52946.00 ask=52949.00 spread=3.0000 imb=+0.16 ofi1m=+0.00 trades=0 quotes=647140 err=0
+[RUN] 458.0min | chunks=913
+  MES  bid=7621.25 ask=7621.50 spread=0.2500 imb=-0.16 ofi1m=+0.00 trades=0 quotes=907890 err=0
+  MNQ  bid=30039.00 ask=30039.75 spread=0.7500 imb=+0.21 ofi1m=+0.00 trades=0 quotes=8277538 err=0
+  YM   bid=52941.00 ask=52944.00 spread=3.0000 imb=-0.09 ofi1m=+0.00 trades=0 quotes=647332 err=0
+[RUN] 459.0min | chunks=915
+  MES  bid=7622.00 ask=7622.25 spread=0.2500 imb=+0.01 ofi1m=+0.00 trades=0 quotes=908323 err=0
+  MNQ  bid=30046.75 ask=30047.25 spread=0.5000 imb=-0.27 ofi1m=+0.00 trades=0 quotes=8280066 err=0
+  YM   bid=52950.00 ask=52953.00 spread=3.0000 imb=+0.07 ofi1m=+0.00 trades=0 quotes=647526 err=0
+[RUN] 460.0min | chunks=917
+  MES  bid=7621.50 ask=7621.75 spread=0.2500 imb=-0.05 ofi1m=+0.00 trades=0 quotes=908698 err=0
+  MNQ  bid=30046.00 ask=30046.25 spread=0.2500 imb=-0.05 ofi1m=+0.00 trades=0 quotes=8282377 err=0
+  YM   bid=52946.00 ask=52949.00 spread=3.0000 imb=-0.12 ofi1m=+0.00 trades=0 quotes=647703 err=0
+[RUN] 461.0min | chunks=919
+  MES  bid=7623.00 ask=7623.25 spread=0.2500 imb=-0.11 ofi1m=+0.00 trades=0 quotes=909101 err=0
+  MNQ  bid=30050.50 ask=30051.00 spread=0.5000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=8284931 err=0
+  YM   bid=52956.00 ask=52960.00 spread=4.0000 imb=-0.10 ofi1m=+0.00 trades=0 quotes=647921 err=0
+[RUN] 462.0min | chunks=921
+  MES  bid=7622.25 ask=7622.50 spread=0.2500 imb=+0.18 ofi1m=+0.00 trades=0 quotes=909540 err=0
+  MNQ  bid=30049.25 ask=30049.75 spread=0.5000 imb=-0.18 ofi1m=+0.00 trades=0 quotes=8287537 err=0
+  YM   bid=52950.00 ask=52953.00 spread=3.0000 imb=+0.15 ofi1m=+0.00 trades=0 quotes=648169 err=0
+[RUN] 463.0min | chunks=923
+  MES  bid=7622.75 ask=7623.00 spread=0.2500 imb=-0.26 ofi1m=+0.00 trades=0 quotes=909944 err=0
+  MNQ  bid=30049.00 ask=30049.50 spread=0.5000 imb=+0.24 ofi1m=+0.00 trades=0 quotes=8289798 err=0
+  YM   bid=52948.00 ask=52951.00 spread=3.0000 imb=-0.03 ofi1m=+0.00 trades=0 quotes=648476 err=0
+[RUN] 464.0min | chunks=925
+  MES  bid=7623.00 ask=7623.25 spread=0.2500 imb=-0.19 ofi1m=+0.00 trades=0 quotes=910325 err=0
+  MNQ  bid=30049.00 ask=30049.50 spread=0.5000 imb=+0.38 ofi1m=+0.00 trades=0 quotes=8291995 err=0
+  YM   bid=52954.00 ask=52957.00 spread=3.0000 imb=-0.05 ofi1m=+0.00 trades=0 quotes=648727 err=0
+[RUN] 465.0min | chunks=927
+  MES  bid=7622.25 ask=7622.50 spread=0.2500 imb=+0.25 ofi1m=+0.00 trades=0 quotes=910696 err=0
+  MNQ  bid=30047.75 ask=30048.25 spread=0.5000 imb=+0.07 ofi1m=+0.00 trades=0 quotes=8294603 err=0
+  YM   bid=52954.00 ask=52957.00 spread=3.0000 imb=-0.07 ofi1m=+0.00 trades=0 quotes=649014 err=0
+[RUN] 466.0min | chunks=929
+  MES  bid=7622.75 ask=7623.00 spread=0.2500 imb=-0.14 ofi1m=+0.00 trades=0 quotes=910974 err=0
+  MNQ  bid=30051.50 ask=30051.75 spread=0.2500 imb=+0.04 ofi1m=+0.00 trades=0 quotes=8296238 err=0
+  YM   bid=52961.00 ask=52964.00 spread=3.0000 imb=-0.12 ofi1m=+0.00 trades=0 quotes=649183 err=0
+[RUN] 467.0min | chunks=931
+  MES  bid=7623.00 ask=7623.25 spread=0.2500 imb=-0.13 ofi1m=+0.00 trades=0 quotes=911143 err=0
+  MNQ  bid=30053.00 ask=30053.50 spread=0.5000 imb=-0.16 ofi1m=+0.00 trades=0 quotes=8297314 err=0
+  YM   bid=52960.00 ask=52963.00 spread=3.0000 imb=-0.10 ofi1m=+0.00 trades=0 quotes=649340 err=0
+[RUN] 468.0min | chunks=933
+  MES  bid=7623.25 ask=7623.50 spread=0.2500 imb=-0.04 ofi1m=+0.00 trades=0 quotes=911405 err=0
+  MNQ  bid=30054.75 ask=30055.25 spread=0.5000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=8298867 err=0
+  YM   bid=52963.00 ask=52966.00 spread=3.0000 imb=-0.14 ofi1m=+0.00 trades=0 quotes=649520 err=0
+[RUN] 469.0min | chunks=935
+  MES  bid=7622.75 ask=7623.00 spread=0.2500 imb=-0.17 ofi1m=+0.00 trades=0 quotes=911652 err=0
+  MNQ  bid=30053.50 ask=30054.00 spread=0.5000 imb=-0.03 ofi1m=+0.00 trades=0 quotes=8300059 err=0
+  YM   bid=52964.00 ask=52967.00 spread=3.0000 imb=-0.29 ofi1m=+0.00 trades=0 quotes=649685 err=0
+[RUN] 470.0min | chunks=937
+  MES  bid=7622.50 ask=7622.75 spread=0.2500 imb=+0.13 ofi1m=+0.00 trades=0 quotes=911845 err=0
+  MNQ  bid=30052.75 ask=30053.25 spread=0.5000 imb=-0.08 ofi1m=+0.00 trades=0 quotes=8301086 err=0
+  YM   bid=52958.00 ask=52961.00 spread=3.0000 imb=-0.03 ofi1m=+0.00 trades=0 quotes=649874 err=0
+[RUN] 471.0min | chunks=939
+  MES  bid=7621.75 ask=7622.25 spread=0.5000 imb=-0.00 ofi1m=+0.00 trades=0 quotes=912063 err=0
+  MNQ  bid=30050.75 ask=30051.00 spread=0.2500 imb=-0.15 ofi1m=+0.00 trades=0 quotes=8302154 err=0
+  YM   bid=52958.00 ask=52961.00 spread=3.0000 imb=-0.03 ofi1m=+0.00 trades=0 quotes=650122 err=0
+[RUN] 472.0min | chunks=941
+  MES  bid=7622.00 ask=7622.25 spread=0.2500 imb=+0.12 ofi1m=+0.00 trades=0 quotes=912300 err=0
+  MNQ  bid=30052.00 ask=30052.25 spread=0.2500 imb=-0.02 ofi1m=+0.00 trades=0 quotes=8303262 err=0
+  YM   bid=52965.00 ask=52969.00 spread=4.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=650345 err=0
+[RUN] 473.0min | chunks=943
+  MES  bid=7622.00 ask=7622.25 spread=0.2500 imb=-0.03 ofi1m=+0.00 trades=0 quotes=912427 err=0
+  MNQ  bid=30051.75 ask=30052.25 spread=0.5000 imb=-0.39 ofi1m=+0.00 trades=0 quotes=8303959 err=0
+  YM   bid=52960.00 ask=52963.00 spread=3.0000 imb=-0.16 ofi1m=+0.00 trades=0 quotes=650554 err=0
+[RUN] 474.0min | chunks=945
+  MES  bid=7622.50 ask=7622.75 spread=0.2500 imb=-0.16 ofi1m=+0.00 trades=0 quotes=912553 err=0
+  MNQ  bid=30054.25 ask=30054.75 spread=0.5000 imb=-0.24 ofi1m=+0.00 trades=0 quotes=8304683 err=0
+  YM   bid=52965.00 ask=52967.00 spread=2.0000 imb=+0.00 ofi1m=+0.00 trades=0 quotes=650783 err=0
+[RUN] 475.0min | chunks=947
+  MES  bid=7622.00 ask=7622.25 spread=0.2500 imb=+0.24 ofi1m=+0.00 trades=0 quotes=912745 err=0
+  MNQ  bid=30053.00 ask=30053.25 spread=0.2500 imb=+0.23 ofi1m=+0.00 trades=0 quotes=8305620 err=0
+  YM   bid=52960.00 ask=52963.00 spread=3.0000 imb=-0.10 ofi1m=+0.00 trades=0 quotes=650904 err=0
+[RUN] 476.0min | chunks=949
+  MES  bid=7622.50 ask=7622.75 spread=0.2500 imb=-0.11 ofi1m=+0.00 trades=0 quotes=912992 err=0
+  MNQ  bid=30053.50 ask=30054.00 spread=0.5000 imb=+0.27 ofi1m=+0.00 trades=0 quotes=8306636 err=0
+  YM   bid=52964.00 ask=52967.00 spread=3.0000 imb=-0.29 ofi1m=+0.00 trades=0 quotes=651111 err=0
+[RUN] 477.0min | chunks=951
+  MES  bid=7623.25 ask=7623.50 spread=0.2500 imb=+0.03 ofi1m=+0.00 trades=0 quotes=913220 err=0
+  MNQ  bid=30053.75 ask=30054.00 spread=0.2500 imb=+0.05 ofi1m=+0.00 trades=0 quotes=8307670 err=0
+  YM   bid=52966.00 ask=52968.00 spread=2.0000 imb=-0.06 ofi1m=+0.00 trades=0 quotes=651306 err=0
+[RUN] 478.0min | chunks=953
+  MES  bid=7623.75 ask=7624.00 spread=0.2500 imb=-0.21 ofi1m=+0.00 trades=0 quotes=913519 err=0
+  MNQ  bid=30055.50 ask=30056.00 spread=0.5000 imb=-0.04 ofi1m=+0.00 trades=0 quotes=8308823 err=0
+  YM   bid=52961.00 ask=52963.00 spread=2.0000 imb=+0.28 ofi1m=+0.00 trades=0 quotes=651521 err=0
+[RUN] 479.0min | chunks=955
+  MES  bid=7624.75 ask=7625.00 spread=0.2500 imb=+0.16 ofi1m=+0.00 trades=0 quotes=913961 err=0
+  MNQ  bid=30057.50 ask=30058.00 spread=0.5000 imb=-0.16 ofi1m=+0.00 trades=0 quotes=8310433 err=0
+  YM   bid=52965.00 ask=52967.00 spread=2.0000 imb=+0.19 ofi1m=+0.00 trades=0 quotes=651698 err=0
+
+[OK] Collecte terminee.
+[OUT] Repertoire : collectOF/
+[OUT] Chunks ecrits : 958
+
+Resume final :
+  MES   session=sessions_mes  last=0.00  spread=0.2500  trades=0  quotes=914390
+  MNQ   session=sessions_mnq  last=0.00  spread=0.5000  trades=0  quotes=8311764
+  YM    session=sessions_dow  last=0.00  spread=3.0000  trades=0  quotes=651893
+[2026-07-10 16:30:12,83] Collecte terminee (exit code: 0) 

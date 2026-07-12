@@ -20,19 +20,15 @@ import yfinance as yf
 from datetime import datetime, timedelta
 from typing import Optional, Tuple, Dict
 from pathlib import Path
-import sqlite3
+import sys as _sys, os as _os
+_sys.path.append(_os.path.abspath(_os.path.join(_os.path.dirname(__file__), '../../..')))
+from src.app.database.pg_connection import get_conn, read_sql
 
 
 class EarningsFeatures:
     """Calcul des features basées sur les earnings."""
 
-    def __init__(self, db_path: str = "trading_data.db"):
-        # Résoudre le chemin par rapport à la racine du projet si chemin relatif
-        if not Path(db_path).is_absolute():
-            project_root = Path(__file__).parent.parent.parent.parent
-            self.db_path = str(project_root / db_path)
-        else:
-            self.db_path = db_path
+    def __init__(self, db_path=None):  # db_path ignoré — connexion via pg_config.py
         self._spy_cache = None  # Cache des prix SPY
 
     def get_earnings_dates(self, symbol: str, limit: int = 12) -> pd.DataFrame:
@@ -74,18 +70,16 @@ class EarningsFeatures:
         """Récupère les prix historiques depuis la BD ou yfinance."""
         try:
             # Essayer d'abord la BD
-            conn = sqlite3.connect(self.db_path)
             query = """
                 SELECT date, close FROM historical_data
-                WHERE symbol = ? AND date BETWEEN ? AND ?
+                WHERE symbol = %s AND date BETWEEN %s AND %s
                 ORDER BY date
             """
-            df = pd.read_sql_query(query, conn, params=(
+            df = read_sql(query, (
                 symbol,
                 start_date.strftime('%Y-%m-%d'),
                 end_date.strftime('%Y-%m-%d')
             ))
-            conn.close()
 
             if len(df) >= 3:
                 df['date'] = pd.to_datetime(df['date'])

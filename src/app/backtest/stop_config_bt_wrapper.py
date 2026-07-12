@@ -19,6 +19,7 @@ from datetime import datetime, timedelta
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 
 from src.app.strategies.momentum import MomentumStrategy
+from src.app.strategies.wyckoff_ml import WyckoffMLStrategy
 from src.app.database.trade_journal import TradeJournal, TradeMode
 from src.app.stop_manager import StopConfig
 
@@ -38,6 +39,8 @@ class StopConfigBTWrapper(bt.Strategy):
         config=None,           # StopConfig chargÃ© avant le lancement
         dataframes=None,
         scoring_type="smooth_ml",
+        smooth_model_path=None,
+        wyckoff_model_path=None,
         use_sue_filter=False,
         sue_threshold=0.0,
         db_path=None
@@ -70,16 +73,28 @@ class StopConfigBTWrapper(bt.Strategy):
             db_path = os.path.basename(self.p.db_path)
 
         # StratÃ©gie mÃ©tier
-        self.strategy = MomentumStrategy(
-            market_data=self.market_data,
-            capital=self.p.capital,
-            max_stocks=self.p.max_stocks,
-            use_trailing_stop=False,  # gÃ©rÃ© ici, pas dans la stratÃ©gie
-            scoring_type=self.p.scoring_type,
-            use_sue_filter=self.p.use_sue_filter,
-            sue_threshold=self.p.sue_threshold,
-            db_path=db_path
-        )
+        if self.p.scoring_type == "wyckoff_ml":
+            self.strategy = WyckoffMLStrategy(
+                market_data=self.market_data,
+                capital=self.p.capital,
+                max_stocks=self.p.max_stocks,
+                use_trailing_stop=False,  # gÃ©rÃ© ici, pas dans la stratÃ©gie
+                scoring_type=self.p.scoring_type,
+                wyckoff_model_path=self.p.wyckoff_model_path,
+                db_path=db_path
+            )
+        else:
+            self.strategy = MomentumStrategy(
+                market_data=self.market_data,
+                capital=self.p.capital,
+                max_stocks=self.p.max_stocks,
+                use_trailing_stop=False,  # gÃ©rÃ© ici, pas dans la stratÃ©gie
+                scoring_type=self.p.scoring_type,
+                smooth_model_path=self.p.smooth_model_path,
+                use_sue_filter=self.p.use_sue_filter,
+                sue_threshold=self.p.sue_threshold,
+                db_path=db_path
+            )
 
         # Trackers par symbole
         self.orders_by_symbol = {}     # symbol â†’ {'entry': order}
@@ -92,7 +107,8 @@ class StopConfigBTWrapper(bt.Strategy):
         prof = (f"fixed{self.stop_cfg.profit_fixed_pct:.0f}"
                 if self.stop_cfg.profit_type == "fixed"
                 else f"atr{self.stop_cfg.profit_atr_mult:.1f}")
-        self.strategy_name = f"StopConfig_{prot}_{prof}"
+        model_tag = "Wyckoff" if self.p.scoring_type == "wyckoff_ml" else "Smooth"
+        self.strategy_name = f"StopConfig_{model_tag}_{prot}_{prof}"
 
         self.trade_journal = TradeJournal("backtest_journal.db")
         self.trade_journal.clear_backtest_trades(self.strategy_name)
@@ -277,7 +293,16 @@ class StopConfigBTWrapper(bt.Strategy):
         self.strategy.symbolsToTrade = symbols_available
         order_bundles = self.strategy.get_order_params()
 
+        # Sizing dynamique base sur le cash disponible pour limiter les rejets Margin.
+        reserved_cash = float(self.broker.get_cash())
+        planned_entries = 0
+        cash_buffer_mult = 1.002
+
         for bundle in order_bundles:
+            slots_left = self.p.max_stocks - current_positions - planned_entries
+            if slots_left <= 0:
+                break
+
             symbol = bundle["symbol"]
             data = self._get_data(symbol)
             if not data:
@@ -285,11 +310,25 @@ class StopConfigBTWrapper(bt.Strategy):
             if self.getposition(data).size != 0:
                 continue
 
-            qty = bundle["entry_order"].totalQuantity
+            requested_qty = int(bundle["entry_order"].totalQuantity)
+            entry_price_ref = float(getattr(bundle["entry_order"], "lmtPrice", data.close[0] * 1.005))
+            budget_per_slot = reserved_cash / max(slots_left, 1)
+            affordable_qty = int(budget_per_slot / max(entry_price_ref * cash_buffer_mult, 0.01))
+            qty = min(requested_qty, affordable_qty)
+
+            if qty <= 0:
+                self.log_diag(
+                    f"[CASH] {symbol}: entrée ignorée (cash réservé={reserved_cash:.2f}, "
+                    f"slots_left={slots_left}, prix_ref={entry_price_ref:.2f})"
+                )
+                continue
+
             entry_order = self.buy(data=data, size=qty)
             if entry_order:
                 self.orders_by_symbol[symbol] = {"entry": entry_order}
                 self.log_diag(f"[BT] {symbol}: EntrÃ©e qty={qty}")
+                reserved_cash -= qty * entry_price_ref * cash_buffer_mult
+                planned_entries += 1
 
     def stop(self):
         """Ferme les positions ouvertes en fin de backtest."""

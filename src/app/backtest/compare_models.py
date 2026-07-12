@@ -3,8 +3,7 @@ Script de comparaison des différents modèles ML via backtest.
 
 Compare:
 1. Smooth Momentum (modèle actuel)
-2. Earnings Momentum (avec SUE/CAR3)
-3. Earnings comme filtre uniquement (SUE > 0)
+2. Wyckoff VPA (meta-labeling)
 
 Usage:
     python compare_models.py
@@ -55,22 +54,17 @@ PERIODS = {
 }
 
 # Configurations des modèles à tester
+# Note: 'earnings_ml' et le filtre SUE ont été retirés — seul smooth_ml est utilisé en production.
 MODELS = {
     'smooth_momentum': {
         'name': 'Smooth Momentum',
         'scoring_type': 'smooth_ml',
         'use_earnings_filter': False,
     },
-    'earnings_momentum': {
-        'name': 'Earnings Momentum',
-        'scoring_type': 'earnings_ml',
+    'wyckoff_vpa': {
+        'name': 'Wyckoff VPA',
+        'scoring_type': 'wyckoff_ml',
         'use_earnings_filter': False,
-    },
-    'smooth_with_sue_filter': {
-        'name': 'Smooth + SUE Filter',
-        'scoring_type': 'smooth_ml',
-        'use_earnings_filter': True,
-        'sue_threshold': 0,  # SUE > 0
     },
 }
 

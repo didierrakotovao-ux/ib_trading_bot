@@ -11,7 +11,6 @@ Usage:
 """
 import pandas as pd
 import numpy as np
-import sqlite3
 from datetime import datetime, timedelta
 import sys
 import os
@@ -21,17 +20,17 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')
 from src.app.strategies.momentum_filters import MomentumFilters
 from src.app.ml.ml_smooth_scoring import SmoothMLScoring
 from src.app.ml.ml_scoring import MLScoring
+from src.app.database.pg_connection import get_conn_ca, read_sql_ca
 
 
 class CanadianScreener:
     """Screener quotidien pour actions canadiennes."""
 
-    def __init__(self, db_path: str = "trading_data_ca.db",
+    def __init__(self, db_path=None,  # db_path ignoré — connexion via pg_config.py (schéma ca)
                  scoring_type: str = "smooth_ml",
                  min_price: float = 2.0,
                  min_volume: int = 100000,
                  top_n: int = 10):
-        self.db_path = self._resolve_db_path(db_path)
         self.scoring_type = scoring_type
         self.min_price = min_price
         self.min_volume = min_volume
@@ -43,20 +42,10 @@ class CanadianScreener:
         # Charger le scorer ML
         self.scorer = self._init_scorer()
 
-    def _resolve_db_path(self, db_path: str) -> str:
-        """Résout le chemin de la DB par rapport à la racine du projet."""
-        if os.path.isabs(db_path):
-            return db_path
-        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
-        return os.path.join(project_root, db_path)
-
     def _init_scorer(self):
         """Initialise le scorer ML selon le type choisi."""
         if self.scoring_type == "smooth_ml":
-            return SmoothMLScoring(
-                model_path="models/smooth_ml_ca.pkl",
-                db_path=os.path.basename(self.db_path)
-            )
+            return SmoothMLScoring(model_path="models/smooth_ml_ca.pkl")
         elif self.scoring_type == "ml":
             return MLScoring(model_path="models/momentum_model.pkl")
         else:
@@ -72,8 +61,6 @@ class CanadianScreener:
         Returns:
             Dict {symbol: DataFrame} avec les données OHLCV
         """
-        conn = sqlite3.connect(self.db_path)
-
         # Charger 400 jours calendaires (~252 jours de trading + marge)
         data_start = (trade_date - timedelta(days=400)).strftime('%Y-%m-%d')
         data_end = trade_date.strftime('%Y-%m-%d')
@@ -82,29 +69,25 @@ class CanadianScreener:
         query_normal = """
             SELECT symbol, date, open, high, low, close, volume
             FROM historical_data
-            WHERE date BETWEEN ? AND ?
-            AND close >= ?
-            AND symbol NOT LIKE '%.NE'
+            WHERE date BETWEEN %s AND %s
+            AND close >= %s
+            AND symbol NOT LIKE '%%.NE'
             AND volume > 0
             ORDER BY symbol, date
         """
-        df_normal = pd.read_sql_query(query_normal, conn,
-                                       params=(data_start, data_end, self.min_price))
+        df_normal = read_sql_ca(query_normal, (data_start, data_end, self.min_price))
 
         # Requête 2: CDR (.NE) - pas de filtre volume (liquides par design)
         query_cdr = """
             SELECT symbol, date, open, high, low, close, volume
             FROM historical_data
-            WHERE date BETWEEN ? AND ?
-            AND close >= ?
-            AND symbol LIKE '%.NE'
+            WHERE date BETWEEN %s AND %s
+            AND close >= %s
+            AND symbol LIKE '%%.NE'
             AND volume > 0
             ORDER BY symbol, date
         """
-        df_cdr = pd.read_sql_query(query_cdr, conn,
-                                    params=(data_start, data_end, self.min_price))
-
-        conn.close()
+        df_cdr = read_sql_ca(query_cdr, (data_start, data_end, self.min_price))
 
         # Combiner
         df_all = pd.concat([df_normal, df_cdr], ignore_index=True)

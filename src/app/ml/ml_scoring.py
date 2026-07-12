@@ -12,6 +12,7 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 from src.app.ml.scoring import Scoring
+from src.app.database.pg_connection import get_conn, read_sql
 
 
 class MLScoring(Scoring):
@@ -56,7 +57,7 @@ class MLScoring(Scoring):
                 print(f"[OK] Modèle ML chargé: {self.model_path}")
             else:
                 print(f"[WARN] Modèle ML non trouvé: {self.model_path}")
-                print("       Entraînez-le avec: python src/app/ml/ml_momentum_predictor.py")
+                print("       Entraînez-le avec: python src/app/ml/ml_smooth_momentum_predictor.py")
         except Exception as e:
             print(f"[ERROR] Erreur chargement modèle: {e}")
 
@@ -74,6 +75,12 @@ class MLScoring(Scoring):
 
         # Normaliser les noms de colonnes
         df.columns = df.columns.str.lower()
+
+        # Ignorer les colonnes d'indicateurs venant de la DB : elles sont
+        # à zéro pour la quasi-totalité des symboles (bug compute_features).
+        # Tout est recalculé ci-dessous depuis l'OHLCV.
+        from src.app.ml.features import DB_STALE_COLUMNS
+        df = df.drop(columns=[c for c in DB_STALE_COLUMNS if c in df.columns])
 
         # --- Features de base (si pas déjà présentes) ---
 
@@ -261,30 +268,22 @@ class MLScoring(Scoring):
 
 # Test standalone
 if __name__ == "__main__":
-    import sqlite3
-
-    # Charger des données de test
-    db_path = "trading_data.db"
-    conn = sqlite3.connect(db_path)
-
-    symbols_to_test = ['AAPL', 'NVDA', 'GOOGL', 'QCOM', 'TXN', 'INTU','TFC', 'USB', 'PNC','ABBV', 'MRK', 'PFE', 'ORLY', 'AZO', 'YUM', 'RTX', 'GE', 'LMT', 'EOG', 'MPC', 'PSX', 'EXC', 'SRE', 'PLD', 'NEM', 'FCX', 'NUE']
+    symbols_to_test = ['AAPL', 'NVDA', 'GOOGL', 'QCOM', 'TXN', 'INTU', 'TFC', 'USB', 'PNC',
+                       'ABBV', 'MRK', 'PFE', 'ORLY', 'AZO', 'YUM', 'RTX', 'GE', 'LMT',
+                       'EOG', 'MPC', 'PSX', 'EXC', 'SRE', 'PLD', 'NEM', 'FCX', 'NUE']
 
     scoring = MLScoring(model_path="models/momentum_model.pkl")
-
     print("\n" + "="*60)
     print("TEST MLScoring")
     print("="*60)
 
     for symbol in symbols_to_test:
-        query = f"""
+        df = read_sql("""
             SELECT date, open, high, low, close, volume,
                    sma20_volume, hl_sma20vol, oc_sma20vol,
                    macd, macd_signal, rsi, adx, bb_high, bb_low, pct_close
-            FROM historical_data
-            WHERE symbol = '{symbol}'
-            ORDER BY date
-        """
-        df = pd.read_sql_query(query, conn)
+            FROM historical_data WHERE symbol = %s ORDER BY date
+        """, (symbol,))
 
         if not df.empty:
             details = scoring.get_prediction_details(df)

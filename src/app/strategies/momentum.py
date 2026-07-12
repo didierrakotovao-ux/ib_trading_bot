@@ -3,12 +3,9 @@ import numpy as np
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
-from src.app.ml.ml_scoring import MLScoring
 from src.app.ml.ml_smooth_scoring import SmoothMLScoring
-from src.app.ml.ml_earnings_scoring import EarningsMLScoring
-from src.app.ml.addivergencescoring import AdDivergenceScoring
-from src.app.ml.earnings_features import EarningsFeatures
 from src.app.strategies.momentum_filters import MomentumFilters
+from src.app.strategies.earnings_filter import EarningsFilter
 from src.app.screener.providers.market_data_provider import MarketDataProvider
 from src.app.database.db_manager import DatabaseManager
 from src.app.strategies.strategy import Strategy
@@ -36,23 +33,27 @@ class MomentumStrategy(Strategy):
     """
     def __init__(self, market_data: MarketDataProvider, capital=10000, max_stocks=5,
                  use_trailing_stop=False, trailing_percent=5.0,
-                 scoring_type="ml",
+                 scoring_type="smooth_ml",
                  momentum_top_pct=0.3, fip_threshold=0.0,
-                 use_seasonal_threshold=True,
+                 use_seasonal_threshold=False,
+                 use_earnings_filter=True, earnings_blackout_days=14,
                  use_sue_filter=False, sue_threshold=0.0,
                  db_path="trading_data.db",
                  smooth_model_path=None):
-        if scoring_type == "smooth_ml":
-            _model_path = smooth_model_path or "models/smooth_momentum_model.pkl"
-            self.scoring = SmoothMLScoring(model_path=_model_path, db_path=db_path)
-        elif scoring_type == "earnings_ml":
-            self.scoring = EarningsMLScoring(model_path="models/earnings_momentum_model.pkl")
-        else:
-            self.scoring = MLScoring(model_path="models/momentum_model.pkl")
+        if scoring_type != "smooth_ml":
+            raise ValueError(
+                f"scoring_type={scoring_type!r} n'est plus supporté — "
+                "seul 'smooth_ml' (smooth_momentum_model.pkl) est utilisé en production."
+            )
+        _model_path = smooth_model_path or "models/smooth_momentum_model.pkl"
+        self.scoring = SmoothMLScoring(model_path=_model_path, db_path=db_path)
         self.scoring_type = scoring_type
         self.market_data = market_data
         self.lookback_days = 400  # ~252 jours de trading + marge pour les features
-        self.score_threshold = 65  # Seuil par défaut (peut être overridé par saisonnalité)
+        # Seuil calibré par balayage EV sur le test out-of-time 2025-04→2026-06
+        # (modèle avec contexte marché, 2026-07-11) : EV +1.47%/trade à 60.
+        # L'ancien 65 correspondait à l'échelle de score du modèle précédent.
+        self.score_threshold = 60
         self.capital = capital
         self.max_stocks = max_stocks
         self.use_trailing_stop = use_trailing_stop
@@ -61,14 +62,25 @@ class MomentumStrategy(Strategy):
         # Filtres Gray & Vogel
         self.momentum_top_pct = momentum_top_pct  # Top 30% par momentum 12-1
         self.fip_threshold = fip_threshold          # FIP < 0 = bon momentum smooth
-        self.use_seasonal_threshold = use_seasonal_threshold  # Seuil dynamique par mois
+        # Seuil saisonnier (window dressing, Gray & Vogel) : désactivé par
+        # défaut depuis que month_sin/month_cos sont DANS le modèle — la
+        # saisonnalité est apprise, un seuil externe la compterait deux fois
+        # (et la table de get_score_threshold est calibrée sur l'ancienne
+        # échelle de score)
+        self.use_seasonal_threshold = use_seasonal_threshold
 
-        # Filtre SUE (Novy-Marx)
-        self.use_sue_filter = use_sue_filter  # Activer le filtre SUE
-        self.sue_threshold = sue_threshold     # SUE > sue_threshold (défaut: 0)
+        # Filtre earnings : pas d'entrée si annonce de résultats proche
+        # (les gaps post-earnings traversent le trailing stop)
+        self.use_earnings_filter = use_earnings_filter
+        self.earnings_blackout_days = earnings_blackout_days
+        self.earnings_filter = EarningsFilter(blackout_days=earnings_blackout_days) \
+            if use_earnings_filter else None
+
+        # Filtre SUE (Novy-Marx) — retiré, EarningsFeatures n'est plus chargé
         if use_sue_filter:
-            self.earnings_features = EarningsFeatures()
-            print(f"[PIPELINE] Filtre SUE activé (seuil > {sue_threshold})")
+            raise ValueError("use_sue_filter=True n'est plus supporté (EarningsFeatures retiré).")
+        self.use_sue_filter = use_sue_filter
+        self.sue_threshold = sue_threshold
 
         # DB locale pour les données historiques (priorité sur yfinance)
         self.db_manager = DatabaseManager(db_path)
@@ -97,16 +109,24 @@ class MomentumStrategy(Strategy):
         # Étape 1: Récupérer les données pour tous les symboles
         all_candidates = []
         nan_count = 0
+        # Déterminer si market_data a un cache préchargé (mode backtest)
+        _cache_preloaded = getattr(self.market_data, '_preloaded', False)
         for symbol in self.symbolsToAnalyse:
             start_date = trade_date - timedelta(days=self.lookback_days)
-            # Priorité: DB locale → fallback yfinance
-            data = self.db_manager.get_historical_data(symbol, start_date, trade_date)
-            source = "db"
+            data = None
+            source = "none"
+            # Mode backtest : utiliser le cache en mémoire en priorité (évite les requêtes DB par symbole)
+            if _cache_preloaded:
+                data = self.market_data.get_historical_data(symbol, start_date, trade_date, interval="1d")
+                source = "cache"
+            # Mode live ou cache manquant : requête DB puis fallback yfinance
+            if data is None or len(data) < 60:
+                data = self.db_manager.get_historical_data(symbol, start_date, trade_date)
+                source = "db"
             if data is None or len(data) < 60:
                 data = self.market_data.get_historical_data(symbol, start_date, trade_date, interval="1d")
                 source = "yfinance"
             if data is not None and len(data) >= 60:
-                print(f"[DATA] {symbol}: {len(data)} barres ({source})")
                 momentum_12_1 = MomentumFilters.calc_momentum_12_1(data)
                 if np.isnan(momentum_12_1):
                     nan_count += 1
@@ -114,16 +134,14 @@ class MomentumStrategy(Strategy):
 
         valid_count = len(all_candidates) - nan_count
         if all_candidates:
-            sample = all_candidates[0]
-            print(f"[PIPELINE] {len(all_candidates)} symboles ({valid_count} valides, {nan_count} NaN momentum)")
-            print(f"[PIPELINE] Exemple: {sample[0]} -> {len(sample[2])} barres, mom_12_1={sample[1]}")
+            print(f"[PIPELINE] {trade_date} | {len(all_candidates)} symboles ({valid_count} valides, {nan_count} NaN momentum)")
         else:
-            print(f"[PIPELINE] 0 symboles avec données suffisantes")
+            print(f"[PIPELINE] {trade_date} | 0 symboles avec données suffisantes")
 
         # Étape 2: Filtre momentum 12-1 (top 30%)
         momentum_filtered = MomentumFilters.filter_top_momentum(
             all_candidates, self.momentum_top_pct)
-        print(f"[PIPELINE] {len(momentum_filtered)} symboles après filtre momentum 12-1 (top {self.momentum_top_pct*100:.0f}%)")
+        print(f"[PIPELINE] {trade_date} | {len(momentum_filtered)} après momentum top {self.momentum_top_pct*100:.0f}%")
 
         # Étape 3: Filtre FIP
         fip_filtered = []
@@ -131,30 +149,19 @@ class MomentumStrategy(Strategy):
             fip = MomentumFilters.calc_fip(data)
             if not np.isnan(fip) and fip < self.fip_threshold:
                 fip_filtered.append((symbol, mom, fip, data))
-                print(f"  [FIP] {symbol}: mom_12_1={mom:.2%}, FIP={fip:.4f} [OK]")
-            else:
-                fip_val = f"{fip:.4f}" if not np.isnan(fip) else "N/A"
-                print(f"  [FIP] {symbol}: mom_12_1={mom:.2%}, FIP={fip_val} [X]")
 
-        print(f"[PIPELINE] {len(fip_filtered)} symboles après filtre FIP (< {self.fip_threshold})")
+        print(f"[PIPELINE] {trade_date} | {len(fip_filtered)} après filtre FIP (< {self.fip_threshold})")
 
-        # Étape 3b: Filtre SUE optionnel (Novy-Marx)
-        if self.use_sue_filter:
-            sue_filtered = []
-            for symbol, mom, fip, data in fip_filtered:
-                try:
-                    earnings = self.earnings_features.get_latest_earnings_features(symbol)
-                    sue = earnings.get('sue')
-                    if sue is not None and sue > self.sue_threshold:
-                        sue_filtered.append((symbol, mom, fip, data))
-                        print(f"  [SUE] {symbol}: SUE={sue:.2f}% > {self.sue_threshold} [OK]")
-                    else:
-                        sue_val = f"{sue:.2f}%" if sue is not None else "N/A"
-                        print(f"  [SUE] {symbol}: SUE={sue_val} [X]")
-                except Exception as e:
-                    print(f"  [SUE] {symbol}: Erreur ({e}) [X]")
-            print(f"[PIPELINE] {len(sue_filtered)} symboles après filtre SUE (> {self.sue_threshold})")
-            fip_filtered = sue_filtered
+        # Étape 3b: Filtre earnings — pas d'entrée si annonce de résultats
+        # dans les earnings_blackout_days jours (gap risk au travers du stop)
+        if self.use_earnings_filter and fip_filtered:
+            self.earnings_filter.preload([t[0] for t in fip_filtered], trade_date)
+            fip_filtered = [
+                t for t in fip_filtered
+                if not self.earnings_filter.is_in_blackout(t[0], trade_date)
+            ]
+            print(f"[PIPELINE] {trade_date} | {len(fip_filtered)} après filtre earnings "
+                  f"(blackout {self.earnings_blackout_days}j)")
 
         # Étape 4: Scoring ML sur les candidats restants
         # Déterminer le seuil selon la saisonnalité
@@ -167,24 +174,21 @@ class MomentumStrategy(Strategy):
 
         scored_symbols = []
         for symbol, mom, fip, data in fip_filtered:
-            if isinstance(self.scoring, SmoothMLScoring):
-                score = self.scoring.score(data, symbol=symbol)
-            else:
-                score = self.scoring.score(data)
+            score = self.scoring.score(data, symbol=symbol)
 
             if score >= threshold:
                 scored_symbols.append((symbol, score, data))
-                print(f"  [SCORE] {symbol}: score={score} >= {threshold} [OK]")
-            else:
-                print(f"  [SCORE] {symbol}: score={score} < {threshold} [X]")
 
-        print(f"[PIPELINE] {len(scored_symbols)} symboles après scoring ML (seuil={threshold})")
+        print(f"[PIPELINE] {trade_date} | {len(scored_symbols)} après scoring ML (seuil={threshold})"
+              + (f": {[s[0] for s in scored_symbols]}" if scored_symbols else ""))
 
         # Étape 5: Trier par score décroissant, garder top max_stocks
         scored_symbols.sort(key=lambda x: x[1], reverse=True)
         selected = scored_symbols[:self.max_stocks]
         self.symbolsToTrade = [s[0] for s in selected]
         self.symbolsData = {s[0]: s[2] for s in selected}
+        # Scores d'entrée, exposés pour la journalisation (score_entree)
+        self.symbolsScores = {s[0]: s[1] for s in selected}
         return self.symbolsToTrade
 
     def get_order_params(self):
