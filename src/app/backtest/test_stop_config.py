@@ -52,6 +52,12 @@ def main():
         default=os.path.join(os.path.dirname(__file__), '..', '..', '..', 'stop_config.json'),
         help='Chemin vers stop_config.json (défaut : racine du projet)'
     )
+    parser.add_argument('--scoring', choices=['smooth_ml', 'wyckoff_ml'], default='smooth_ml',
+                        help='Type de scoring (défaut: smooth_ml)')
+    parser.add_argument('--smooth-model', type=str, default=None,
+                        help='Chemin du modèle smooth (optionnel)')
+    parser.add_argument('--wyckoff-model', type=str, default=None,
+                        help='Chemin du modèle wyckoff (optionnel)')
     args = parser.parse_args()
 
     # Résoudre les dates
@@ -79,6 +85,7 @@ def main():
     print("BACKTEST — STOP CONFIG")
     print("=" * 60)
     print(f"Période    : {start_date.date()} → {end_date.date()}")
+    print(f"Scoring    : {args.scoring}")
     print(f"Protection : {prot_desc}")
     print(f"Profit     : {prof_desc}")
     print(f"Config     : {config_path}")
@@ -89,6 +96,9 @@ def main():
         start_date=start_date,
         end_date=end_date,
         initial_cash=100_000,
+        scoring_type=args.scoring,
+        smooth_model_path=args.smooth_model,
+        wyckoff_model_path=args.wyckoff_model,
     )
 
     # Passer la config au wrapper via addstrategy kwargs
@@ -108,6 +118,8 @@ def main():
             end_date=engine.end_date,
             dataframes=engine.dataframes,
             scoring_type=engine.scoring_type,
+            smooth_model_path=engine.smooth_model_path,
+            wyckoff_model_path=engine.wyckoff_model_path,
             use_sue_filter=engine.use_sue_filter,
             sue_threshold=engine.sue_threshold,
             db_path=engine.db_path,

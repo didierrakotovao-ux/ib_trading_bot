@@ -9,7 +9,9 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 from src.app.strategies.momentum import MomentumStrategy
+from src.app.strategies.wyckoff_ml import WyckoffMLStrategy
 from src.app.strategies.addivergence import AdDivergenceStrategy
+from src.app.value.fundamental_filters import FundamentalFilters
 from src.app.database.trade_journal import TradeJournal, TradeMode
 from market_data_mock import MarketDataMock
 
@@ -25,16 +27,18 @@ class TrailingOnlyBTWrapper(bt.Strategy):
         trailing_percent=5.0,  # Trailing stop à 5%
         cooldown_days=30,       # Jours d'interdiction de réentrée après stop-out (0 = désactivé)
         dataframes=None,  # DataFrames pré-chargés depuis SQLite
-        scoring_type="smooth_ml",  # Type de scoring: "ml", "smooth_ml", "earnings_ml"
+        scoring_type="smooth_ml",
         smooth_model_path=None,  # Chemin du modèle smooth_ml (None = modèle US par défaut)
+        wyckoff_model_path=None,  # Chemin du modèle wyckoff_ml
         use_sue_filter=False,  # Filtre SUE (Novy-Marx)
         sue_threshold=0.0,  # Seuil SUE (SUE > sue_threshold)
         db_path=None  # Chemin DB (None = trading_data.db)
     )
 
-    def __init__(self, start_date, end_date, dataframes=None):
+    def __init__(self, start_date, end_date, use_fondamental_data=False, dataframes=None):
         self.start_date = start_date
         self.end_date = end_date
+        self.use_fondamental_data = use_fondamental_data
 
         # MarketData mock avec cache des DataFrames
         self.market_data = MarketDataMock(self.datas)
@@ -49,18 +53,30 @@ class TrailingOnlyBTWrapper(bt.Strategy):
             db_path = os.path.basename(self.p.db_path)
 
         # Stratégie métier
-        self.strategy = MomentumStrategy(
-            market_data=self.market_data,
-            capital=self.p.capital,
-            max_stocks=self.p.max_stocks,
-            use_trailing_stop=True,
-            trailing_percent=self.p.trailing_percent,
-            scoring_type=self.p.scoring_type,
-            smooth_model_path=self.p.smooth_model_path,
-            use_sue_filter=self.p.use_sue_filter,
-            sue_threshold=self.p.sue_threshold,
-            db_path=db_path
-        )
+        if self.p.scoring_type == "wyckoff_ml":
+            self.strategy = WyckoffMLStrategy(
+                market_data=self.market_data,
+                capital=self.p.capital,
+                max_stocks=self.p.max_stocks,
+                use_trailing_stop=True,
+                trailing_percent=self.p.trailing_percent,
+                scoring_type=self.p.scoring_type,
+                wyckoff_model_path=self.p.wyckoff_model_path,
+                db_path=db_path,
+            )
+        else:
+            self.strategy = MomentumStrategy(
+                market_data=self.market_data,
+                capital=self.p.capital,
+                max_stocks=self.p.max_stocks,
+                use_trailing_stop=True,
+                trailing_percent=self.p.trailing_percent,
+                scoring_type=self.p.scoring_type,
+                smooth_model_path=self.p.smooth_model_path,
+                use_sue_filter=self.p.use_sue_filter,
+                sue_threshold=self.p.sue_threshold,
+                db_path=db_path,
+            )
 
         self.orders_by_symbol = {}
         self.pending_order_bundles = {}
@@ -68,9 +84,20 @@ class TrailingOnlyBTWrapper(bt.Strategy):
         self.pending_stops = {}
         self.stop_exit_dates = {}   # symbol → date de dernier stop-out
 
+        # Filtres fondamentaux (si activés)
+        if self.use_fondamental_data:
+            self.fundamental = FundamentalFilters(backtest_mode=True, max_workers=8)
+            self._fund_symbols_cache = None  # résultat du filtre mis en cache
+            self._fund_cache_ym      = None  # (année, mois) du dernier calcul
+
         # Journal de trading en BD
         self.trade_entries = {}
-        self.strategy_name = "TrailingOnly"
+        model_tag = "Wyckoff" if self.p.scoring_type == "wyckoff_ml" else "Smooth"
+        if self.use_fondamental_data:
+            self.strategy_name = f"TrailingOnly_{model_tag}_WithFundamental"
+        else:
+            self.strategy_name = f"TrailingOnly_{model_tag}"
+           
         self.trade_journal = TradeJournal("backtest_journal.db")
         # Effacer les trades backtest existants pour cette stratégie
         self.trade_journal.clear_backtest_trades(self.strategy_name)
@@ -83,7 +110,7 @@ class TrailingOnlyBTWrapper(bt.Strategy):
         with open(self.diag_filename, "w") as f:
             f.write(f"--- Début du diagnostic TrailingOnly ({diag_date}) ---\n")
 
-    def _log_trade_journal(self, symbol, entry_date, qty, entry_price, exit_date, exit_price, cause, pnl_brut, bars_held=0):
+    def _log_trade_journal(self, symbol, entry_date, qty, entry_price, exit_date, exit_price, cause, pnl_brut, bars_held=0, score=None):
         """Enregistre un trade dans le journal BD."""
         # Calculer les commissions (0.1% à l'achat + 0.1% à la vente)
         commission_rate = 0.001
@@ -106,6 +133,7 @@ class TrailingOnlyBTWrapper(bt.Strategy):
             commission=round(total_commission, 2),
             pnl_net=round(pnl_net, 2),
             bars_held=bars_held,
+            score_entree=score,
             backtest_start_date=self.start_date,
             backtest_end_date=self.end_date
         )
@@ -141,7 +169,9 @@ class TrailingOnlyBTWrapper(bt.Strategy):
                     'date_entree': order.data.datetime.datetime(0),
                     'prix_entree': order.executed.price,
                     'quantite': abs(order.executed.size),
-                    'bar_entree': len(self)
+                    'bar_entree': len(self),
+                    # Score ML à l'entrée (None si la stratégie ne l'expose pas)
+                    'score': getattr(self.strategy, 'symbolsScores', {}).get(symbol),
                 }
 
                 # Placer le trailing stop uniquement
@@ -188,7 +218,8 @@ class TrailingOnlyBTWrapper(bt.Strategy):
                         exit_price=order.executed.price,
                         cause=order_type,
                         pnl_brut=pnl,
-                        bars_held=bars_held
+                        bars_held=bars_held,
+                        score=entry_info.get('score')
                     )
                     del self.trade_entries[symbol]
 
@@ -237,6 +268,38 @@ class TrailingOnlyBTWrapper(bt.Strategy):
             return
 
         symbols = [d._name for d in self.datas]
+
+        if self.use_fondamental_data:
+            ym = (current_date.year, current_date.month)
+
+            # Recalculer une fois par mois (les fondamentaux changent trimestriellement)
+            if self._fund_cache_ym != ym:
+                all_syms = [d._name for d in self.datas]
+                prices   = {d._name: d.close[0] for d in self.datas}
+
+                # Pré-charger tous les fondamentaux en parallèle (cache 24h ensuite)
+                self.fundamental._prefetch_parallel(all_syms)
+
+                # 1. Piotroski > 6
+                pio_syms, _ = self.fundamental.filter_piotroski(
+                    all_syms, min_score=6, trade_date=current_date)
+
+                # 2. EBIT/TEV top 10% parmi les symboles Piotroski OK
+                ratios  = {s: self.fundamental.calc_ebit_tev(
+                               s, trade_date=current_date,
+                               current_price=prices.get(s))
+                           for s in pio_syms}
+                valid   = {s: r for s, r in ratios.items() if r is not None}
+                n_keep  = max(1, int(len(valid) * 0.10))
+                top_ev  = [s for s, _ in
+                           sorted(valid.items(), key=lambda x: x[1], reverse=True)[:n_keep]]
+
+                self._fund_symbols_cache = top_ev 
+                self._fund_cache_ym = ym
+                print(f"[FUND] {current_date}: {len(top_ev)} top EBIT/TEV")
+
+            symbols = self._fund_symbols_cache
+            
         self.strategy.set_symbols_to_analyse(symbols)
         symbols_to_trade = self.strategy.get_symbols(current_date)
         self.log_diag(f"{current_date} Symboles sélectionnés: {symbols_to_trade}")
@@ -287,7 +350,16 @@ class TrailingOnlyBTWrapper(bt.Strategy):
         print(f"[DEBUG] Nombre de bundles à traiter: {len(order_bundles)}")
         print(f"[DEBUG] Data feeds disponibles: {[d._name for d in self.datas[:10]]}...")
 
+        # Sizing dynamique base sur le cash disponible pour limiter les rejets Margin.
+        reserved_cash = float(self.broker.get_cash())
+        planned_entries = 0
+        cash_buffer_mult = 1.002  # petit coussin pour commissions/slippage
+
         for bundle in order_bundles:
+            slots_left = self.p.max_stocks - current_positions - planned_entries
+            if slots_left <= 0:
+                break
+
             symbol = bundle["symbol"]
             data = self._get_data(symbol)
             if not data:
@@ -302,11 +374,26 @@ class TrailingOnlyBTWrapper(bt.Strategy):
                 self.log_diag(f"[WARNING] {symbol} a une position mais n'aurait pas dû passer le filtre, skip")
                 continue
 
-            # Placer l'ordre d'entrée (market order)
-            qty = bundle["entry_order"].totalQuantity
+            # Ajuster la quantité en fonction du cash restant et des slots restants.
+            requested_qty = int(bundle["entry_order"].totalQuantity)
+            entry_price_ref = float(getattr(bundle["entry_order"], "lmtPrice", data.close[0] * 1.005))
+            budget_per_slot = reserved_cash / max(slots_left, 1)
+            affordable_qty = int(budget_per_slot / max(entry_price_ref * cash_buffer_mult, 0.01))
+            qty = min(requested_qty, affordable_qty)
+
+            if qty <= 0:
+                self.log_diag(
+                    f"[CASH] {symbol} ignoré (cash réservé={reserved_cash:.2f}, "
+                    f"slots_left={slots_left}, prix_ref={entry_price_ref:.2f})"
+                )
+                continue
+
             cash = self.broker.get_cash()
             price = data.close[0]
-            print(f"[DEBUG] Tentative achat {symbol}: qty={qty}, price={price:.2f}, cash={cash:.2f}")
+            print(
+                f"[DEBUG] Tentative achat {symbol}: qty={qty} (req={requested_qty}), "
+                f"price={price:.2f}, cash={cash:.2f}, reserved={reserved_cash:.2f}"
+            )
 
             try:
                 entry_order = self.buy(data=data, size=qty)
@@ -317,6 +404,8 @@ class TrailingOnlyBTWrapper(bt.Strategy):
                     self.log_diag(f"[BT] Entry order placé pour {symbol}, qty={qty}")
                     self.orders_by_symbol[symbol] = {"entry": entry_order}
                     self.pending_order_bundles[symbol] = bundle
+                    reserved_cash -= qty * entry_price_ref * cash_buffer_mult
+                    planned_entries += 1
                 else:
                     print(f"[ERROR] Échec placement ordre pour {symbol} (buy returned None)")
                     self.log_diag(f"[ERROR] Échec de placement d'ordre pour {symbol}")
@@ -374,7 +463,8 @@ class TrailingOnlyBTWrapper(bt.Strategy):
                         exit_price=exit_price,
                         cause='END_OF_BACKTEST',
                         pnl_brut=pnl_brut,
-                        bars_held=bars_held
+                        bars_held=bars_held,
+                        score=entry_info.get('score')
                     )
                     print(f"  {symbol}: Fermé à {exit_price:.2f} (Entrée: {entry_info['prix_entree']:.2f}, PnL: {pnl_brut:+.2f}$, Bars: {bars_held})")
                     closed_count += 1

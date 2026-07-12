@@ -1,0 +1,428 @@
+[2026-07-09  9:25:01,93] Demarrage collecte tick OFI 
+
+============================================================
+TICK OFI COLLECTOR  (reqTickByTickData + Lee-Ready)
+============================================================
+Host/Port      : 192.168.0.103:7496
+Client ID      : 98
+Exchange       : ISLAND
+Symbols ( 5)  : AAPL, MSFT, NVDA, AMZN, META
+Tick rotation  : desactivee (5 <= 5)
+Sample OFI     : toutes les 5.0s
+Duration       : 395 min
+Output OFI     : logs\tick_ofi\tick_ofi_20260709_092502.csv
+Output ticks   : logs\tick_ofi\tick_raw_20260709_092502.csv
+============================================================
+
+[OK] Connecté à IB
+[OK] L1 souscrit pour 5 symboles
+[OK] Ticks actifs  : AAPL, MSFT, NVDA, AMZN, META
+[INFO] Warmup 3s...
+
+[RUN] OFI agrégé  : logs\tick_ofi\tick_ofi_20260709_092502.csv
+[RUN] Ticks bruts : logs\tick_ofi\tick_raw_20260709_092502.csv
+
+[RUN] 0.9min | ticks=365 | grp1/1: AAPL L1=-0.34 trd=-0.14 cnt=34 | MSFT L1=-0.35 trd=-0.07 cnt=87 | NVDA L1=+0.04 trd=-0.46 cnt=119 | AMZN L1=-0.24 trd=+0.35 cnt=18 | META L1=+0.04 trd=-0.00 cnt=104
+[RUN] 1.9min | ticks=732 | grp1/1: AAPL L1=-0.28 trd=-0.21 cnt=22 | MSFT L1=-0.24 trd=+0.33 cnt=24 | NVDA L1=-0.03 trd=-0.40 cnt=38 | AMZN L1=+0.09 trd=-0.36 cnt=58 | META L1=+0.27 trd=-0.69 cnt=211
+[RUN] 2.9min | ticks=1643 | grp1/1: AAPL L1=-0.17 trd=-0.91 cnt=287 | MSFT L1=-0.18 trd=-0.66 cnt=87 | NVDA L1=-0.12 trd=-0.33 cnt=265 | AMZN L1=-0.23 trd=-0.40 cnt=100 | META L1=+0.17 trd=-0.15 cnt=165
+[RUN] 3.9min | ticks=2418 | grp1/1: AAPL L1=+0.10 trd=-0.21 cnt=314 | MSFT L1=-0.23 trd=-0.39 cnt=104 | NVDA L1=-0.11 trd=+0.39 cnt=173 | AMZN L1=-0.07 trd=-0.84 cnt=77 | META L1=-0.13 trd=+0.41 cnt=98
+[RUN] 4.9min | ticks=7786 | grp1/1: AAPL L1=+0.13 trd=-0.95 cnt=751 | MSFT L1=+0.09 trd=+0.93 cnt=1289 | NVDA L1=-0.08 trd=-0.95 cnt=2085 | AMZN L1=-0.22 trd=-0.93 cnt=666 | META L1=+0.15 trd=+0.91 cnt=563
+[RUN] 5.9min | ticks=22867 | grp1/1: AAPL L1=-0.13 trd=-0.01 cnt=3090 | MSFT L1=-0.07 trd=-0.00 cnt=2175 | NVDA L1=-0.06 trd=-0.13 cnt=4651 | AMZN L1=-0.07 trd=+0.01 cnt=1963 | META L1=-0.07 trd=-0.50 cnt=2402
+[RUN] 6.9min | ticks=32169 | grp1/1: AAPL L1=-0.03 trd=-0.18 cnt=1681 | MSFT L1=-0.01 trd=-0.16 cnt=930 | NVDA L1=-0.07 trd=-0.11 cnt=3850 | AMZN L1=-0.07 trd=-0.12 cnt=1448 | META L1=+0.03 trd=-0.32 cnt=1176
+[RUN] 7.9min | ticks=38851 | grp1/1: AAPL L1=+0.10 trd=-0.07 cnt=970 | MSFT L1=-0.02 trd=-0.11 cnt=668 | NVDA L1=+0.12 trd=-0.02 cnt=3382 | AMZN L1=+0.04 trd=+0.11 cnt=693 | META L1=-0.05 trd=-0.04 cnt=823
+[RUN] 8.9min | ticks=45689 | grp1/1: AAPL L1=+0.09 trd=-0.11 cnt=734 | MSFT L1=+0.02 trd=+0.10 cnt=779 | NVDA L1=-0.04 trd=-0.21 cnt=3895 | AMZN L1=+0.05 trd=+0.05 cnt=619 | META L1=-0.01 trd=-0.01 cnt=703
+[RUN] 9.9min | ticks=51499 | grp1/1: AAPL L1=+0.01 trd=-0.01 cnt=671 | MSFT L1=-0.00 trd=-0.26 cnt=702 | NVDA L1=-0.04 trd=-0.14 cnt=3395 | AMZN L1=+0.04 trd=-0.36 cnt=459 | META L1=-0.04 trd=+0.06 cnt=353
+[RUN] 10.9min | ticks=58461 | grp1/1: AAPL L1=+0.04 trd=-0.19 cnt=901 | MSFT L1=-0.08 trd=+0.25 cnt=640 | NVDA L1=-0.01 trd=-0.08 cnt=3905 | AMZN L1=+0.00 trd=+0.20 cnt=908 | META L1=+0.09 trd=-0.03 cnt=480
+[RUN] 12.0min | ticks=64573 | grp1/1: AAPL L1=+0.00 trd=-0.24 cnt=1276 | MSFT L1=+0.15 trd=+0.38 cnt=651 | NVDA L1=-0.04 trd=-0.14 cnt=3379 | AMZN L1=-0.01 trd=-0.13 cnt=361 | META L1=+0.11 trd=+0.16 cnt=364
+[RUN] 13.0min | ticks=70987 | grp1/1: AAPL L1=+0.03 trd=-0.19 cnt=976 | MSFT L1=-0.07 trd=+0.35 cnt=847 | NVDA L1=+0.03 trd=-0.24 cnt=3307 | AMZN L1=-0.00 trd=+0.12 cnt=662 | META L1=+0.04 trd=+0.02 cnt=493
+[RUN] 14.0min | ticks=76481 | grp1/1: AAPL L1=+0.03 trd=+0.00 cnt=660 | MSFT L1=+0.08 trd=-0.43 cnt=660 | NVDA L1=-0.05 trd=-0.07 cnt=2534 | AMZN L1=+0.04 trd=+0.10 cnt=1199 | META L1=+0.13 trd=+0.52 cnt=317
+[RUN] 15.0min | ticks=84075 | grp1/1: AAPL L1=+0.00 trd=+0.07 cnt=774 | MSFT L1=+0.09 trd=-0.35 cnt=1443 | NVDA L1=-0.09 trd=-0.07 cnt=4188 | AMZN L1=+0.02 trd=+0.24 cnt=533 | META L1=+0.09 trd=+0.14 cnt=516
+[RUN] 16.0min | ticks=90644 | grp1/1: AAPL L1=-0.04 trd=-0.00 cnt=650 | MSFT L1=+0.09 trd=-0.18 cnt=628 | NVDA L1=-0.02 trd=-0.05 cnt=3738 | AMZN L1=+0.08 trd=+0.01 cnt=763 | META L1=+0.11 trd=+0.21 cnt=537
+[RUN] 17.0min | ticks=94765 | grp1/1: AAPL L1=+0.04 trd=+0.10 cnt=590 | MSFT L1=+0.12 trd=-0.12 cnt=600 | NVDA L1=-0.03 trd=-0.05 cnt=2140 | AMZN L1=+0.02 trd=+0.06 cnt=447 | META L1=+0.10 trd=-0.14 cnt=229
+[RUN] 18.0min | ticks=99346 | grp1/1: AAPL L1=+0.05 trd=-0.25 cnt=569 | MSFT L1=+0.16 trd=-0.16 cnt=555 | NVDA L1=+0.03 trd=+0.23 cnt=2317 | AMZN L1=+0.06 trd=+0.46 cnt=601 | META L1=-0.14 trd=-0.46 cnt=489
+[RUN] 19.0min | ticks=103694 | grp1/1: AAPL L1=+0.29 trd=+0.21 cnt=469 | MSFT L1=+0.08 trd=-0.37 cnt=662 | NVDA L1=-0.02 trd=+0.06 cnt=2265 | AMZN L1=+0.18 trd=-0.24 cnt=673 | META L1=+0.10 trd=-0.06 cnt=158
+[RUN] 20.0min | ticks=107339 | grp1/1: AAPL L1=-0.02 trd=+0.21 cnt=444 | MSFT L1=+0.05 trd=-0.37 cnt=377 | NVDA L1=-0.05 trd=-0.02 cnt=2050 | AMZN L1=-0.03 trd=-0.30 cnt=476 | META L1=-0.10 trd=-0.44 cnt=246
+[RUN] 21.0min | ticks=110941 | grp1/1: AAPL L1=+0.01 trd=-0.19 cnt=262 | MSFT L1=+0.06 trd=+0.31 cnt=585 | NVDA L1=+0.02 trd=+0.11 cnt=2136 | AMZN L1=+0.00 trd=-0.36 cnt=289 | META L1=-0.10 trd=-0.15 cnt=243
+[RUN] 22.1min | ticks=114179 | grp1/1: AAPL L1=-0.04 trd=-0.21 cnt=424 | MSFT L1=+0.07 trd=-0.18 cnt=360 | NVDA L1=+0.02 trd=+0.08 cnt=1831 | AMZN L1=+0.09 trd=+0.28 cnt=227 | META L1=-0.01 trd=-0.43 cnt=321
+[RUN] 23.1min | ticks=118300 | grp1/1: AAPL L1=+0.05 trd=-0.10 cnt=319 | MSFT L1=+0.15 trd=+0.25 cnt=268 | NVDA L1=+0.04 trd=-0.07 cnt=2531 | AMZN L1=+0.07 trd=+0.61 cnt=612 | META L1=-0.07 trd=+0.41 cnt=164
+[RUN] 24.1min | ticks=122053 | grp1/1: AAPL L1=+0.05 trd=-0.19 cnt=402 | MSFT L1=+0.06 trd=+0.26 cnt=428 | NVDA L1=-0.00 trd=-0.49 cnt=2271 | AMZN L1=+0.00 trd=-0.31 cnt=285 | META L1=-0.08 trd=-0.11 cnt=202
+[RUN] 25.1min | ticks=125368 | grp1/1: AAPL L1=+0.02 trd=+0.01 cnt=382 | MSFT L1=+0.07 trd=-0.21 cnt=298 | NVDA L1=+0.04 trd=-0.02 cnt=2191 | AMZN L1=+0.08 trd=-0.01 cnt=175 | META L1=-0.06 trd=+0.30 cnt=196
+[RUN] 26.1min | ticks=128431 | grp1/1: AAPL L1=-0.06 trd=-0.17 cnt=500 | MSFT L1=-0.08 trd=-0.48 cnt=386 | NVDA L1=+0.01 trd=-0.12 cnt=1661 | AMZN L1=-0.10 trd=-0.32 cnt=231 | META L1=+0.06 trd=-0.03 cnt=212
+[RUN] 27.1min | ticks=132723 | grp1/1: AAPL L1=-0.07 trd=-0.03 cnt=826 | MSFT L1=+0.14 trd=+0.07 cnt=321 | NVDA L1=+0.03 trd=+0.02 cnt=2189 | AMZN L1=+0.07 trd=-0.70 cnt=627 | META L1=-0.18 trd=+0.29 cnt=286
+[RUN] 28.1min | ticks=135771 | grp1/1: AAPL L1=+0.07 trd=+0.16 cnt=622 | MSFT L1=+0.05 trd=-0.15 cnt=285 | NVDA L1=-0.12 trd=-0.21 cnt=1507 | AMZN L1=+0.10 trd=-0.25 cnt=453 | META L1=-0.01 trd=-0.30 cnt=131
+[RUN] 29.1min | ticks=138513 | grp1/1: AAPL L1=+0.07 trd=+0.11 cnt=463 | MSFT L1=-0.13 trd=-0.14 cnt=382 | NVDA L1=+0.04 trd=+0.08 cnt=1352 | AMZN L1=+0.05 trd=-0.04 cnt=297 | META L1=+0.04 trd=-0.02 cnt=177
+[RUN] 30.1min | ticks=141017 | grp1/1: AAPL L1=+0.03 trd=-0.00 cnt=439 | MSFT L1=+0.20 trd=+0.33 cnt=265 | NVDA L1=+0.01 trd=+0.10 cnt=1222 | AMZN L1=-0.02 trd=-0.26 cnt=339 | META L1=+0.05 trd=-0.19 cnt=182
+[RUN] 31.1min | ticks=143410 | grp1/1: AAPL L1=-0.08 trd=+0.27 cnt=419 | MSFT L1=+0.11 trd=-0.03 cnt=205 | NVDA L1=-0.03 trd=+0.03 cnt=1165 | AMZN L1=+0.09 trd=-0.33 cnt=349 | META L1=+0.09 trd=+0.35 cnt=234
+[RUN] 32.1min | ticks=147095 | grp1/1: AAPL L1=+0.02 trd=+0.30 cnt=313 | MSFT L1=-0.02 trd=+0.07 cnt=348 | NVDA L1=-0.08 trd=-0.34 cnt=2387 | AMZN L1=-0.02 trd=+0.01 cnt=326 | META L1=+0.04 trd=+0.35 cnt=271
+[RUN] 33.1min | ticks=150188 | grp1/1: AAPL L1=+0.16 trd=+0.22 cnt=503 | MSFT L1=+0.22 trd=-0.21 cnt=210 | NVDA L1=+0.09 trd=+0.02 cnt=1521 | AMZN L1=+0.05 trd=-0.22 cnt=381 | META L1=+0.03 trd=+0.18 cnt=447
+[RUN] 34.1min | ticks=154170 | grp1/1: AAPL L1=-0.02 trd=-0.33 cnt=277 | MSFT L1=+0.13 trd=+0.18 cnt=309 | NVDA L1=-0.11 trd=-0.23 cnt=2366 | AMZN L1=+0.00 trd=+0.48 cnt=748 | META L1=+0.03 trd=+0.25 cnt=174
+[RUN] 35.1min | ticks=159135 | grp1/1: AAPL L1=-0.03 trd=-0.18 cnt=380 | MSFT L1=+0.07 trd=-0.17 cnt=375 | NVDA L1=+0.04 trd=-0.08 cnt=2431 | AMZN L1=+0.08 trd=+0.29 cnt=323 | META L1=+0.01 trd=+0.45 cnt=1388
+[RUN] 36.2min | ticks=162630 | grp1/1: AAPL L1=-0.06 trd=-0.14 cnt=312 | MSFT L1=+0.14 trd=+0.38 cnt=319 | NVDA L1=-0.03 trd=-0.02 cnt=1435 | AMZN L1=-0.07 trd=-0.07 cnt=438 | META L1=+0.09 trd=-0.00 cnt=849
+[RUN] 37.2min | ticks=167348 | grp1/1: AAPL L1=+0.03 trd=-0.39 cnt=660 | MSFT L1=-0.04 trd=-0.39 cnt=477 | NVDA L1=-0.12 trd=-0.12 cnt=1896 | AMZN L1=+0.06 trd=+0.10 cnt=300 | META L1=+0.08 trd=+0.07 cnt=1269
+[RUN] 38.2min | ticks=172592 | grp1/1: AAPL L1=+0.11 trd=-0.21 cnt=374 | MSFT L1=+0.07 trd=-0.56 cnt=378 | NVDA L1=-0.02 trd=-0.31 cnt=3160 | AMZN L1=-0.07 trd=-0.20 cnt=187 | META L1=+0.05 trd=+0.19 cnt=1081
+[RUN] 39.2min | ticks=175270 | grp1/1: AAPL L1=+0.01 trd=-0.45 cnt=307 | MSFT L1=+0.09 trd=-0.07 cnt=317 | NVDA L1=+0.08 trd=+0.21 cnt=1316 | AMZN L1=-0.01 trd=+0.57 cnt=155 | META L1=+0.07 trd=-0.04 cnt=529
+[RUN] 40.2min | ticks=178018 | grp1/1: AAPL L1=+0.05 trd=-0.06 cnt=272 | MSFT L1=+0.04 trd=+0.04 cnt=358 | NVDA L1=+0.02 trd=-0.07 cnt=1524 | AMZN L1=+0.07 trd=-0.69 cnt=163 | META L1=-0.10 trd=-0.02 cnt=400
+[RUN] 41.2min | ticks=181018 | grp1/1: AAPL L1=+0.02 trd=+0.25 cnt=299 | MSFT L1=+0.09 trd=-0.20 cnt=386 | NVDA L1=+0.01 trd=-0.29 cnt=1214 | AMZN L1=-0.15 trd=-0.23 cnt=337 | META L1=-0.01 trd=-0.29 cnt=682
+[RUN] 42.2min | ticks=184763 | grp1/1: AAPL L1=+0.10 trd=+0.16 cnt=404 | MSFT L1=+0.13 trd=-0.12 cnt=554 | NVDA L1=-0.00 trd=-0.08 cnt=1998 | AMZN L1=-0.01 trd=-0.19 cnt=383 | META L1=-0.03 trd=-0.02 cnt=334
+[RUN] 43.2min | ticks=187965 | grp1/1: AAPL L1=+0.15 trd=+0.49 cnt=231 | MSFT L1=+0.20 trd=-0.39 cnt=408 | NVDA L1=+0.01 trd=-0.12 cnt=1838 | AMZN L1=+0.10 trd=-0.20 cnt=493 | META L1=-0.12 trd=-0.29 cnt=197
+[RUN] 44.2min | ticks=190642 | grp1/1: AAPL L1=+0.17 trd=+0.26 cnt=273 | MSFT L1=+0.14 trd=-0.52 cnt=575 | NVDA L1=+0.03 trd=+0.05 cnt=1479 | AMZN L1=-0.00 trd=-0.33 cnt=151 | META L1=-0.10 trd=+0.11 cnt=163
+[RUN] 45.2min | ticks=195170 | grp1/1: AAPL L1=-0.05 trd=-0.53 cnt=285 | MSFT L1=-0.01 trd=-0.53 cnt=811 | NVDA L1=-0.03 trd=-0.59 cnt=2770 | AMZN L1=-0.16 trd=-0.53 cnt=234 | META L1=-0.07 trd=+0.22 cnt=272
+[RUN] 46.2min | ticks=198107 | grp1/1: AAPL L1=-0.05 trd=+0.43 cnt=576 | MSFT L1=+0.02 trd=-0.03 cnt=565 | NVDA L1=+0.13 trd=+0.21 cnt=1265 | AMZN L1=+0.10 trd=-0.17 cnt=247 | META L1=+0.04 trd=-0.29 cnt=206
+[RUN] 47.2min | ticks=201472 | grp1/1: AAPL L1=-0.02 trd=+0.06 cnt=331 | MSFT L1=+0.18 trd=-0.18 cnt=507 | NVDA L1=-0.16 trd=-0.14 cnt=1784 | AMZN L1=-0.03 trd=-0.22 cnt=568 | META L1=+0.11 trd=-0.10 cnt=144
+[RUN] 48.2min | ticks=204285 | grp1/1: AAPL L1=-0.06 trd=+0.00 cnt=416 | MSFT L1=+0.04 trd=+0.01 cnt=434 | NVDA L1=+0.02 trd=+0.01 cnt=1443 | AMZN L1=+0.13 trd=-0.47 cnt=259 | META L1=-0.09 trd=-0.55 cnt=168
+[RUN] 49.3min | ticks=207975 | grp1/1: AAPL L1=+0.09 trd=-0.34 cnt=301 | MSFT L1=+0.04 trd=+0.02 cnt=467 | NVDA L1=+0.07 trd=+0.15 cnt=1995 | AMZN L1=-0.14 trd=-0.45 cnt=601 | META L1=-0.11 trd=-0.87 cnt=120
+[RUN] 50.3min | ticks=211635 | grp1/1: AAPL L1=+0.05 trd=-0.16 cnt=470 | MSFT L1=+0.12 trd=-0.60 cnt=464 | NVDA L1=+0.06 trd=-0.32 cnt=2091 | AMZN L1=-0.03 trd=-0.09 cnt=329 | META L1=-0.05 trd=-0.30 cnt=278
+[RUN] 51.3min | ticks=215389 | grp1/1: AAPL L1=-0.07 trd=+0.13 cnt=390 | MSFT L1=+0.18 trd=-0.46 cnt=632 | NVDA L1=-0.06 trd=-0.28 cnt=2005 | AMZN L1=-0.14 trd=-0.61 cnt=425 | META L1=-0.03 trd=-0.43 cnt=210
+[RUN] 52.3min | ticks=218595 | grp1/1: AAPL L1=+0.04 trd=+0.20 cnt=393 | MSFT L1=-0.02 trd=-0.32 cnt=656 | NVDA L1=+0.05 trd=+0.09 cnt=1311 | AMZN L1=+0.03 trd=-0.49 cnt=604 | META L1=-0.05 trd=-0.24 cnt=160
+[RUN] 53.3min | ticks=221418 | grp1/1: AAPL L1=+0.05 trd=+0.27 cnt=216 | MSFT L1=+0.07 trd=+0.08 cnt=318 | NVDA L1=+0.01 trd=-0.27 cnt=1581 | AMZN L1=-0.12 trd=-0.12 cnt=455 | META L1=+0.01 trd=-0.45 cnt=177
+[RUN] 54.3min | ticks=224281 | grp1/1: AAPL L1=+0.06 trd=-0.30 cnt=213 | MSFT L1=-0.04 trd=-0.18 cnt=345 | NVDA L1=-0.09 trd=-0.26 cnt=1667 | AMZN L1=-0.01 trd=+0.37 cnt=460 | META L1=+0.10 trd=-0.47 cnt=141
+[RUN] 55.3min | ticks=227185 | grp1/1: AAPL L1=+0.10 trd=-0.30 cnt=257 | MSFT L1=+0.10 trd=-0.31 cnt=485 | NVDA L1=+0.06 trd=+0.15 cnt=1676 | AMZN L1=-0.03 trd=+0.02 cnt=276 | META L1=+0.02 trd=-0.57 cnt=160
+[RUN] 56.3min | ticks=231211 | grp1/1: AAPL L1=+0.15 trd=+0.10 cnt=451 | MSFT L1=+0.04 trd=-0.34 cnt=345 | NVDA L1=-0.08 trd=-0.30 cnt=2477 | AMZN L1=-0.02 trd=+0.14 cnt=462 | META L1=-0.07 trd=+0.02 cnt=199
+[RUN] 57.3min | ticks=234632 | grp1/1: AAPL L1=+0.02 trd=+0.04 cnt=377 | MSFT L1=+0.02 trd=-0.37 cnt=336 | NVDA L1=+0.02 trd=-0.21 cnt=2048 | AMZN L1=+0.11 trd=-0.10 cnt=422 | META L1=+0.04 trd=-0.35 cnt=145
+[RUN] 58.3min | ticks=237674 | grp1/1: AAPL L1=-0.02 trd=-0.30 cnt=640 | MSFT L1=+0.15 trd=+0.42 cnt=560 | NVDA L1=-0.09 trd=+0.18 cnt=1429 | AMZN L1=-0.08 trd=-0.05 cnt=259 | META L1=+0.04 trd=+0.64 cnt=129
+[RUN] 59.3min | ticks=239463 | grp1/1: AAPL L1=-0.03 trd=+0.19 cnt=339 | MSFT L1=+0.16 trd=+0.16 cnt=218 | NVDA L1=+0.05 trd=+0.31 cnt=795 | AMZN L1=+0.02 trd=-0.59 cnt=167 | META L1=+0.06 trd=+0.27 cnt=175
+[RUN] 60.3min | ticks=241520 | grp1/1: AAPL L1=+0.05 trd=+0.19 cnt=434 | MSFT L1=+0.21 trd=-0.04 cnt=238 | NVDA L1=+0.01 trd=+0.46 cnt=924 | AMZN L1=+0.08 trd=-0.68 cnt=242 | META L1=-0.04 trd=-0.14 cnt=154
+[RUN] 61.3min | ticks=243522 | grp1/1: AAPL L1=+0.05 trd=-0.22 cnt=335 | MSFT L1=+0.07 trd=-0.36 cnt=271 | NVDA L1=-0.15 trd=-0.07 cnt=1051 | AMZN L1=-0.06 trd=-0.18 cnt=201 | META L1=+0.09 trd=+0.18 cnt=101
+[RUN] 62.3min | ticks=245338 | grp1/1: AAPL L1=+0.11 trd=+0.07 cnt=276 | MSFT L1=+0.03 trd=-0.19 cnt=249 | NVDA L1=+0.01 trd=+0.31 cnt=935 | AMZN L1=+0.02 trd=+0.51 cnt=113 | META L1=+0.06 trd=+0.25 cnt=230
+[RUN] 63.4min | ticks=247541 | grp1/1: AAPL L1=-0.09 trd=+0.05 cnt=248 | MSFT L1=+0.12 trd=+0.12 cnt=346 | NVDA L1=-0.00 trd=-0.03 cnt=1091 | AMZN L1=+0.02 trd=+0.15 cnt=331 | META L1=+0.03 trd=+0.27 cnt=166
+[RUN] 64.4min | ticks=249971 | grp1/1: AAPL L1=+0.06 trd=-0.29 cnt=327 | MSFT L1=+0.16 trd=+0.11 cnt=309 | NVDA L1=-0.03 trd=-0.27 cnt=1314 | AMZN L1=+0.04 trd=-0.28 cnt=200 | META L1=+0.01 trd=+0.09 cnt=268
+[RUN] 65.4min | ticks=252098 | grp1/1: AAPL L1=+0.12 trd=-0.28 cnt=303 | MSFT L1=-0.04 trd=-0.44 cnt=249 | NVDA L1=-0.02 trd=-0.31 cnt=1003 | AMZN L1=+0.09 trd=-0.39 cnt=381 | META L1=-0.00 trd=-0.39 cnt=162
+[RUN] 66.4min | ticks=254899 | grp1/1: AAPL L1=+0.01 trd=+0.01 cnt=483 | MSFT L1=+0.11 trd=-0.18 cnt=249 | NVDA L1=-0.03 trd=-0.15 cnt=1604 | AMZN L1=+0.05 trd=-0.11 cnt=329 | META L1=+0.02 trd=-0.44 cnt=102
+[RUN] 67.4min | ticks=257085 | grp1/1: AAPL L1=+0.06 trd=-0.05 cnt=447 | MSFT L1=+0.19 trd=+0.10 cnt=290 | NVDA L1=-0.00 trd=-0.00 cnt=919 | AMZN L1=-0.03 trd=+0.11 cnt=235 | META L1=-0.03 trd=+0.00 cnt=251
+[RUN] 68.4min | ticks=258602 | grp1/1: AAPL L1=+0.07 trd=-0.19 cnt=264 | MSFT L1=+0.13 trd=+0.56 cnt=191 | NVDA L1=+0.01 trd=+0.02 cnt=697 | AMZN L1=+0.02 trd=+0.04 cnt=210 | META L1=+0.14 trd=+0.15 cnt=126
+[RUN] 69.4min | ticks=261132 | grp1/1: AAPL L1=-0.00 trd=-0.18 cnt=361 | MSFT L1=+0.12 trd=-0.24 cnt=233 | NVDA L1=+0.07 trd=-0.45 cnt=853 | AMZN L1=+0.11 trd=+0.05 cnt=441 | META L1=-0.10 trd=-0.05 cnt=143
+[RUN] 70.4min | ticks=263324 | grp1/1: AAPL L1=+0.07 trd=-0.03 cnt=294 | MSFT L1=+0.18 trd=+0.17 cnt=193 | NVDA L1=-0.06 trd=-0.01 cnt=1002 | AMZN L1=+0.18 trd=+0.05 cnt=562 | META L1=+0.11 trd=+0.26 cnt=116
+[RUN] 71.4min | ticks=265464 | grp1/1: AAPL L1=+0.03 trd=+0.14 cnt=294 | MSFT L1=+0.20 trd=+0.21 cnt=312 | NVDA L1=-0.04 trd=-0.04 cnt=1005 | AMZN L1=+0.02 trd=+0.20 cnt=342 | META L1=+0.13 trd=-0.04 cnt=129
+[RUN] 72.4min | ticks=267630 | grp1/1: AAPL L1=-0.01 trd=+0.04 cnt=304 | MSFT L1=+0.04 trd=-0.19 cnt=311 | NVDA L1=-0.03 trd=-0.33 cnt=1088 | AMZN L1=+0.03 trd=-0.17 cnt=266 | META L1=+0.06 trd=+0.30 cnt=193
+[RUN] 73.4min | ticks=269357 | grp1/1: AAPL L1=+0.02 trd=+0.40 cnt=369 | MSFT L1=+0.11 trd=+0.26 cnt=211 | NVDA L1=+0.06 trd=-0.08 cnt=852 | AMZN L1=-0.05 trd=-0.15 cnt=120 | META L1=-0.02 trd=-0.29 cnt=123
+[RUN] 74.4min | ticks=270770 | grp1/1: AAPL L1=-0.05 trd=-0.16 cnt=269 | MSFT L1=+0.04 trd=+0.54 cnt=219 | NVDA L1=+0.09 trd=+0.01 cnt=651 | AMZN L1=+0.08 trd=+0.06 cnt=130 | META L1=+0.23 trd=+0.56 cnt=105
+[RUN] 75.4min | ticks=272773 | grp1/1: AAPL L1=+0.06 trd=+0.14 cnt=335 | MSFT L1=+0.07 trd=+0.17 cnt=199 | NVDA L1=+0.07 trd=+0.12 cnt=1149 | AMZN L1=-0.09 trd=-0.53 cnt=179 | META L1=+0.04 trd=-0.13 cnt=131
+[RUN] 76.4min | ticks=274817 | grp1/1: AAPL L1=-0.03 trd=+0.02 cnt=302 | MSFT L1=+0.08 trd=+0.37 cnt=208 | NVDA L1=+0.07 trd=+0.07 cnt=1138 | AMZN L1=-0.08 trd=-0.14 cnt=217 | META L1=+0.05 trd=-0.16 cnt=124
+[RUN] 77.4min | ticks=276667 | grp1/1: AAPL L1=-0.00 trd=-0.21 cnt=588 | MSFT L1=+0.10 trd=-0.01 cnt=240 | NVDA L1=-0.00 trd=+0.35 cnt=698 | AMZN L1=+0.01 trd=+0.02 cnt=149 | META L1=+0.10 trd=-0.34 cnt=146
+[RUN] 78.4min | ticks=278532 | grp1/1: AAPL L1=+0.02 trd=-0.15 cnt=413 | MSFT L1=+0.15 trd=+0.10 cnt=233 | NVDA L1=-0.02 trd=-0.21 cnt=901 | AMZN L1=-0.01 trd=-0.22 cnt=145 | META L1=-0.08 trd=-0.09 cnt=153
+[RUN] 79.4min | ticks=280670 | grp1/1: AAPL L1=+0.01 trd=-0.12 cnt=434 | MSFT L1=+0.07 trd=-0.46 cnt=346 | NVDA L1=-0.05 trd=-0.18 cnt=925 | AMZN L1=-0.00 trd=-0.08 cnt=246 | META L1=-0.02 trd=-0.78 cnt=153
+[RUN] 80.5min | ticks=282506 | grp1/1: AAPL L1=+0.09 trd=+0.07 cnt=405 | MSFT L1=+0.12 trd=-0.18 cnt=249 | NVDA L1=-0.04 trd=-0.07 cnt=832 | AMZN L1=+0.07 trd=-0.24 cnt=192 | META L1=+0.01 trd=-0.01 cnt=99
+[RUN] 81.5min | ticks=284367 | grp1/1: AAPL L1=+0.00 trd=-0.14 cnt=316 | MSFT L1=+0.20 trd=+0.06 cnt=196 | NVDA L1=+0.16 trd=+0.27 cnt=1037 | AMZN L1=+0.00 trd=-0.31 cnt=170 | META L1=-0.04 trd=-0.04 cnt=105
+[RUN] 82.5min | ticks=286432 | grp1/1: AAPL L1=-0.04 trd=-0.33 cnt=375 | MSFT L1=-0.02 trd=+0.20 cnt=295 | NVDA L1=+0.02 trd=+0.22 cnt=932 | AMZN L1=-0.01 trd=+0.12 cnt=128 | META L1=-0.20 trd=+0.82 cnt=226
+[RUN] 83.5min | ticks=288232 | grp1/1: AAPL L1=-0.02 trd=+0.41 cnt=320 | MSFT L1=+0.15 trd=-0.20 cnt=191 | NVDA L1=-0.04 trd=+0.23 cnt=935 | AMZN L1=+0.05 trd=-0.07 cnt=131 | META L1=+0.18 trd=+0.03 cnt=186
+[RUN] 84.5min | ticks=289540 | grp1/1: AAPL L1=-0.05 trd=+0.22 cnt=308 | MSFT L1=-0.07 trd=-0.33 cnt=201 | NVDA L1=+0.07 trd=+0.19 cnt=486 | AMZN L1=+0.03 trd=-0.12 cnt=178 | META L1=+0.02 trd=+0.09 cnt=105
+[RUN] 85.5min | ticks=291497 | grp1/1: AAPL L1=+0.01 trd=+0.08 cnt=297 | MSFT L1=+0.03 trd=-0.11 cnt=256 | NVDA L1=-0.04 trd=-0.04 cnt=852 | AMZN L1=+0.05 trd=+0.34 cnt=288 | META L1=+0.15 trd=+0.01 cnt=247
+[RUN] 86.5min | ticks=293065 | grp1/1: AAPL L1=-0.02 trd=-0.17 cnt=286 | MSFT L1=+0.13 trd=-0.08 cnt=185 | NVDA L1=-0.05 trd=-0.26 cnt=615 | AMZN L1=+0.03 trd=-0.07 cnt=180 | META L1=+0.10 trd=+0.09 cnt=262
+[RUN] 87.5min | ticks=294765 | grp1/1: AAPL L1=+0.04 trd=+0.38 cnt=252 | MSFT L1=+0.20 trd=+0.53 cnt=215 | NVDA L1=+0.00 trd=+0.07 cnt=864 | AMZN L1=-0.15 trd=+0.18 cnt=126 | META L1=+0.03 trd=-0.20 cnt=228
+[RUN] 88.5min | ticks=296293 | grp1/1: AAPL L1=+0.07 trd=+0.47 cnt=210 | MSFT L1=+0.12 trd=-0.12 cnt=234 | NVDA L1=+0.11 trd=-0.33 cnt=740 | AMZN L1=+0.07 trd=-0.53 cnt=166 | META L1=-0.01 trd=-0.05 cnt=173
+[RUN] 89.5min | ticks=297717 | grp1/1: AAPL L1=-0.02 trd=-0.15 cnt=152 | MSFT L1=+0.07 trd=+0.06 cnt=199 | NVDA L1=-0.09 trd=+0.01 cnt=563 | AMZN L1=+0.02 trd=-0.00 cnt=164 | META L1=+0.06 trd=+0.30 cnt=260
+[RUN] 90.5min | ticks=299726 | grp1/1: AAPL L1=+0.06 trd=+0.11 cnt=241 | MSFT L1=+0.10 trd=+0.16 cnt=238 | NVDA L1=+0.00 trd=+0.22 cnt=1209 | AMZN L1=-0.04 trd=+0.01 cnt=149 | META L1=+0.10 trd=+0.10 cnt=136
+[RUN] 91.5min | ticks=301254 | grp1/1: AAPL L1=-0.01 trd=-0.23 cnt=232 | MSFT L1=-0.01 trd=-0.11 cnt=205 | NVDA L1=+0.07 trd=-0.03 cnt=815 | AMZN L1=-0.16 trd=-0.62 cnt=108 | META L1=-0.07 trd=-0.14 cnt=163
+[RUN] 92.5min | ticks=302561 | grp1/1: AAPL L1=+0.01 trd=+0.19 cnt=222 | MSFT L1=+0.25 trd=-0.09 cnt=315 | NVDA L1=+0.01 trd=-0.10 cnt=532 | AMZN L1=+0.06 trd=-0.17 cnt=145 | META L1=+0.10 trd=+0.15 cnt=85
+[RUN] 93.5min | ticks=304114 | grp1/1: AAPL L1=-0.00 trd=+0.32 cnt=185 | MSFT L1=-0.05 trd=+0.44 cnt=314 | NVDA L1=+0.00 trd=-0.07 cnt=734 | AMZN L1=-0.01 trd=-0.50 cnt=172 | META L1=-0.04 trd=-0.20 cnt=118
+[RUN] 94.5min | ticks=306003 | grp1/1: AAPL L1=+0.13 trd=+0.25 cnt=266 | MSFT L1=+0.04 trd=-0.48 cnt=325 | NVDA L1=-0.02 trd=+0.22 cnt=919 | AMZN L1=+0.10 trd=-0.33 cnt=268 | META L1=+0.01 trd=+0.17 cnt=98
+[RUN] 95.5min | ticks=307983 | grp1/1: AAPL L1=+0.00 trd=-0.25 cnt=355 | MSFT L1=+0.03 trd=+0.27 cnt=338 | NVDA L1=+0.02 trd=-0.25 cnt=807 | AMZN L1=+0.16 trd=-0.48 cnt=213 | META L1=-0.04 trd=+0.76 cnt=257
+[RUN] 96.5min | ticks=310004 | grp1/1: AAPL L1=-0.03 trd=+0.02 cnt=286 | MSFT L1=+0.15 trd=-0.24 cnt=301 | NVDA L1=+0.11 trd=-0.33 cnt=839 | AMZN L1=-0.02 trd=-0.32 cnt=266 | META L1=+0.02 trd=-0.22 cnt=238
+[RUN] 97.5min | ticks=311896 | grp1/1: AAPL L1=+0.14 trd=-0.42 cnt=460 | MSFT L1=+0.05 trd=+0.21 cnt=423 | NVDA L1=-0.02 trd=-0.11 cnt=581 | AMZN L1=+0.05 trd=-0.72 cnt=165 | META L1=+0.10 trd=+0.02 cnt=227
+[RUN] 98.6min | ticks=313383 | grp1/1: AAPL L1=-0.05 trd=+0.21 cnt=174 | MSFT L1=+0.00 trd=-0.29 cnt=273 | NVDA L1=-0.05 trd=+0.14 cnt=499 | AMZN L1=-0.10 trd=+0.04 cnt=193 | META L1=-0.10 trd=+0.17 cnt=313
+[RUN] 99.6min | ticks=314736 | grp1/1: AAPL L1=+0.02 trd=+0.15 cnt=255 | MSFT L1=+0.07 trd=-0.42 cnt=177 | NVDA L1=+0.01 trd=+0.04 cnt=519 | AMZN L1=-0.04 trd=-0.61 cnt=221 | META L1=+0.02 trd=-0.31 cnt=168
+[RUN] 100.6min | ticks=316223 | grp1/1: AAPL L1=+0.02 trd=+0.07 cnt=286 | MSFT L1=-0.04 trd=+0.20 cnt=211 | NVDA L1=-0.00 trd=+0.00 cnt=597 | AMZN L1=+0.03 trd=+0.08 cnt=237 | META L1=-0.21 trd=+0.69 cnt=138
+[RUN] 101.6min | ticks=317922 | grp1/1: AAPL L1=+0.02 trd=+0.16 cnt=311 | MSFT L1=+0.04 trd=-0.34 cnt=223 | NVDA L1=-0.10 trd=+0.20 cnt=780 | AMZN L1=-0.04 trd=-0.52 cnt=182 | META L1=+0.05 trd=-0.01 cnt=182
+[RUN] 102.6min | ticks=319693 | grp1/1: AAPL L1=+0.02 trd=+0.01 cnt=308 | MSFT L1=+0.15 trd=+0.15 cnt=316 | NVDA L1=-0.04 trd=-0.63 cnt=654 | AMZN L1=+0.01 trd=-0.21 cnt=272 | META L1=+0.04 trd=-0.18 cnt=192
+[RUN] 103.6min | ticks=321135 | grp1/1: AAPL L1=+0.15 trd=-0.19 cnt=248 | MSFT L1=-0.10 trd=-0.03 cnt=319 | NVDA L1=-0.01 trd=-0.11 cnt=567 | AMZN L1=-0.02 trd=-0.27 cnt=207 | META L1=-0.14 trd=-0.10 cnt=80
+[RUN] 104.6min | ticks=323044 | grp1/1: AAPL L1=-0.09 trd=-0.05 cnt=269 | MSFT L1=+0.09 trd=-0.33 cnt=208 | NVDA L1=+0.02 trd=-0.20 cnt=687 | AMZN L1=-0.02 trd=-0.26 cnt=463 | META L1=-0.14 trd=-0.14 cnt=247
+[RUN] 105.6min | ticks=324958 | grp1/1: AAPL L1=-0.06 trd=-0.25 cnt=226 | MSFT L1=+0.05 trd=+0.00 cnt=303 | NVDA L1=+0.13 trd=+0.22 cnt=975 | AMZN L1=+0.00 trd=+0.06 cnt=182 | META L1=-0.00 trd=+0.10 cnt=126
+[RUN] 106.6min | ticks=326714 | grp1/1: AAPL L1=+0.07 trd=-0.25 cnt=332 | MSFT L1=-0.12 trd=-0.42 cnt=205 | NVDA L1=-0.19 trd=-0.05 cnt=875 | AMZN L1=-0.05 trd=-0.43 cnt=166 | META L1=-0.01 trd=-0.11 cnt=156
+[RUN] 107.6min | ticks=328431 | grp1/1: AAPL L1=+0.04 trd=-0.13 cnt=374 | MSFT L1=+0.12 trd=+0.24 cnt=206 | NVDA L1=+0.02 trd=+0.15 cnt=620 | AMZN L1=-0.04 trd=-0.65 cnt=187 | META L1=-0.05 trd=+0.61 cnt=258
+[RUN] 108.6min | ticks=329948 | grp1/1: AAPL L1=+0.02 trd=+0.27 cnt=307 | MSFT L1=-0.07 trd=-0.08 cnt=162 | NVDA L1=+0.03 trd=-0.40 cnt=628 | AMZN L1=+0.02 trd=-0.44 cnt=276 | META L1=+0.11 trd=-0.09 cnt=125
+[RUN] 109.6min | ticks=332124 | grp1/1: AAPL L1=+0.12 trd=-0.05 cnt=377 | MSFT L1=+0.11 trd=+0.14 cnt=208 | NVDA L1=-0.02 trd=-0.10 cnt=1046 | AMZN L1=+0.08 trd=-0.11 cnt=291 | META L1=-0.12 trd=-0.72 cnt=198
+[RUN] 110.6min | ticks=333989 | grp1/1: AAPL L1=+0.18 trd=+0.13 cnt=371 | MSFT L1=-0.02 trd=+0.17 cnt=167 | NVDA L1=+0.03 trd=-0.13 cnt=723 | AMZN L1=+0.06 trd=-0.33 cnt=443 | META L1=+0.06 trd=-0.21 cnt=94
+[RUN] 111.6min | ticks=335306 | grp1/1: AAPL L1=+0.01 trd=-0.34 cnt=233 | MSFT L1=-0.06 trd=+0.01 cnt=160 | NVDA L1=-0.05 trd=+0.13 cnt=528 | AMZN L1=+0.12 trd=-0.32 cnt=258 | META L1=+0.01 trd=-0.54 cnt=117
+[RUN] 112.6min | ticks=336576 | grp1/1: AAPL L1=+0.04 trd=-0.27 cnt=212 | MSFT L1=-0.02 trd=+0.09 cnt=148 | NVDA L1=-0.10 trd=-0.33 cnt=663 | AMZN L1=-0.00 trd=+0.02 cnt=158 | META L1=-0.14 trd=+0.06 cnt=49
+[RUN] 113.6min | ticks=338072 | grp1/1: AAPL L1=+0.06 trd=+0.31 cnt=459 | MSFT L1=-0.10 trd=+0.22 cnt=131 | NVDA L1=+0.04 trd=-0.30 cnt=671 | AMZN L1=-0.03 trd=-0.82 cnt=110 | META L1=-0.21 trd=+0.02 cnt=116
+[RUN] 114.6min | ticks=339633 | grp1/1: AAPL L1=+0.09 trd=+0.06 cnt=295 | MSFT L1=+0.17 trd=+0.09 cnt=131 | NVDA L1=+0.06 trd=-0.30 cnt=648 | AMZN L1=+0.08 trd=-0.55 cnt=320 | META L1=+0.11 trd=+0.65 cnt=115
+[RUN] 115.6min | ticks=341856 | grp1/1: AAPL L1=+0.11 trd=+0.02 cnt=1150 | MSFT L1=+0.08 trd=-0.05 cnt=105 | NVDA L1=+0.03 trd=-0.17 cnt=547 | AMZN L1=-0.09 trd=-0.27 cnt=210 | META L1=-0.09 trd=-0.84 cnt=153
+[RUN] 116.7min | ticks=343396 | grp1/1: AAPL L1=-0.07 trd=-0.26 cnt=461 | MSFT L1=+0.10 trd=+0.14 cnt=139 | NVDA L1=-0.06 trd=+0.20 cnt=592 | AMZN L1=-0.02 trd=-0.52 cnt=228 | META L1=+0.12 trd=-0.20 cnt=93
+[RUN] 117.7min | ticks=345360 | grp1/1: AAPL L1=-0.01 trd=+0.60 cnt=761 | MSFT L1=+0.23 trd=-0.09 cnt=213 | NVDA L1=+0.04 trd=+0.02 cnt=614 | AMZN L1=+0.00 trd=-0.22 cnt=247 | META L1=-0.16 trd=-0.32 cnt=96
+[RUN] 118.7min | ticks=346939 | grp1/1: AAPL L1=-0.05 trd=-0.30 cnt=384 | MSFT L1=+0.14 trd=+0.58 cnt=325 | NVDA L1=+0.04 trd=-0.11 cnt=474 | AMZN L1=-0.11 trd=-0.37 cnt=146 | META L1=+0.02 trd=-0.37 cnt=176
+[RUN] 119.7min | ticks=348293 | grp1/1: AAPL L1=+0.07 trd=-0.11 cnt=303 | MSFT L1=+0.09 trd=+0.00 cnt=161 | NVDA L1=-0.04 trd=+0.11 cnt=615 | AMZN L1=+0.06 trd=-0.17 cnt=146 | META L1=-0.13 trd=-0.36 cnt=110
+[RUN] 120.7min | ticks=349988 | grp1/1: AAPL L1=+0.08 trd=+0.09 cnt=447 | MSFT L1=+0.05 trd=+0.43 cnt=336 | NVDA L1=+0.12 trd=-0.17 cnt=556 | AMZN L1=-0.03 trd=-0.67 cnt=214 | META L1=-0.01 trd=-0.25 cnt=127
+[RUN] 121.7min | ticks=351451 | grp1/1: AAPL L1=-0.01 trd=-0.09 cnt=320 | MSFT L1=+0.03 trd=-0.35 cnt=167 | NVDA L1=+0.05 trd=+0.23 cnt=565 | AMZN L1=-0.02 trd=-0.46 cnt=260 | META L1=-0.10 trd=-0.12 cnt=128
+[RUN] 122.7min | ticks=353163 | grp1/1: AAPL L1=-0.02 trd=+0.09 cnt=379 | MSFT L1=+0.08 trd=+0.03 cnt=184 | NVDA L1=-0.09 trd=-0.02 cnt=825 | AMZN L1=+0.01 trd=-0.13 cnt=182 | META L1=+0.07 trd=-0.42 cnt=112
+[RUN] 123.7min | ticks=354500 | grp1/1: AAPL L1=+0.05 trd=+0.57 cnt=363 | MSFT L1=-0.06 trd=+0.16 cnt=139 | NVDA L1=-0.04 trd=-0.02 cnt=486 | AMZN L1=-0.04 trd=-0.77 cnt=185 | META L1=+0.06 trd=+0.50 cnt=158
+[RUN] 124.7min | ticks=355579 | grp1/1: AAPL L1=+0.04 trd=+0.14 cnt=240 | MSFT L1=+0.10 trd=+0.25 cnt=166 | NVDA L1=-0.06 trd=+0.10 cnt=407 | AMZN L1=+0.10 trd=-0.49 cnt=133 | META L1=+0.04 trd=-0.21 cnt=110
+[RUN] 125.7min | ticks=356966 | grp1/1: AAPL L1=-0.11 trd=-0.34 cnt=211 | MSFT L1=+0.09 trd=+0.17 cnt=173 | NVDA L1=+0.06 trd=-0.33 cnt=514 | AMZN L1=-0.04 trd=-0.47 cnt=190 | META L1=+0.19 trd=+0.39 cnt=265
+[RUN] 126.7min | ticks=358247 | grp1/1: AAPL L1=+0.11 trd=+0.17 cnt=343 | MSFT L1=+0.01 trd=+0.13 cnt=182 | NVDA L1=-0.06 trd=-0.06 cnt=342 | AMZN L1=-0.19 trd=-0.20 cnt=176 | META L1=+0.06 trd=-0.39 cnt=234
+[RUN] 127.7min | ticks=359947 | grp1/1: AAPL L1=+0.01 trd=-0.14 cnt=201 | MSFT L1=+0.02 trd=-0.44 cnt=161 | NVDA L1=-0.07 trd=-0.23 cnt=580 | AMZN L1=+0.04 trd=-0.21 cnt=539 | META L1=+0.08 trd=+0.29 cnt=208
+[RUN] 128.7min | ticks=361395 | grp1/1: AAPL L1=+0.06 trd=+0.23 cnt=263 | MSFT L1=+0.05 trd=+0.38 cnt=196 | NVDA L1=+0.06 trd=+0.01 cnt=551 | AMZN L1=+0.08 trd=-0.33 cnt=231 | META L1=-0.02 trd=+0.11 cnt=165
+[RUN] 129.7min | ticks=362826 | grp1/1: AAPL L1=+0.02 trd=+0.33 cnt=444 | MSFT L1=+0.11 trd=+0.07 cnt=159 | NVDA L1=-0.06 trd=+0.10 cnt=478 | AMZN L1=+0.01 trd=-0.56 cnt=193 | META L1=-0.01 trd=+0.36 cnt=128
+[RUN] 130.7min | ticks=363953 | grp1/1: AAPL L1=+0.04 trd=-0.13 cnt=261 | MSFT L1=+0.06 trd=+0.28 cnt=169 | NVDA L1=+0.08 trd=-0.10 cnt=447 | AMZN L1=+0.09 trd=-0.55 cnt=118 | META L1=+0.01 trd=-0.56 cnt=125
+[RUN] 131.7min | ticks=365240 | grp1/1: AAPL L1=-0.02 trd=+0.10 cnt=262 | MSFT L1=+0.04 trd=+0.25 cnt=116 | NVDA L1=-0.04 trd=-0.17 cnt=400 | AMZN L1=-0.04 trd=-0.42 cnt=260 | META L1=+0.04 trd=-0.03 cnt=154
+[RUN] 132.7min | ticks=366401 | grp1/1: AAPL L1=-0.05 trd=-0.17 cnt=302 | MSFT L1=-0.08 trd=-0.13 cnt=121 | NVDA L1=-0.09 trd=-0.16 cnt=419 | AMZN L1=+0.07 trd=-0.18 cnt=156 | META L1=-0.13 trd=+0.39 cnt=118
+[RUN] 133.7min | ticks=368354 | grp1/1: AAPL L1=+0.05 trd=+0.75 cnt=1056 | MSFT L1=+0.08 trd=-0.13 cnt=146 | NVDA L1=-0.03 trd=-0.08 cnt=438 | AMZN L1=+0.12 trd=-0.79 cnt=135 | META L1=+0.19 trd=+0.16 cnt=139
+[RUN] 134.7min | ticks=369484 | grp1/1: AAPL L1=+0.07 trd=-0.22 cnt=337 | MSFT L1=-0.02 trd=+0.03 cnt=68 | NVDA L1=+0.09 trd=-0.08 cnt=432 | AMZN L1=-0.04 trd=-0.12 cnt=151 | META L1=+0.01 trd=+0.08 cnt=126
+[RUN] 135.7min | ticks=370662 | grp1/1: AAPL L1=+0.07 trd=+0.17 cnt=255 | MSFT L1=-0.16 trd=-0.26 cnt=138 | NVDA L1=+0.02 trd=-0.19 cnt=399 | AMZN L1=+0.11 trd=+0.02 cnt=232 | META L1=+0.01 trd=+0.55 cnt=120
+[RUN] 136.7min | ticks=372560 | grp1/1: AAPL L1=+0.02 trd=-0.29 cnt=324 | MSFT L1=+0.12 trd=-0.04 cnt=197 | NVDA L1=+0.01 trd=-0.14 cnt=777 | AMZN L1=+0.16 trd=-0.30 cnt=343 | META L1=+0.22 trd=-0.46 cnt=230
+[RUN] 137.7min | ticks=373629 | grp1/1: AAPL L1=-0.01 trd=-0.20 cnt=229 | MSFT L1=-0.19 trd=+0.51 cnt=148 | NVDA L1=-0.04 trd=-0.07 cnt=395 | AMZN L1=+0.03 trd=-0.54 cnt=152 | META L1=+0.08 trd=-0.20 cnt=124
+[RUN] 138.8min | ticks=374738 | grp1/1: AAPL L1=-0.00 trd=-0.04 cnt=246 | MSFT L1=+0.08 trd=+0.39 cnt=153 | NVDA L1=+0.05 trd=-0.50 cnt=395 | AMZN L1=-0.05 trd=-0.58 cnt=140 | META L1=+0.00 trd=-0.21 cnt=173
+[RUN] 139.8min | ticks=376123 | grp1/1: AAPL L1=-0.03 trd=+0.24 cnt=310 | MSFT L1=-0.11 trd=+0.47 cnt=150 | NVDA L1=-0.06 trd=-0.31 cnt=573 | AMZN L1=-0.03 trd=-0.50 cnt=154 | META L1=+0.01 trd=+0.46 cnt=138
+[RUN] 140.8min | ticks=377546 | grp1/1: AAPL L1=+0.05 trd=+0.25 cnt=376 | MSFT L1=-0.03 trd=+0.59 cnt=143 | NVDA L1=+0.01 trd=+0.04 cnt=490 | AMZN L1=-0.07 trd=-0.40 cnt=181 | META L1=-0.03 trd=-0.19 cnt=188
+[RUN] 141.9min | ticks=379053 | grp1/1: AAPL L1=+0.05 trd=+0.53 cnt=368 | MSFT L1=-0.05 trd=+0.81 cnt=176 | NVDA L1=+0.00 trd=+0.26 cnt=580 | AMZN L1=+0.05 trd=-0.44 cnt=118 | META L1=-0.01 trd=-0.11 cnt=124
+[RUN] 142.9min | ticks=380558 | grp1/1: AAPL L1=-0.06 trd=-0.34 cnt=340 | MSFT L1=+0.06 trd=+0.12 cnt=155 | NVDA L1=-0.09 trd=-0.56 cnt=646 | AMZN L1=-0.03 trd=-0.31 cnt=120 | META L1=+0.05 trd=+0.11 cnt=166
+[RUN] 143.9min | ticks=382152 | grp1/1: AAPL L1=-0.07 trd=-0.15 cnt=607 | MSFT L1=+0.13 trd=+0.01 cnt=174 | NVDA L1=+0.10 trd=+0.23 cnt=463 | AMZN L1=+0.18 trd=-0.03 cnt=170 | META L1=+0.11 trd=+0.50 cnt=103
+[RUN] 144.9min | ticks=383402 | grp1/1: AAPL L1=+0.07 trd=+0.20 cnt=280 | MSFT L1=+0.08 trd=+0.14 cnt=165 | NVDA L1=-0.02 trd=+0.22 cnt=320 | AMZN L1=+0.08 trd=-0.17 cnt=280 | META L1=-0.04 trd=-0.20 cnt=112
+[RUN] 146.0min | ticks=384490 | grp1/1: AAPL L1=-0.09 trd=-0.04 cnt=285 | MSFT L1=-0.10 trd=+0.19 cnt=104 | NVDA L1=+0.01 trd=-0.14 cnt=361 | AMZN L1=+0.03 trd=-0.11 cnt=202 | META L1=-0.02 trd=+0.46 cnt=95
+[RUN] 147.0min | ticks=385775 | grp1/1: AAPL L1=+0.05 trd=-0.28 cnt=316 | MSFT L1=-0.11 trd=-0.23 cnt=137 | NVDA L1=+0.03 trd=+0.10 cnt=447 | AMZN L1=+0.05 trd=-0.16 cnt=159 | META L1=+0.07 trd=-0.91 cnt=93
+[RUN] 148.0min | ticks=386832 | grp1/1: AAPL L1=+0.07 trd=-0.14 cnt=308 | MSFT L1=-0.05 trd=-0.17 cnt=103 | NVDA L1=-0.03 trd=+0.19 cnt=379 | AMZN L1=+0.01 trd=-0.43 cnt=174 | META L1=+0.09 trd=+0.43 cnt=92
+[RUN] 149.0min | ticks=387984 | grp1/1: AAPL L1=-0.11 trd=-0.05 cnt=194 | MSFT L1=-0.02 trd=-0.37 cnt=197 | NVDA L1=+0.02 trd=+0.09 cnt=418 | AMZN L1=-0.16 trd=-0.20 cnt=251 | META L1=+0.13 trd=-0.11 cnt=77
+[RUN] 150.0min | ticks=389043 | grp1/1: AAPL L1=-0.10 trd=-0.24 cnt=229 | MSFT L1=+0.17 trd=+0.06 cnt=158 | NVDA L1=-0.02 trd=+0.27 cnt=366 | AMZN L1=+0.12 trd=-0.38 cnt=174 | META L1=+0.20 trd=-0.50 cnt=77
+[RUN] 151.1min | ticks=390571 | grp1/1: AAPL L1=+0.08 trd=+0.19 cnt=268 | MSFT L1=+0.10 trd=-0.17 cnt=151 | NVDA L1=-0.07 trd=-0.52 cnt=774 | AMZN L1=+0.05 trd=-0.49 cnt=228 | META L1=+0.10 trd=-0.21 cnt=86
+[RUN] 152.1min | ticks=391752 | grp1/1: AAPL L1=-0.09 trd=-0.18 cnt=181 | MSFT L1=-0.14 trd=-0.17 cnt=181 | NVDA L1=-0.01 trd=-0.10 cnt=298 | AMZN L1=-0.14 trd=+0.43 cnt=248 | META L1=+0.06 trd=+0.15 cnt=265
+[RUN] 153.1min | ticks=392920 | grp1/1: AAPL L1=-0.04 trd=-0.03 cnt=249 | MSFT L1=+0.05 trd=+0.12 cnt=166 | NVDA L1=+0.00 trd=-0.02 cnt=475 | AMZN L1=+0.02 trd=-0.54 cnt=156 | META L1=+0.08 trd=+0.21 cnt=97
+[RUN] 154.3min | ticks=394332 | grp1/1: AAPL L1=-0.09 trd=-0.33 cnt=298 | MSFT L1=+0.10 trd=+0.47 cnt=173 | NVDA L1=-0.09 trd=+0.23 cnt=351 | AMZN L1=-0.04 trd=-0.19 cnt=104 | META L1=+0.09 trd=-0.20 cnt=177
+[RUN] 155.4min | ticks=395708 | grp1/1: AAPL L1=+0.01 trd=-0.36 cnt=343 | MSFT L1=+0.08 trd=-0.23 cnt=205 | NVDA L1=-0.10 trd=-0.38 cnt=411 | AMZN L1=-0.08 trd=-0.16 cnt=163 | META L1=+0.09 trd=+0.11 cnt=191
+[RUN] 156.5min | ticks=397516 | grp1/1: AAPL L1=-0.02 trd=+0.32 cnt=580 | MSFT L1=+0.01 trd=+0.09 cnt=202 | NVDA L1=+0.12 trd=+0.03 cnt=493 | AMZN L1=-0.04 trd=-0.59 cnt=165 | META L1=+0.03 trd=+0.04 cnt=160
+[RUN] 157.6min | ticks=398936 | grp1/1: AAPL L1=+0.07 trd=-0.50 cnt=341 | MSFT L1=+0.14 trd=+0.44 cnt=145 | NVDA L1=-0.08 trd=+0.04 cnt=444 | AMZN L1=+0.19 trd=-0.30 cnt=136 | META L1=+0.07 trd=+0.15 cnt=124
+[RUN] 158.7min | ticks=400179 | grp1/1: AAPL L1=+0.05 trd=+0.12 cnt=292 | MSFT L1=+0.08 trd=+0.22 cnt=145 | NVDA L1=+0.10 trd=-0.06 cnt=554 | AMZN L1=-0.01 trd=-0.79 cnt=127 | META L1=-0.09 trd=+0.59 cnt=98
+[RUN] 159.7min | ticks=401629 | grp1/1: AAPL L1=-0.02 trd=-0.42 cnt=370 | MSFT L1=-0.05 trd=+0.26 cnt=137 | NVDA L1=-0.02 trd=+0.27 cnt=621 | AMZN L1=+0.06 trd=-0.34 cnt=124 | META L1=+0.10 trd=+0.55 cnt=162
+[RUN] 160.7min | ticks=403299 | grp1/1: AAPL L1=-0.02 trd=+0.22 cnt=561 | MSFT L1=+0.17 trd=+0.02 cnt=81 | NVDA L1=+0.08 trd=+0.35 cnt=436 | AMZN L1=+0.12 trd=-0.41 cnt=190 | META L1=+0.09 trd=+0.01 cnt=365
+[RUN] 161.7min | ticks=404678 | grp1/1: AAPL L1=+0.07 trd=+0.07 cnt=279 | MSFT L1=+0.01 trd=-0.08 cnt=180 | NVDA L1=-0.00 trd=+0.15 cnt=557 | AMZN L1=+0.05 trd=-0.65 cnt=100 | META L1=+0.04 trd=+0.20 cnt=259
+[RUN] 162.7min | ticks=405867 | grp1/1: AAPL L1=+0.03 trd=-0.08 cnt=257 | MSFT L1=+0.09 trd=-0.26 cnt=144 | NVDA L1=-0.07 trd=-0.02 cnt=408 | AMZN L1=+0.01 trd=-0.19 cnt=83 | META L1=-0.07 trd=+0.10 cnt=268
+[RUN] 163.7min | ticks=407158 | grp1/1: AAPL L1=+0.05 trd=-0.05 cnt=240 | MSFT L1=+0.08 trd=+0.25 cnt=126 | NVDA L1=-0.09 trd=-0.25 cnt=294 | AMZN L1=+0.06 trd=-0.67 cnt=173 | META L1=+0.03 trd=-0.08 cnt=420
+[RUN] 164.7min | ticks=408571 | grp1/1: AAPL L1=-0.02 trd=+0.09 cnt=240 | MSFT L1=-0.14 trd=+0.16 cnt=199 | NVDA L1=-0.07 trd=+0.04 cnt=346 | AMZN L1=-0.12 trd=-0.43 cnt=366 | META L1=-0.03 trd=+0.05 cnt=241
+[RUN] 165.7min | ticks=410460 | grp1/1: AAPL L1=-0.06 trd=+0.29 cnt=245 | MSFT L1=+0.09 trd=-0.16 cnt=175 | NVDA L1=+0.10 trd=-0.04 cnt=942 | AMZN L1=+0.06 trd=-0.02 cnt=343 | META L1=+0.03 trd=+0.06 cnt=180
+[RUN] 166.7min | ticks=412482 | grp1/1: AAPL L1=-0.00 trd=-0.16 cnt=267 | MSFT L1=-0.07 trd=+0.17 cnt=154 | NVDA L1=+0.01 trd=-0.19 cnt=693 | AMZN L1=-0.01 trd=-0.35 cnt=620 | META L1=-0.06 trd=+0.01 cnt=259
+[RUN] 167.7min | ticks=413882 | grp1/1: AAPL L1=+0.11 trd=+0.38 cnt=310 | MSFT L1=-0.07 trd=-0.03 cnt=194 | NVDA L1=-0.01 trd=-0.32 cnt=413 | AMZN L1=+0.05 trd=+0.01 cnt=216 | META L1=-0.08 trd=-0.43 cnt=236
+[RUN] 168.7min | ticks=415720 | grp1/1: AAPL L1=-0.11 trd=-0.15 cnt=305 | MSFT L1=-0.04 trd=+0.12 cnt=122 | NVDA L1=-0.06 trd=-0.30 cnt=1010 | AMZN L1=+0.12 trd=+0.36 cnt=159 | META L1=-0.08 trd=+0.17 cnt=229
+[RUN] 169.7min | ticks=416881 | grp1/1: AAPL L1=+0.12 trd=-0.34 cnt=248 | MSFT L1=-0.07 trd=+0.14 cnt=173 | NVDA L1=+0.05 trd=+0.06 cnt=384 | AMZN L1=+0.16 trd=-0.23 cnt=144 | META L1=+0.15 trd=+0.35 cnt=192
+[RUN] 170.7min | ticks=418283 | grp1/1: AAPL L1=+0.00 trd=-0.29 cnt=282 | MSFT L1=+0.16 trd=+0.51 cnt=203 | NVDA L1=+0.03 trd=-0.22 cnt=359 | AMZN L1=+0.24 trd=+0.73 cnt=301 | META L1=-0.01 trd=+0.24 cnt=235
+[RUN] 171.7min | ticks=419463 | grp1/1: AAPL L1=+0.02 trd=-0.07 cnt=193 | MSFT L1=+0.17 trd=-0.35 cnt=210 | NVDA L1=+0.06 trd=-0.34 cnt=281 | AMZN L1=-0.10 trd=-0.06 cnt=178 | META L1=+0.16 trd=+0.60 cnt=279
+[RUN] 172.7min | ticks=421039 | grp1/1: AAPL L1=-0.08 trd=+0.40 cnt=296 | MSFT L1=-0.05 trd=+0.24 cnt=163 | NVDA L1=-0.12 trd=-0.49 cnt=509 | AMZN L1=-0.06 trd=-0.20 cnt=153 | META L1=+0.03 trd=+0.13 cnt=433
+[RUN] 173.7min | ticks=422135 | grp1/1: AAPL L1=+0.18 trd=+0.37 cnt=293 | MSFT L1=-0.13 trd=-0.20 cnt=99 | NVDA L1=-0.01 trd=-0.39 cnt=428 | AMZN L1=-0.00 trd=-0.22 cnt=109 | META L1=-0.17 trd=+0.44 cnt=130
+[RUN] 174.7min | ticks=423675 | grp1/1: AAPL L1=-0.06 trd=-0.14 cnt=269 | MSFT L1=+0.06 trd=-0.06 cnt=224 | NVDA L1=-0.02 trd=+0.14 cnt=382 | AMZN L1=+0.18 trd=+0.12 cnt=382 | META L1=+0.07 trd=+0.49 cnt=256
+[RUN] 175.7min | ticks=425029 | grp1/1: AAPL L1=-0.07 trd=-0.10 cnt=272 | MSFT L1=+0.04 trd=+0.31 cnt=124 | NVDA L1=+0.01 trd=-0.08 cnt=375 | AMZN L1=+0.08 trd=-0.38 cnt=260 | META L1=+0.08 trd=+0.45 cnt=265
+[RUN] 176.8min | ticks=426517 | grp1/1: AAPL L1=+0.10 trd=-0.42 cnt=342 | MSFT L1=+0.17 trd=+0.10 cnt=187 | NVDA L1=-0.00 trd=-0.11 cnt=355 | AMZN L1=+0.03 trd=-0.31 cnt=314 | META L1=-0.06 trd=+0.47 cnt=285
+[RUN] 177.8min | ticks=428499 | grp1/1: AAPL L1=+0.02 trd=-0.21 cnt=392 | MSFT L1=-0.18 trd=-0.05 cnt=167 | NVDA L1=+0.06 trd=-0.25 cnt=585 | AMZN L1=+0.13 trd=+0.35 cnt=396 | META L1=-0.04 trd=+0.44 cnt=432
+[RUN] 178.8min | ticks=429840 | grp1/1: AAPL L1=+0.09 trd=+0.29 cnt=228 | MSFT L1=-0.05 trd=+0.25 cnt=87 | NVDA L1=+0.12 trd=-0.59 cnt=347 | AMZN L1=+0.07 trd=-0.15 cnt=216 | META L1=-0.01 trd=+0.46 cnt=433
+[RUN] 179.8min | ticks=430836 | grp1/1: AAPL L1=-0.02 trd=+0.13 cnt=145 | MSFT L1=-0.02 trd=-0.36 cnt=123 | NVDA L1=+0.08 trd=-0.03 cnt=409 | AMZN L1=+0.04 trd=+0.09 cnt=83 | META L1=-0.20 trd=+0.16 cnt=194
+[RUN] 180.8min | ticks=431869 | grp1/1: AAPL L1=+0.11 trd=+0.01 cnt=185 | MSFT L1=+0.17 trd=+0.25 cnt=108 | NVDA L1=+0.05 trd=-0.20 cnt=305 | AMZN L1=-0.01 trd=+0.70 cnt=128 | META L1=+0.00 trd=+0.49 cnt=286
+[RUN] 181.8min | ticks=432913 | grp1/1: AAPL L1=+0.11 trd=-0.07 cnt=235 | MSFT L1=+0.05 trd=-0.66 cnt=112 | NVDA L1=-0.07 trd=+0.30 cnt=332 | AMZN L1=-0.07 trd=-0.19 cnt=192 | META L1=-0.01 trd=+0.57 cnt=150
+[RUN] 182.8min | ticks=434000 | grp1/1: AAPL L1=+0.03 trd=+0.38 cnt=354 | MSFT L1=+0.20 trd=+0.26 cnt=143 | NVDA L1=+0.06 trd=-0.12 cnt=226 | AMZN L1=-0.07 trd=-0.25 cnt=151 | META L1=-0.01 trd=+0.25 cnt=235
+[RUN] 183.8min | ticks=435388 | grp1/1: AAPL L1=-0.04 trd=-0.20 cnt=450 | MSFT L1=+0.11 trd=+0.42 cnt=103 | NVDA L1=-0.07 trd=-0.12 cnt=314 | AMZN L1=-0.10 trd=-0.42 cnt=364 | META L1=-0.14 trd=-0.53 cnt=112
+[RUN] 184.8min | ticks=436525 | grp1/1: AAPL L1=+0.05 trd=-0.21 cnt=222 | MSFT L1=+0.18 trd=-0.18 cnt=141 | NVDA L1=-0.01 trd=+0.30 cnt=462 | AMZN L1=+0.02 trd=-0.04 cnt=88 | META L1=+0.05 trd=-0.23 cnt=219
+[RUN] 185.8min | ticks=437445 | grp1/1: AAPL L1=+0.02 trd=-0.51 cnt=221 | MSFT L1=+0.12 trd=-0.14 cnt=110 | NVDA L1=+0.06 trd=-0.16 cnt=371 | AMZN L1=-0.04 trd=-0.52 cnt=98 | META L1=-0.05 trd=-0.02 cnt=116
+[RUN] 186.8min | ticks=438901 | grp1/1: AAPL L1=+0.05 trd=-0.29 cnt=305 | MSFT L1=+0.04 trd=-0.27 cnt=105 | NVDA L1=+0.08 trd=+0.25 cnt=760 | AMZN L1=+0.16 trd=-0.21 cnt=145 | META L1=-0.11 trd=+0.07 cnt=114
+[RUN] 187.8min | ticks=440130 | grp1/1: AAPL L1=+0.10 trd=-0.11 cnt=497 | MSFT L1=+0.17 trd=-0.21 cnt=133 | NVDA L1=+0.02 trd=+0.33 cnt=372 | AMZN L1=+0.00 trd=-0.67 cnt=103 | META L1=-0.03 trd=+0.06 cnt=81
+[RUN] 188.8min | ticks=441361 | grp1/1: AAPL L1=-0.02 trd=+0.42 cnt=482 | MSFT L1=+0.21 trd=+0.59 cnt=122 | NVDA L1=-0.01 trd=+0.21 cnt=310 | AMZN L1=+0.21 trd=+0.17 cnt=141 | META L1=+0.07 trd=-0.21 cnt=163
+[RUN] 189.8min | ticks=442481 | grp1/1: AAPL L1=-0.14 trd=-0.04 cnt=276 | MSFT L1=-0.01 trd=+0.07 cnt=73 | NVDA L1=-0.05 trd=-0.08 cnt=484 | AMZN L1=+0.01 trd=-0.21 cnt=68 | META L1=-0.03 trd=+0.45 cnt=210
+[RUN] 190.8min | ticks=443341 | grp1/1: AAPL L1=+0.03 trd=+0.19 cnt=232 | MSFT L1=+0.13 trd=-0.47 cnt=98 | NVDA L1=+0.16 trd=-0.25 cnt=304 | AMZN L1=+0.12 trd=-0.74 cnt=76 | META L1=-0.07 trd=-0.74 cnt=140
+[RUN] 191.8min | ticks=444677 | grp1/1: AAPL L1=+0.15 trd=+0.05 cnt=258 | MSFT L1=+0.14 trd=-0.01 cnt=90 | NVDA L1=-0.08 trd=-0.31 cnt=619 | AMZN L1=+0.00 trd=-0.52 cnt=90 | META L1=-0.01 trd=+0.01 cnt=266
+[RUN] 192.8min | ticks=445847 | grp1/1: AAPL L1=+0.02 trd=+0.48 cnt=549 | MSFT L1=+0.03 trd=+0.23 cnt=88 | NVDA L1=+0.03 trd=+0.34 cnt=317 | AMZN L1=+0.14 trd=-0.50 cnt=70 | META L1=+0.15 trd=-0.17 cnt=130
+[RUN] 193.8min | ticks=446637 | grp1/1: AAPL L1=-0.09 trd=-0.03 cnt=146 | MSFT L1=+0.16 trd=+0.02 cnt=143 | NVDA L1=-0.09 trd=+0.15 cnt=323 | AMZN L1=-0.04 trd=+0.28 cnt=77 | META L1=-0.06 trd=-0.79 cnt=93
+[RUN] 194.8min | ticks=447750 | grp1/1: AAPL L1=-0.05 trd=-0.01 cnt=337 | MSFT L1=+0.24 trd=+0.51 cnt=151 | NVDA L1=-0.05 trd=-0.06 cnt=321 | AMZN L1=+0.04 trd=-0.36 cnt=195 | META L1=+0.06 trd=-0.33 cnt=89
+[RUN] 195.8min | ticks=449002 | grp1/1: AAPL L1=-0.00 trd=-0.17 cnt=338 | MSFT L1=+0.09 trd=+0.21 cnt=100 | NVDA L1=+0.13 trd=+0.33 cnt=581 | AMZN L1=-0.04 trd=+0.18 cnt=102 | META L1=-0.15 trd=-0.29 cnt=119
+[RUN] 196.8min | ticks=449858 | grp1/1: AAPL L1=+0.04 trd=+0.60 cnt=157 | MSFT L1=+0.21 trd=+0.41 cnt=156 | NVDA L1=+0.05 trd=-0.13 cnt=227 | AMZN L1=-0.07 trd=+0.34 cnt=103 | META L1=+0.16 trd=-0.41 cnt=175
+[RUN] 197.8min | ticks=450785 | grp1/1: AAPL L1=-0.06 trd=-0.31 cnt=191 | MSFT L1=-0.02 trd=+0.48 cnt=96 | NVDA L1=+0.05 trd=-0.01 cnt=360 | AMZN L1=-0.08 trd=-0.68 cnt=200 | META L1=+0.11 trd=-0.38 cnt=74
+[RUN] 198.8min | ticks=451665 | grp1/1: AAPL L1=+0.11 trd=+0.06 cnt=163 | MSFT L1=+0.15 trd=-0.49 cnt=116 | NVDA L1=-0.05 trd=-0.40 cnt=328 | AMZN L1=+0.19 trd=-0.50 cnt=128 | META L1=-0.02 trd=-0.16 cnt=110
+[RUN] 199.8min | ticks=452557 | grp1/1: AAPL L1=+0.04 trd=+0.25 cnt=199 | MSFT L1=+0.08 trd=-0.38 cnt=162 | NVDA L1=-0.05 trd=-0.05 cnt=332 | AMZN L1=+0.02 trd=-0.08 cnt=100 | META L1=-0.11 trd=+0.29 cnt=66
+[RUN] 200.8min | ticks=453620 | grp1/1: AAPL L1=-0.02 trd=-0.18 cnt=270 | MSFT L1=+0.11 trd=+0.25 cnt=179 | NVDA L1=+0.11 trd=+0.06 cnt=473 | AMZN L1=+0.12 trd=-0.67 cnt=33 | META L1=-0.04 trd=-0.04 cnt=74
+[RUN] 201.8min | ticks=454551 | grp1/1: AAPL L1=-0.02 trd=-0.06 cnt=216 | MSFT L1=-0.04 trd=+0.02 cnt=104 | NVDA L1=-0.09 trd=+0.15 cnt=327 | AMZN L1=-0.01 trd=-0.60 cnt=83 | META L1=+0.15 trd=-0.17 cnt=167
+[RUN] 202.8min | ticks=455752 | grp1/1: AAPL L1=-0.06 trd=-0.20 cnt=264 | MSFT L1=+0.21 trd=-0.48 cnt=231 | NVDA L1=+0.08 trd=+0.04 cnt=361 | AMZN L1=-0.08 trd=+0.03 cnt=204 | META L1=-0.07 trd=-0.03 cnt=105
+[RUN] 203.8min | ticks=456813 | grp1/1: AAPL L1=-0.03 trd=-0.60 cnt=261 | MSFT L1=-0.05 trd=+0.05 cnt=153 | NVDA L1=+0.04 trd=-0.15 cnt=328 | AMZN L1=-0.03 trd=-0.66 cnt=211 | META L1=+0.09 trd=-0.32 cnt=85
+[RUN] 204.9min | ticks=457630 | grp1/1: AAPL L1=+0.02 trd=+0.04 cnt=227 | MSFT L1=+0.03 trd=-0.44 cnt=125 | NVDA L1=-0.01 trd=+0.14 cnt=275 | AMZN L1=+0.05 trd=-0.47 cnt=86 | META L1=-0.13 trd=-0.20 cnt=95
+[RUN] 205.9min | ticks=458538 | grp1/1: AAPL L1=+0.01 trd=+0.16 cnt=206 | MSFT L1=+0.17 trd=+0.25 cnt=179 | NVDA L1=-0.01 trd=-0.14 cnt=346 | AMZN L1=-0.05 trd=-0.76 cnt=56 | META L1=-0.10 trd=-0.58 cnt=115
+[RUN] 206.9min | ticks=459580 | grp1/1: AAPL L1=+0.05 trd=-0.06 cnt=310 | MSFT L1=-0.01 trd=-0.41 cnt=134 | NVDA L1=-0.00 trd=+0.11 cnt=321 | AMZN L1=-0.03 trd=+0.04 cnt=137 | META L1=+0.18 trd=+0.29 cnt=128
+[RUN] 207.9min | ticks=460563 | grp1/1: AAPL L1=+0.07 trd=-0.20 cnt=246 | MSFT L1=+0.11 trd=-0.32 cnt=135 | NVDA L1=+0.08 trd=-0.07 cnt=294 | AMZN L1=-0.05 trd=-0.23 cnt=117 | META L1=-0.05 trd=-0.27 cnt=182
+[RUN] 208.9min | ticks=461543 | grp1/1: AAPL L1=-0.00 trd=-0.27 cnt=251 | MSFT L1=+0.03 trd=-0.45 cnt=146 | NVDA L1=+0.04 trd=-0.08 cnt=283 | AMZN L1=-0.03 trd=-0.72 cnt=138 | META L1=-0.19 trd=-0.59 cnt=156
+[RUN] 209.9min | ticks=462440 | grp1/1: AAPL L1=+0.03 trd=-0.02 cnt=226 | MSFT L1=+0.10 trd=+0.11 cnt=167 | NVDA L1=+0.09 trd=+0.28 cnt=287 | AMZN L1=+0.02 trd=+0.17 cnt=138 | META L1=-0.18 trd=-0.17 cnt=66
+[RUN] 210.9min | ticks=463550 | grp1/1: AAPL L1=+0.21 trd=-0.07 cnt=248 | MSFT L1=+0.07 trd=+0.07 cnt=189 | NVDA L1=-0.03 trd=-0.46 cnt=377 | AMZN L1=+0.07 trd=+0.00 cnt=132 | META L1=+0.06 trd=+0.29 cnt=160
+[RUN] 211.9min | ticks=464388 | grp1/1: AAPL L1=+0.10 trd=+0.12 cnt=271 | MSFT L1=+0.01 trd=-0.10 cnt=108 | NVDA L1=-0.04 trd=-0.55 cnt=290 | AMZN L1=+0.02 trd=-0.53 cnt=68 | META L1=+0.02 trd=-0.31 cnt=98
+[RUN] 212.9min | ticks=465473 | grp1/1: AAPL L1=+0.05 trd=-0.11 cnt=215 | MSFT L1=+0.20 trd=-0.01 cnt=163 | NVDA L1=-0.07 trd=-0.15 cnt=440 | AMZN L1=+0.11 trd=-0.54 cnt=169 | META L1=+0.09 trd=-0.60 cnt=86
+[RUN] 213.9min | ticks=466309 | grp1/1: AAPL L1=+0.00 trd=-0.67 cnt=117 | MSFT L1=+0.02 trd=+0.32 cnt=110 | NVDA L1=-0.00 trd=-0.27 cnt=430 | AMZN L1=+0.06 trd=-0.87 cnt=92 | META L1=-0.12 trd=-0.05 cnt=75
+[RUN] 214.9min | ticks=467196 | grp1/1: AAPL L1=+0.04 trd=-0.24 cnt=250 | MSFT L1=-0.09 trd=-0.01 cnt=186 | NVDA L1=-0.04 trd=-0.34 cnt=269 | AMZN L1=+0.03 trd=-0.68 cnt=73 | META L1=-0.14 trd=-0.54 cnt=92
+[RUN] 215.9min | ticks=468401 | grp1/1: AAPL L1=+0.04 trd=+0.19 cnt=286 | MSFT L1=+0.21 trd=+0.34 cnt=223 | NVDA L1=+0.14 trd=-0.25 cnt=328 | AMZN L1=+0.12 trd=+0.08 cnt=173 | META L1=-0.02 trd=+0.22 cnt=182
+[RUN] 216.9min | ticks=470076 | grp1/1: AAPL L1=-0.09 trd=-0.20 cnt=406 | MSFT L1=+0.31 trd=+0.36 cnt=236 | NVDA L1=-0.02 trd=+0.45 cnt=589 | AMZN L1=+0.24 trd=+0.39 cnt=313 | META L1=-0.22 trd=+0.25 cnt=122
+[RUN] 217.9min | ticks=471534 | grp1/1: AAPL L1=+0.02 trd=+0.24 cnt=222 | MSFT L1=+0.22 trd=+0.38 cnt=218 | NVDA L1=+0.04 trd=+0.24 cnt=669 | AMZN L1=+0.00 trd=-0.55 cnt=205 | META L1=+0.06 trd=-0.25 cnt=110
+[RUN] 218.9min | ticks=472786 | grp1/1: AAPL L1=+0.07 trd=+0.26 cnt=242 | MSFT L1=+0.16 trd=+0.36 cnt=237 | NVDA L1=+0.04 trd=+0.25 cnt=411 | AMZN L1=+0.02 trd=-0.39 cnt=123 | META L1=-0.02 trd=-0.74 cnt=128
+[RUN] 219.9min | ticks=473884 | grp1/1: AAPL L1=+0.06 trd=-0.31 cnt=314 | MSFT L1=-0.15 trd=-0.17 cnt=153 | NVDA L1=-0.00 trd=-0.16 cnt=428 | AMZN L1=+0.10 trd=-0.18 cnt=119 | META L1=+0.04 trd=-0.41 cnt=66
+[RUN] 220.9min | ticks=475047 | grp1/1: AAPL L1=+0.02 trd=+0.37 cnt=286 | MSFT L1=+0.16 trd=+0.21 cnt=89 | NVDA L1=+0.16 trd=-0.14 cnt=488 | AMZN L1=-0.02 trd=-0.51 cnt=190 | META L1=+0.23 trd=-0.26 cnt=79
+[RUN] 221.9min | ticks=476424 | grp1/1: AAPL L1=+0.03 trd=+0.06 cnt=181 | MSFT L1=-0.08 trd=-0.43 cnt=153 | NVDA L1=+0.04 trd=-0.16 cnt=670 | AMZN L1=+0.06 trd=+0.22 cnt=205 | META L1=-0.08 trd=-0.52 cnt=161
+[RUN] 222.9min | ticks=478343 | grp1/1: AAPL L1=-0.01 trd=-0.06 cnt=238 | MSFT L1=+0.03 trd=-0.53 cnt=91 | NVDA L1=+0.11 trd=+0.51 cnt=1007 | AMZN L1=-0.09 trd=+0.05 cnt=349 | META L1=-0.02 trd=+0.39 cnt=232
+[RUN] 223.9min | ticks=479437 | grp1/1: AAPL L1=+0.13 trd=-0.22 cnt=185 | MSFT L1=-0.02 trd=+0.07 cnt=108 | NVDA L1=+0.01 trd=+0.02 cnt=439 | AMZN L1=-0.04 trd=-0.39 cnt=215 | META L1=-0.10 trd=-0.15 cnt=103
+[RUN] 224.9min | ticks=480905 | grp1/1: AAPL L1=+0.06 trd=-0.24 cnt=145 | MSFT L1=-0.09 trd=+0.12 cnt=89 | NVDA L1=-0.04 trd=-0.01 cnt=375 | AMZN L1=+0.01 trd=+0.29 cnt=738 | META L1=-0.10 trd=-0.34 cnt=117
+[RUN] 225.9min | ticks=482405 | grp1/1: AAPL L1=+0.03 trd=-0.02 cnt=314 | MSFT L1=+0.04 trd=+0.34 cnt=123 | NVDA L1=+0.13 trd=+0.06 cnt=641 | AMZN L1=-0.02 trd=-0.28 cnt=307 | META L1=+0.18 trd=+0.12 cnt=79
+[RUN] 226.9min | ticks=483591 | grp1/1: AAPL L1=-0.01 trd=-0.44 cnt=251 | MSFT L1=+0.05 trd=-0.46 cnt=93 | NVDA L1=+0.02 trd=+0.21 cnt=518 | AMZN L1=-0.05 trd=-0.19 cnt=169 | META L1=-0.05 trd=-0.21 cnt=142
+[RUN] 227.9min | ticks=484910 | grp1/1: AAPL L1=+0.13 trd=+0.10 cnt=181 | MSFT L1=+0.25 trd=+0.02 cnt=135 | NVDA L1=-0.04 trd=-0.18 cnt=486 | AMZN L1=-0.06 trd=-0.68 cnt=349 | META L1=+0.18 trd=-0.17 cnt=103
+[RUN] 228.9min | ticks=486415 | grp1/1: AAPL L1=-0.02 trd=-0.14 cnt=306 | MSFT L1=-0.11 trd=+0.01 cnt=130 | NVDA L1=+0.11 trd=-0.00 cnt=584 | AMZN L1=-0.13 trd=-0.05 cnt=379 | META L1=-0.01 trd=+0.68 cnt=62
+[RUN] 229.9min | ticks=487353 | grp1/1: AAPL L1=+0.06 trd=-0.52 cnt=245 | MSFT L1=+0.13 trd=-0.11 cnt=113 | NVDA L1=-0.03 trd=+0.10 cnt=316 | AMZN L1=+0.07 trd=+0.09 cnt=156 | META L1=+0.01 trd=-0.34 cnt=76
+[RUN] 230.9min | ticks=488463 | grp1/1: AAPL L1=-0.19 trd=+0.04 cnt=176 | MSFT L1=+0.04 trd=+0.14 cnt=227 | NVDA L1=+0.02 trd=-0.07 cnt=366 | AMZN L1=+0.02 trd=+0.48 cnt=111 | META L1=+0.03 trd=-0.45 cnt=155
+[RUN] 231.9min | ticks=490163 | grp1/1: AAPL L1=-0.02 trd=+0.27 cnt=319 | MSFT L1=+0.10 trd=-0.03 cnt=164 | NVDA L1=+0.12 trd=+0.48 cnt=970 | AMZN L1=-0.05 trd=-0.56 cnt=77 | META L1=+0.12 trd=+0.05 cnt=139
+[RUN] 232.9min | ticks=491568 | grp1/1: AAPL L1=+0.10 trd=-0.29 cnt=299 | MSFT L1=+0.23 trd=+0.39 cnt=155 | NVDA L1=-0.03 trd=+0.04 cnt=695 | AMZN L1=-0.06 trd=-0.50 cnt=117 | META L1=-0.08 trd=+0.43 cnt=85
+[RUN] 233.9min | ticks=492630 | grp1/1: AAPL L1=+0.05 trd=+0.00 cnt=267 | MSFT L1=-0.04 trd=-0.10 cnt=125 | NVDA L1=-0.05 trd=+0.19 cnt=424 | AMZN L1=+0.03 trd=-0.76 cnt=84 | META L1=-0.04 trd=+0.03 cnt=135
+[RUN] 234.9min | ticks=493788 | grp1/1: AAPL L1=+0.04 trd=-0.19 cnt=460 | MSFT L1=+0.07 trd=+0.38 cnt=196 | NVDA L1=+0.01 trd=-0.03 cnt=298 | AMZN L1=+0.12 trd=-0.41 cnt=78 | META L1=+0.02 trd=+0.14 cnt=81
+[RUN] 236.0min | ticks=495139 | grp1/1: AAPL L1=-0.06 trd=+0.14 cnt=390 | MSFT L1=+0.22 trd=-0.06 cnt=147 | NVDA L1=+0.08 trd=+0.21 cnt=436 | AMZN L1=-0.13 trd=-0.29 cnt=229 | META L1=+0.14 trd=+0.27 cnt=107
+[RUN] 237.0min | ticks=496292 | grp1/1: AAPL L1=+0.09 trd=+0.29 cnt=281 | MSFT L1=+0.09 trd=+0.24 cnt=183 | NVDA L1=-0.04 trd=-0.03 cnt=382 | AMZN L1=+0.00 trd=-0.40 cnt=143 | META L1=-0.07 trd=-0.56 cnt=110
+[RUN] 238.0min | ticks=497209 | grp1/1: AAPL L1=+0.15 trd=+0.26 cnt=262 | MSFT L1=+0.11 trd=-0.08 cnt=203 | NVDA L1=+0.03 trd=+0.48 cnt=201 | AMZN L1=-0.16 trd=-0.53 cnt=131 | META L1=+0.04 trd=+0.28 cnt=111
+[RUN] 239.9min | ticks=498719 | grp1/1: AAPL L1=+0.00 trd=+0.26 cnt=190 | MSFT L1=+0.14 trd=-0.38 cnt=68 | NVDA L1=+0.04 trd=+0.02 cnt=209 | AMZN L1=-0.09 trd=+0.12 cnt=101 | META L1=+0.09 trd=-0.06 cnt=87
+[RUN] 240.9min | ticks=499661 | grp1/1: AAPL L1=+0.06 trd=+0.28 cnt=188 | MSFT L1=+0.11 trd=+0.39 cnt=68 | NVDA L1=-0.20 trd=+0.03 cnt=335 | AMZN L1=+0.14 trd=+0.06 cnt=213 | META L1=+0.18 trd=-0.13 cnt=45
+[RUN] 242.1min | ticks=500625 | grp1/1: AAPL L1=+0.07 trd=+0.08 cnt=154 | MSFT L1=+0.06 trd=-0.06 cnt=80 | NVDA L1=-0.09 trd=-0.21 cnt=213 | AMZN L1=-0.01 trd=-0.69 cnt=229 | META L1=-0.03 trd=+0.47 cnt=43
+[RUN] 243.3min | ticks=502144 | grp1/1: AAPL L1=+0.14 trd=-0.11 cnt=159 | MSFT L1=+0.09 trd=+0.04 cnt=134 | NVDA L1=+0.06 trd=+0.19 cnt=215 | AMZN L1=-0.02 trd=-0.68 cnt=445 | META L1=+0.16 trd=-0.44 cnt=90
+[RUN] 244.4min | ticks=503521 | grp1/1: AAPL L1=+0.10 trd=+0.71 cnt=308 | MSFT L1=+0.20 trd=-0.19 cnt=154 | NVDA L1=+0.01 trd=-0.12 cnt=315 | AMZN L1=+0.09 trd=-0.35 cnt=483 | META L1=+0.17 trd=+0.00 cnt=48
+[RUN] 245.5min | ticks=504311 | grp1/1: AAPL L1=-0.01 trd=+0.01 cnt=164 | MSFT L1=-0.01 trd=+0.02 cnt=87 | NVDA L1=+0.01 trd=-0.28 cnt=278 | AMZN L1=-0.01 trd=-0.54 cnt=204 | META L1=-0.24 trd=-0.66 cnt=70
+[RUN] 246.6min | ticks=505966 | grp1/1: AAPL L1=-0.09 trd=-0.01 cnt=298 | MSFT L1=+0.01 trd=-0.01 cnt=134 | NVDA L1=-0.03 trd=+0.23 cnt=556 | AMZN L1=-0.16 trd=-0.43 cnt=196 | META L1=-0.09 trd=-0.85 cnt=214
+[RUN] 247.9min | ticks=507382 | grp1/1: AAPL L1=+0.04 trd=+0.32 cnt=258 | MSFT L1=+0.19 trd=-0.58 cnt=137 | NVDA L1=+0.02 trd=-0.29 cnt=345 | AMZN L1=+0.14 trd=-0.68 cnt=182 | META L1=+0.04 trd=+0.05 cnt=108
+[RUN] 248.9min | ticks=508364 | grp1/1: AAPL L1=+0.04 trd=-0.08 cnt=160 | MSFT L1=+0.11 trd=+0.00 cnt=179 | NVDA L1=+0.04 trd=-0.07 cnt=296 | AMZN L1=+0.07 trd=-0.29 cnt=228 | META L1=+0.11 trd=+0.36 cnt=93
+[RUN] 249.9min | ticks=509535 | grp1/1: AAPL L1=-0.08 trd=-0.12 cnt=189 | MSFT L1=+0.00 trd=-0.18 cnt=94 | NVDA L1=+0.00 trd=-0.43 cnt=499 | AMZN L1=-0.07 trd=-0.27 cnt=255 | META L1=+0.07 trd=+0.55 cnt=77
+[RUN] 251.0min | ticks=510742 | grp1/1: AAPL L1=+0.01 trd=+0.10 cnt=264 | MSFT L1=-0.19 trd=-0.39 cnt=113 | NVDA L1=+0.12 trd=-0.02 cnt=323 | AMZN L1=-0.04 trd=-0.29 cnt=306 | META L1=+0.01 trd=-0.75 cnt=136
+[RUN] 252.5min | ticks=512872 | grp1/1: AAPL L1=+0.05 trd=+0.05 cnt=186 | MSFT L1=+0.25 trd=-0.11 cnt=223 | NVDA L1=-0.04 trd=-0.04 cnt=331 | AMZN L1=-0.03 trd=+0.13 cnt=196 | META L1=+0.08 trd=+0.57 cnt=241
+[RUN] 253.5min | ticks=513995 | grp1/1: AAPL L1=-0.08 trd=-0.27 cnt=287 | MSFT L1=-0.20 trd=-0.02 cnt=155 | NVDA L1=+0.15 trd=+0.04 cnt=378 | AMZN L1=-0.23 trd=-0.49 cnt=185 | META L1=-0.13 trd=+0.05 cnt=70
+[RUN] 254.6min | ticks=515092 | grp1/1: AAPL L1=-0.02 trd=+0.40 cnt=189 | MSFT L1=+0.01 trd=+0.24 cnt=123 | NVDA L1=+0.05 trd=+0.17 cnt=346 | AMZN L1=-0.02 trd=+0.31 cnt=281 | META L1=+0.04 trd=+0.42 cnt=79
+[RUN] 255.7min | ticks=516454 | grp1/1: AAPL L1=-0.01 trd=+0.05 cnt=335 | MSFT L1=-0.07 trd=-0.01 cnt=231 | NVDA L1=+0.01 trd=+0.08 cnt=388 | AMZN L1=-0.07 trd=-0.27 cnt=236 | META L1=+0.07 trd=-0.11 cnt=94
+[RUN] 256.7min | ticks=517646 | grp1/1: AAPL L1=+0.02 trd=-0.04 cnt=212 | MSFT L1=+0.21 trd=-0.06 cnt=162 | NVDA L1=+0.07 trd=-0.15 cnt=399 | AMZN L1=-0.03 trd=-0.03 cnt=245 | META L1=-0.06 trd=+0.41 cnt=82
+[RUN] 257.7min | ticks=518501 | grp1/1: AAPL L1=-0.01 trd=-0.05 cnt=162 | MSFT L1=+0.04 trd=-0.19 cnt=159 | NVDA L1=+0.07 trd=-0.30 cnt=286 | AMZN L1=+0.12 trd=+0.11 cnt=151 | META L1=+0.02 trd=-0.11 cnt=97
+[RUN] 258.7min | ticks=519437 | grp1/1: AAPL L1=-0.04 trd=-0.23 cnt=254 | MSFT L1=+0.08 trd=-0.24 cnt=147 | NVDA L1=-0.01 trd=-0.11 cnt=306 | AMZN L1=-0.01 trd=+0.52 cnt=178 | META L1=-0.02 trd=-0.07 cnt=49
+[RUN] 259.7min | ticks=520266 | grp1/1: AAPL L1=+0.04 trd=-0.02 cnt=168 | MSFT L1=+0.27 trd=-0.02 cnt=148 | NVDA L1=-0.05 trd=-0.02 cnt=262 | AMZN L1=-0.31 trd=+0.63 cnt=159 | META L1=-0.15 trd=-0.19 cnt=88
+[RUN] 260.7min | ticks=521146 | grp1/1: AAPL L1=+0.08 trd=+0.32 cnt=155 | MSFT L1=-0.03 trd=-0.27 cnt=88 | NVDA L1=+0.02 trd=+0.01 cnt=376 | AMZN L1=-0.08 trd=+0.04 cnt=143 | META L1=+0.03 trd=-0.11 cnt=94
+[RUN] 261.7min | ticks=522474 | grp1/1: AAPL L1=-0.11 trd=-0.15 cnt=201 | MSFT L1=+0.10 trd=+0.11 cnt=170 | NVDA L1=+0.02 trd=+0.08 cnt=440 | AMZN L1=-0.03 trd=-0.12 cnt=277 | META L1=-0.11 trd=-0.47 cnt=214
+[RUN] 262.7min | ticks=523598 | grp1/1: AAPL L1=-0.08 trd=-0.03 cnt=237 | MSFT L1=+0.14 trd=-0.15 cnt=192 | NVDA L1=+0.03 trd=+0.08 cnt=422 | AMZN L1=-0.03 trd=-0.09 cnt=221 | META L1=-0.24 trd=+0.05 cnt=43
+[RUN] 263.7min | ticks=524645 | grp1/1: AAPL L1=+0.03 trd=-0.39 cnt=245 | MSFT L1=+0.07 trd=-0.30 cnt=131 | NVDA L1=-0.01 trd=-0.05 cnt=363 | AMZN L1=-0.08 trd=-0.03 cnt=206 | META L1=+0.09 trd=+0.88 cnt=96
+[RUN] 264.7min | ticks=525744 | grp1/1: AAPL L1=+0.05 trd=+0.55 cnt=176 | MSFT L1=+0.06 trd=+0.25 cnt=85 | NVDA L1=-0.08 trd=+0.16 cnt=312 | AMZN L1=-0.13 trd=+0.17 cnt=393 | META L1=+0.29 trd=+0.44 cnt=107
+[RUN] 265.7min | ticks=527258 | grp1/1: AAPL L1=+0.17 trd=-0.55 cnt=223 | MSFT L1=+0.23 trd=+0.08 cnt=138 | NVDA L1=+0.10 trd=+0.15 cnt=681 | AMZN L1=-0.02 trd=-0.36 cnt=327 | META L1=+0.02 trd=-0.62 cnt=131
+[RUN] 266.7min | ticks=528121 | grp1/1: AAPL L1=+0.01 trd=+0.25 cnt=145 | MSFT L1=-0.11 trd=-0.30 cnt=104 | NVDA L1=+0.11 trd=+0.52 cnt=285 | AMZN L1=-0.07 trd=-0.07 cnt=244 | META L1=-0.13 trd=-0.66 cnt=62
+[RUN] 267.7min | ticks=529115 | grp1/1: AAPL L1=-0.01 trd=-0.14 cnt=112 | MSFT L1=+0.22 trd=-0.15 cnt=144 | NVDA L1=-0.13 trd=-0.11 cnt=319 | AMZN L1=-0.09 trd=-0.38 cnt=310 | META L1=+0.15 trd=-0.79 cnt=104
+[RUN] 268.7min | ticks=529888 | grp1/1: AAPL L1=-0.20 trd=-0.35 cnt=111 | MSFT L1=+0.04 trd=-0.16 cnt=140 | NVDA L1=-0.08 trd=+0.36 cnt=273 | AMZN L1=+0.07 trd=+0.06 cnt=181 | META L1=-0.13 trd=-0.16 cnt=68
+[RUN] 269.7min | ticks=530772 | grp1/1: AAPL L1=-0.07 trd=+0.60 cnt=204 | MSFT L1=+0.07 trd=-0.10 cnt=151 | NVDA L1=-0.02 trd=-0.23 cnt=282 | AMZN L1=-0.10 trd=+0.44 cnt=163 | META L1=-0.02 trd=-0.34 cnt=76
+[RUN] 270.7min | ticks=531488 | grp1/1: AAPL L1=+0.18 trd=+0.01 cnt=139 | MSFT L1=-0.03 trd=-0.15 cnt=130 | NVDA L1=+0.04 trd=-0.02 cnt=240 | AMZN L1=+0.22 trd=-0.24 cnt=168 | META L1=-0.15 trd=+0.45 cnt=37
+[RUN] 271.7min | ticks=532741 | grp1/1: AAPL L1=-0.01 trd=+0.10 cnt=475 | MSFT L1=+0.02 trd=-0.53 cnt=173 | NVDA L1=+0.05 trd=-0.12 cnt=281 | AMZN L1=-0.03 trd=-0.06 cnt=166 | META L1=-0.12 trd=-0.46 cnt=130
+[RUN] 272.7min | ticks=533796 | grp1/1: AAPL L1=-0.03 trd=-0.24 cnt=247 | MSFT L1=+0.11 trd=-0.57 cnt=140 | NVDA L1=-0.16 trd=+0.09 cnt=414 | AMZN L1=+0.10 trd=-0.20 cnt=151 | META L1=+0.08 trd=-0.20 cnt=70
+[RUN] 273.7min | ticks=536500 | grp1/1: AAPL L1=+0.02 trd=-0.10 cnt=533 | MSFT L1=+0.02 trd=-0.36 cnt=524 | NVDA L1=+0.04 trd=+0.04 cnt=971 | AMZN L1=+0.01 trd=-0.23 cnt=540 | META L1=-0.09 trd=-0.74 cnt=132
+[RUN] 274.8min | ticks=537430 | grp1/1: AAPL L1=+0.02 trd=+0.32 cnt=219 | MSFT L1=+0.06 trd=-0.40 cnt=162 | NVDA L1=+0.02 trd=-0.00 cnt=345 | AMZN L1=+0.05 trd=-0.08 cnt=104 | META L1=+0.13 trd=+0.09 cnt=73
+[RUN] 275.8min | ticks=538401 | grp1/1: AAPL L1=-0.02 trd=+0.02 cnt=175 | MSFT L1=+0.09 trd=-0.16 cnt=207 | NVDA L1=-0.08 trd=-0.14 cnt=330 | AMZN L1=+0.05 trd=-0.04 cnt=176 | META L1=-0.02 trd=+0.02 cnt=63
+[RUN] 276.8min | ticks=539575 | grp1/1: AAPL L1=+0.05 trd=+0.14 cnt=228 | MSFT L1=+0.04 trd=-0.27 cnt=174 | NVDA L1=-0.04 trd=-0.20 cnt=390 | AMZN L1=+0.08 trd=-0.51 cnt=204 | META L1=+0.20 trd=+0.28 cnt=156
+[RUN] 277.8min | ticks=540871 | grp1/1: AAPL L1=+0.03 trd=-0.39 cnt=202 | MSFT L1=-0.04 trd=-0.36 cnt=202 | NVDA L1=-0.05 trd=+0.35 cnt=441 | AMZN L1=+0.01 trd=-0.37 cnt=230 | META L1=-0.15 trd=-0.54 cnt=161
+[RUN] 278.8min | ticks=541971 | grp1/1: AAPL L1=+0.01 trd=-0.12 cnt=258 | MSFT L1=+0.28 trd=+0.56 cnt=261 | NVDA L1=+0.01 trd=-0.09 cnt=385 | AMZN L1=+0.02 trd=-0.28 cnt=110 | META L1=+0.04 trd=+0.01 cnt=52
+[RUN] 279.8min | ticks=543277 | grp1/1: AAPL L1=+0.04 trd=-0.52 cnt=429 | MSFT L1=+0.13 trd=-0.10 cnt=226 | NVDA L1=-0.09 trd=+0.24 cnt=321 | AMZN L1=-0.02 trd=-0.59 cnt=126 | META L1=+0.02 trd=+0.80 cnt=184
+[RUN] 280.8min | ticks=545047 | grp1/1: AAPL L1=-0.06 trd=+0.01 cnt=446 | MSFT L1=+0.08 trd=-0.44 cnt=248 | NVDA L1=-0.01 trd=+0.24 cnt=340 | AMZN L1=+0.10 trd=-0.47 cnt=170 | META L1=+0.00 trd=-0.01 cnt=532
+[RUN] 281.8min | ticks=546511 | grp1/1: AAPL L1=+0.04 trd=+0.26 cnt=405 | MSFT L1=+0.20 trd=+0.31 cnt=191 | NVDA L1=+0.08 trd=+0.23 cnt=439 | AMZN L1=-0.01 trd=-0.03 cnt=179 | META L1=+0.04 trd=+0.43 cnt=232
+[RUN] 282.8min | ticks=547574 | grp1/1: AAPL L1=-0.08 trd=+0.06 cnt=237 | MSFT L1=-0.02 trd=+0.26 cnt=119 | NVDA L1=-0.05 trd=-0.02 cnt=332 | AMZN L1=+0.05 trd=-0.22 cnt=158 | META L1=-0.13 trd=-0.33 cnt=138
+[RUN] 283.8min | ticks=548774 | grp1/1: AAPL L1=-0.05 trd=-0.02 cnt=373 | MSFT L1=+0.05 trd=-0.20 cnt=128 | NVDA L1=+0.08 trd=-0.07 cnt=416 | AMZN L1=-0.06 trd=+0.19 cnt=176 | META L1=+0.04 trd=+0.23 cnt=98
+[RUN] 284.8min | ticks=549832 | grp1/1: AAPL L1=-0.05 trd=+0.21 cnt=278 | MSFT L1=-0.09 trd=+0.44 cnt=120 | NVDA L1=-0.08 trd=+0.23 cnt=224 | AMZN L1=-0.09 trd=-0.31 cnt=177 | META L1=-0.01 trd=+0.19 cnt=257
+[RUN] 285.8min | ticks=551156 | grp1/1: AAPL L1=+0.02 trd=-0.10 cnt=454 | MSFT L1=+0.16 trd=-0.01 cnt=131 | NVDA L1=+0.01 trd=+0.24 cnt=242 | AMZN L1=-0.02 trd=+0.04 cnt=291 | META L1=+0.12 trd=+0.06 cnt=197
+[RUN] 286.8min | ticks=552293 | grp1/1: AAPL L1=+0.17 trd=+0.10 cnt=208 | MSFT L1=+0.15 trd=-0.17 cnt=160 | NVDA L1=+0.00 trd=-0.13 cnt=527 | AMZN L1=+0.07 trd=+0.37 cnt=107 | META L1=-0.04 trd=+0.59 cnt=117
+[RUN] 287.8min | ticks=553101 | grp1/1: AAPL L1=+0.00 trd=+0.32 cnt=161 | MSFT L1=-0.14 trd=-0.08 cnt=83 | NVDA L1=+0.03 trd=+0.13 cnt=382 | AMZN L1=+0.09 trd=-0.81 cnt=94 | META L1=-0.20 trd=-0.20 cnt=79
+[RUN] 288.8min | ticks=554635 | grp1/1: AAPL L1=+0.06 trd=+0.15 cnt=215 | MSFT L1=+0.06 trd=-0.41 cnt=174 | NVDA L1=+0.00 trd=+0.24 cnt=702 | AMZN L1=+0.16 trd=-0.64 cnt=152 | META L1=+0.15 trd=+0.14 cnt=249
+[RUN] 289.8min | ticks=555667 | grp1/1: AAPL L1=+0.03 trd=+0.04 cnt=209 | MSFT L1=+0.04 trd=-0.22 cnt=126 | NVDA L1=-0.01 trd=-0.01 cnt=273 | AMZN L1=+0.09 trd=-0.33 cnt=202 | META L1=-0.10 trd=+0.31 cnt=178
+[RUN] 290.8min | ticks=557209 | grp1/1: AAPL L1=-0.02 trd=+0.29 cnt=221 | MSFT L1=+0.13 trd=-0.08 cnt=107 | NVDA L1=-0.08 trd=+0.08 cnt=290 | AMZN L1=+0.05 trd=-0.20 cnt=794 | META L1=-0.16 trd=-0.16 cnt=121
+[RUN] 291.8min | ticks=558620 | grp1/1: AAPL L1=-0.09 trd=+0.04 cnt=349 | MSFT L1=+0.03 trd=-0.07 cnt=148 | NVDA L1=+0.06 trd=+0.36 cnt=295 | AMZN L1=+0.03 trd=-0.22 cnt=440 | META L1=+0.03 trd=+0.19 cnt=158
+[RUN] 292.8min | ticks=560023 | grp1/1: AAPL L1=+0.14 trd=-0.01 cnt=254 | MSFT L1=+0.04 trd=-0.14 cnt=208 | NVDA L1=+0.07 trd=-0.12 cnt=599 | AMZN L1=-0.03 trd=+0.39 cnt=237 | META L1=+0.10 trd=+0.31 cnt=83
+[RUN] 293.8min | ticks=560987 | grp1/1: AAPL L1=+0.05 trd=-0.19 cnt=194 | MSFT L1=-0.11 trd=-0.58 cnt=135 | NVDA L1=-0.05 trd=+0.14 cnt=506 | AMZN L1=-0.01 trd=-0.28 cnt=94 | META L1=+0.04 trd=-0.95 cnt=28
+[RUN] 294.8min | ticks=562566 | grp1/1: AAPL L1=+0.07 trd=+0.06 cnt=254 | MSFT L1=+0.16 trd=-0.28 cnt=112 | NVDA L1=-0.06 trd=+0.20 cnt=905 | AMZN L1=-0.02 trd=-0.14 cnt=126 | META L1=+0.07 trd=+0.24 cnt=181
+[IB ERROR] reqId=-1 symbol=GLOBAL code=2103 msg=La connexion de données de marché est rompue:hfarm
+[RUN] 295.8min | ticks=564014 | grp1/1: AAPL L1=-0.09 trd=-0.05 cnt=270 | MSFT L1=-0.04 trd=+0.38 cnt=198 | NVDA L1=-0.05 trd=+0.25 cnt=557 | AMZN L1=+0.06 trd=-0.18 cnt=278 | META L1=+0.03 trd=-0.38 cnt=141
+[RUN] 296.8min | ticks=565043 | grp1/1: AAPL L1=+0.00 trd=-0.39 cnt=163 | MSFT L1=-0.13 trd=-0.42 cnt=101 | NVDA L1=+0.01 trd=+0.07 cnt=416 | AMZN L1=+0.11 trd=-0.23 cnt=89 | META L1=+0.09 trd=+0.46 cnt=223
+[RUN] 297.8min | ticks=566028 | grp1/1: AAPL L1=-0.18 trd=-0.39 cnt=148 | MSFT L1=+0.08 trd=-0.00 cnt=90 | NVDA L1=-0.12 trd=-0.20 cnt=394 | AMZN L1=-0.01 trd=-0.03 cnt=211 | META L1=-0.15 trd=+0.60 cnt=124
+[RUN] 298.8min | ticks=567108 | grp1/1: AAPL L1=-0.02 trd=-0.01 cnt=157 | MSFT L1=+0.00 trd=+0.06 cnt=66 | NVDA L1=+0.03 trd=+0.37 cnt=581 | AMZN L1=-0.08 trd=+0.02 cnt=146 | META L1=+0.06 trd=+0.86 cnt=109
+[RUN] 299.8min | ticks=568127 | grp1/1: AAPL L1=+0.06 trd=-0.12 cnt=228 | MSFT L1=+0.09 trd=+0.23 cnt=88 | NVDA L1=+0.12 trd=+0.01 cnt=425 | AMZN L1=+0.01 trd=-0.21 cnt=104 | META L1=+0.02 trd=+0.57 cnt=146
+[RUN] 300.8min | ticks=569000 | grp1/1: AAPL L1=-0.02 trd=-0.03 cnt=175 | MSFT L1=+0.06 trd=-0.18 cnt=120 | NVDA L1=-0.01 trd=-0.10 cnt=331 | AMZN L1=-0.01 trd=-0.41 cnt=91 | META L1=-0.17 trd=+0.21 cnt=146
+[RUN] 301.8min | ticks=570238 | grp1/1: AAPL L1=-0.00 trd=-0.00 cnt=309 | MSFT L1=+0.02 trd=-0.11 cnt=173 | NVDA L1=+0.09 trd=-0.02 cnt=419 | AMZN L1=+0.04 trd=-0.20 cnt=209 | META L1=-0.04 trd=+0.58 cnt=128
+[RUN] 302.8min | ticks=571269 | grp1/1: AAPL L1=+0.05 trd=+0.45 cnt=388 | MSFT L1=+0.18 trd=-0.07 cnt=91 | NVDA L1=-0.12 trd=+0.23 cnt=328 | AMZN L1=+0.07 trd=-0.20 cnt=99 | META L1=+0.01 trd=+0.18 cnt=120
+[RUN] 303.8min | ticks=572216 | grp1/1: AAPL L1=-0.09 trd=+0.20 cnt=208 | MSFT L1=+0.09 trd=+0.22 cnt=126 | NVDA L1=+0.00 trd=-0.24 cnt=382 | AMZN L1=-0.13 trd=-0.43 cnt=127 | META L1=+0.03 trd=-0.24 cnt=68
+[RUN] 304.8min | ticks=573330 | grp1/1: AAPL L1=+0.16 trd=-0.02 cnt=213 | MSFT L1=+0.11 trd=+0.03 cnt=108 | NVDA L1=+0.05 trd=+0.24 cnt=490 | AMZN L1=-0.04 trd=-0.47 cnt=223 | META L1=-0.09 trd=-0.52 cnt=78
+[RUN] 305.8min | ticks=574975 | grp1/1: AAPL L1=+0.08 trd=+0.31 cnt=381 | MSFT L1=-0.07 trd=-0.27 cnt=184 | NVDA L1=+0.02 trd=-0.11 cnt=697 | AMZN L1=+0.03 trd=-0.57 cnt=209 | META L1=+0.06 trd=+0.37 cnt=122
+[RUN] 306.9min | ticks=576379 | grp1/1: AAPL L1=-0.06 trd=+0.08 cnt=250 | MSFT L1=+0.19 trd=+0.38 cnt=142 | NVDA L1=+0.11 trd=+0.02 cnt=759 | AMZN L1=+0.08 trd=+0.04 cnt=149 | META L1=+0.01 trd=+0.01 cnt=82
+[RUN] 307.9min | ticks=577742 | grp1/1: AAPL L1=+0.14 trd=-0.15 cnt=283 | MSFT L1=+0.18 trd=-0.48 cnt=262 | NVDA L1=+0.02 trd=-0.19 cnt=522 | AMZN L1=-0.07 trd=-0.37 cnt=180 | META L1=-0.08 trd=+0.56 cnt=102
+[RUN] 308.9min | ticks=579443 | grp1/1: AAPL L1=+0.01 trd=-0.22 cnt=216 | MSFT L1=+0.04 trd=-0.07 cnt=157 | NVDA L1=+0.01 trd=+0.88 cnt=981 | AMZN L1=+0.00 trd=-0.28 cnt=193 | META L1=-0.16 trd=+0.49 cnt=105
+[RUN] 309.9min | ticks=580649 | grp1/1: AAPL L1=+0.10 trd=-0.04 cnt=234 | MSFT L1=+0.10 trd=-0.00 cnt=148 | NVDA L1=-0.02 trd=-0.06 cnt=491 | AMZN L1=+0.02 trd=-0.54 cnt=212 | META L1=+0.05 trd=+0.20 cnt=90
+[RUN] 310.9min | ticks=581766 | grp1/1: AAPL L1=-0.02 trd=+0.07 cnt=234 | MSFT L1=+0.20 trd=+0.59 cnt=181 | NVDA L1=+0.02 trd=+0.13 cnt=477 | AMZN L1=-0.07 trd=-0.07 cnt=109 | META L1=+0.15 trd=+0.64 cnt=109
+[IB ERROR] reqId=-1 symbol=GLOBAL code=2103 msg=La connexion de données de marché est rompue:jfarm
+[RUN] 311.9min | ticks=582891 | grp1/1: AAPL L1=-0.14 trd=+0.14 cnt=193 | MSFT L1=+0.18 trd=+0.10 cnt=133 | NVDA L1=+0.09 trd=-0.21 cnt=443 | AMZN L1=+0.12 trd=-0.30 cnt=161 | META L1=+0.11 trd=+0.56 cnt=187
+[IB ERROR] reqId=-1 symbol=GLOBAL code=2103 msg=La connexion de données de marché est rompue:jfarm
+[IB ERROR] reqId=-1 symbol=GLOBAL code=2103 msg=La connexion de données de marché est rompue:jfarm
+[IB ERROR] reqId=-1 symbol=GLOBAL code=2103 msg=La connexion de données de marché est rompue:jfarm
+[RUN] 312.9min | ticks=584123 | grp1/1: AAPL L1=+0.07 trd=+0.20 cnt=175 | MSFT L1=-0.01 trd=+0.21 cnt=110 | NVDA L1=-0.02 trd=-0.29 cnt=509 | AMZN L1=-0.07 trd=+0.19 cnt=184 | META L1=-0.16 trd=+0.64 cnt=216
+[RUN] 313.9min | ticks=585436 | grp1/1: AAPL L1=+0.09 trd=+0.18 cnt=139 | MSFT L1=-0.06 trd=-0.20 cnt=112 | NVDA L1=+0.03 trd=+0.20 cnt=798 | AMZN L1=+0.10 trd=-0.66 cnt=109 | META L1=-0.05 trd=-0.77 cnt=59
+[RUN] 314.9min | ticks=586498 | grp1/1: AAPL L1=-0.10 trd=-0.11 cnt=180 | MSFT L1=+0.10 trd=-0.09 cnt=117 | NVDA L1=-0.09 trd=-0.25 cnt=445 | AMZN L1=-0.03 trd=-0.01 cnt=191 | META L1=-0.10 trd=-0.46 cnt=107
+[RUN] 316.0min | ticks=587649 | grp1/1: AAPL L1=+0.04 trd=-0.37 cnt=228 | MSFT L1=+0.12 trd=+0.39 cnt=119 | NVDA L1=-0.09 trd=+0.07 cnt=517 | AMZN L1=-0.01 trd=-0.47 cnt=167 | META L1=+0.11 trd=+0.72 cnt=87
+[RUN] 317.2min | ticks=589282 | grp1/1: AAPL L1=-0.03 trd=-0.08 cnt=158 | MSFT L1=+0.04 trd=-0.40 cnt=229 | NVDA L1=+0.12 trd=-0.01 cnt=523 | AMZN L1=+0.02 trd=-0.23 cnt=175 | META L1=+0.10 trd=-0.58 cnt=213
+[IB ERROR] reqId=-1 symbol=GLOBAL code=2103 msg=La connexion de données de marché est rompue:afarm
+[RUN] 318.2min | ticks=590235 | grp1/1: AAPL L1=-0.13 trd=-0.30 cnt=188 | MSFT L1=-0.05 trd=+0.31 cnt=143 | NVDA L1=+0.03 trd=+0.30 cnt=339 | AMZN L1=-0.15 trd=-0.01 cnt=117 | META L1=-0.06 trd=+0.15 cnt=133
+[RUN] 319.2min | ticks=591023 | grp1/1: AAPL L1=+0.09 trd=-0.34 cnt=157 | MSFT L1=+0.17 trd=-0.32 cnt=75 | NVDA L1=-0.17 trd=-0.31 cnt=288 | AMZN L1=+0.15 trd=+0.11 cnt=129 | META L1=-0.03 trd=+0.74 cnt=116
+[RUN] 320.3min | ticks=591948 | grp1/1: AAPL L1=-0.03 trd=+0.28 cnt=277 | MSFT L1=+0.18 trd=-0.50 cnt=86 | NVDA L1=-0.03 trd=+0.11 cnt=224 | AMZN L1=+0.04 trd=-0.40 cnt=161 | META L1=-0.04 trd=-0.37 cnt=109
+[RUN] 321.3min | ticks=593078 | grp1/1: AAPL L1=+0.03 trd=-0.00 cnt=239 | MSFT L1=-0.01 trd=-0.09 cnt=191 | NVDA L1=-0.02 trd=-0.01 cnt=326 | AMZN L1=+0.01 trd=-0.01 cnt=192 | META L1=-0.05 trd=-0.20 cnt=144
+[RUN] 322.3min | ticks=594152 | grp1/1: AAPL L1=+0.07 trd=-0.24 cnt=194 | MSFT L1=+0.06 trd=-0.05 cnt=220 | NVDA L1=-0.02 trd=+0.30 cnt=343 | AMZN L1=-0.12 trd=+0.49 cnt=138 | META L1=-0.05 trd=-0.91 cnt=106
+[RUN] 323.4min | ticks=595247 | grp1/1: AAPL L1=+0.08 trd=+0.60 cnt=218 | MSFT L1=+0.26 trd=+0.28 cnt=145 | NVDA L1=-0.03 trd=+0.61 cnt=328 | AMZN L1=-0.11 trd=-0.19 cnt=199 | META L1=+0.07 trd=+0.18 cnt=137
+[RUN] 324.4min | ticks=596172 | grp1/1: AAPL L1=+0.01 trd=+0.42 cnt=203 | MSFT L1=+0.07 trd=+0.16 cnt=197 | NVDA L1=-0.03 trd=-0.26 cnt=317 | AMZN L1=-0.08 trd=+0.20 cnt=118 | META L1=-0.05 trd=+0.34 cnt=88
+[RUN] 325.4min | ticks=597043 | grp1/1: AAPL L1=-0.04 trd=-0.03 cnt=177 | MSFT L1=+0.05 trd=-0.26 cnt=170 | NVDA L1=-0.09 trd=-0.13 cnt=276 | AMZN L1=-0.02 trd=+0.08 cnt=158 | META L1=+0.13 trd=+0.01 cnt=80
+[RUN] 326.4min | ticks=598318 | grp1/1: AAPL L1=+0.09 trd=+0.15 cnt=240 | MSFT L1=+0.03 trd=-0.57 cnt=127 | NVDA L1=+0.09 trd=-0.25 cnt=559 | AMZN L1=+0.05 trd=+0.56 cnt=152 | META L1=+0.07 trd=-0.24 cnt=169
+[RUN] 327.8min | ticks=599405 | grp1/1: AAPL L1=+0.11 trd=-0.02 cnt=194 | MSFT L1=+0.11 trd=+0.41 cnt=147 | NVDA L1=+0.07 trd=-0.23 cnt=212 | AMZN L1=-0.20 trd=+0.61 cnt=116 | META L1=-0.04 trd=-0.77 cnt=45
+[RUN] 329.0min | ticks=600514 | grp1/1: AAPL L1=-0.08 trd=+0.28 cnt=137 | MSFT L1=+0.06 trd=-0.15 cnt=167 | NVDA L1=-0.01 trd=-0.08 cnt=362 | AMZN L1=+0.14 trd=-0.18 cnt=140 | META L1=+0.12 trd=+0.26 cnt=151
+[RUN] 330.0min | ticks=601378 | grp1/1: AAPL L1=-0.05 trd=-0.07 cnt=173 | MSFT L1=+0.12 trd=+0.29 cnt=264 | NVDA L1=-0.09 trd=-0.15 cnt=266 | AMZN L1=+0.04 trd=-0.13 cnt=81 | META L1=+0.02 trd=-0.13 cnt=64
+[RUN] 331.1min | ticks=602608 | grp1/1: AAPL L1=-0.06 trd=+0.16 cnt=260 | MSFT L1=+0.03 trd=+0.09 cnt=177 | NVDA L1=-0.04 trd=-0.29 cnt=428 | AMZN L1=-0.11 trd=-0.32 cnt=109 | META L1=+0.14 trd=-0.66 cnt=85
+[RUN] 332.1min | ticks=603323 | grp1/1: AAPL L1=-0.01 trd=-0.07 cnt=140 | MSFT L1=+0.09 trd=+0.24 cnt=83 | NVDA L1=+0.00 trd=-0.47 cnt=305 | AMZN L1=+0.08 trd=+0.11 cnt=103 | META L1=+0.05 trd=+0.44 cnt=76
+[RUN] 333.1min | ticks=604477 | grp1/1: AAPL L1=-0.01 trd=+0.35 cnt=253 | MSFT L1=+0.13 trd=+0.43 cnt=159 | NVDA L1=-0.12 trd=-0.16 cnt=490 | AMZN L1=-0.03 trd=-0.06 cnt=138 | META L1=+0.19 trd=-0.43 cnt=97
+[RUN] 334.1min | ticks=605285 | grp1/1: AAPL L1=+0.10 trd=-0.06 cnt=159 | MSFT L1=+0.10 trd=+0.22 cnt=117 | NVDA L1=-0.00 trd=+0.19 cnt=295 | AMZN L1=-0.13 trd=+0.21 cnt=80 | META L1=+0.15 trd=-0.09 cnt=146
+[RUN] 335.1min | ticks=606162 | grp1/1: AAPL L1=+0.09 trd=-0.12 cnt=158 | MSFT L1=+0.12 trd=-0.31 cnt=156 | NVDA L1=-0.09 trd=-0.14 cnt=351 | AMZN L1=-0.10 trd=+0.53 cnt=113 | META L1=+0.01 trd=+0.12 cnt=85
+[RUN] 336.1min | ticks=607340 | grp1/1: AAPL L1=+0.17 trd=-0.25 cnt=194 | MSFT L1=+0.08 trd=+0.15 cnt=132 | NVDA L1=-0.09 trd=+0.14 cnt=538 | AMZN L1=+0.05 trd=-0.51 cnt=97 | META L1=+0.15 trd=-0.75 cnt=190
+[RUN] 337.1min | ticks=608665 | grp1/1: AAPL L1=-0.02 trd=+0.07 cnt=160 | MSFT L1=+0.10 trd=-0.32 cnt=232 | NVDA L1=+0.13 trd=-0.17 cnt=644 | AMZN L1=+0.11 trd=+0.16 cnt=127 | META L1=+0.11 trd=-0.12 cnt=148
+[RUN] 338.1min | ticks=609772 | grp1/1: AAPL L1=-0.07 trd=+0.06 cnt=172 | MSFT L1=+0.26 trd=-0.09 cnt=263 | NVDA L1=+0.03 trd=-0.07 cnt=421 | AMZN L1=-0.01 trd=-0.52 cnt=129 | META L1=+0.27 trd=-0.22 cnt=108
+[RUN] 339.2min | ticks=610730 | grp1/1: AAPL L1=+0.07 trd=+0.02 cnt=172 | MSFT L1=+0.16 trd=-0.12 cnt=207 | NVDA L1=-0.09 trd=+0.00 cnt=357 | AMZN L1=+0.19 trd=-0.03 cnt=141 | META L1=-0.10 trd=-0.04 cnt=73
+[RUN] 340.2min | ticks=611833 | grp1/1: AAPL L1=+0.08 trd=-0.03 cnt=198 | MSFT L1=-0.02 trd=-0.40 cnt=166 | NVDA L1=+0.01 trd=-0.22 cnt=397 | AMZN L1=+0.13 trd=-0.38 cnt=132 | META L1=+0.04 trd=+0.44 cnt=199
+[RUN] 341.2min | ticks=613230 | grp1/1: AAPL L1=+0.04 trd=-0.01 cnt=212 | MSFT L1=+0.07 trd=+0.50 cnt=256 | NVDA L1=+0.00 trd=+0.08 cnt=577 | AMZN L1=-0.09 trd=+0.28 cnt=168 | META L1=-0.03 trd=-0.10 cnt=151
+[RUN] 342.2min | ticks=614051 | grp1/1: AAPL L1=-0.04 trd=-0.72 cnt=132 | MSFT L1=-0.05 trd=-0.11 cnt=101 | NVDA L1=+0.03 trd=+0.02 cnt=396 | AMZN L1=+0.06 trd=+0.07 cnt=71 | META L1=-0.08 trd=+0.13 cnt=114
+[RUN] 343.2min | ticks=615101 | grp1/1: AAPL L1=-0.06 trd=-0.11 cnt=201 | MSFT L1=+0.00 trd=-0.32 cnt=187 | NVDA L1=-0.00 trd=+0.56 cnt=287 | AMZN L1=-0.21 trd=-0.03 cnt=200 | META L1=-0.19 trd=-0.04 cnt=131
+[RUN] 344.2min | ticks=616065 | grp1/1: AAPL L1=+0.13 trd=-0.20 cnt=147 | MSFT L1=+0.10 trd=+0.13 cnt=196 | NVDA L1=+0.10 trd=+0.62 cnt=333 | AMZN L1=+0.18 trd=-0.05 cnt=163 | META L1=+0.15 trd=+0.36 cnt=119
+[RUN] 345.2min | ticks=616965 | grp1/1: AAPL L1=+0.12 trd=+0.12 cnt=183 | MSFT L1=+0.07 trd=+0.13 cnt=138 | NVDA L1=+0.07 trd=+0.19 cnt=359 | AMZN L1=-0.05 trd=+0.12 cnt=109 | META L1=-0.05 trd=-0.45 cnt=105
+[RUN] 346.2min | ticks=617863 | grp1/1: AAPL L1=+0.04 trd=-0.29 cnt=194 | MSFT L1=+0.04 trd=-0.49 cnt=154 | NVDA L1=+0.01 trd=-0.04 cnt=332 | AMZN L1=+0.03 trd=+0.54 cnt=89 | META L1=+0.10 trd=-0.27 cnt=126
+[RUN] 347.2min | ticks=619058 | grp1/1: AAPL L1=+0.14 trd=-0.21 cnt=300 | MSFT L1=-0.06 trd=-0.21 cnt=129 | NVDA L1=+0.06 trd=-0.06 cnt=346 | AMZN L1=+0.07 trd=+0.36 cnt=123 | META L1=+0.14 trd=-0.05 cnt=291
+[RUN] 348.2min | ticks=620314 | grp1/1: AAPL L1=+0.04 trd=-0.17 cnt=164 | MSFT L1=+0.16 trd=-0.12 cnt=128 | NVDA L1=-0.05 trd=+0.10 cnt=577 | AMZN L1=+0.03 trd=+0.64 cnt=235 | META L1=-0.16 trd=-0.33 cnt=110
+[RUN] 349.2min | ticks=621147 | grp1/1: AAPL L1=+0.14 trd=-0.37 cnt=201 | MSFT L1=-0.06 trd=+0.09 cnt=94 | NVDA L1=+0.08 trd=-0.08 cnt=247 | AMZN L1=-0.10 trd=-0.35 cnt=196 | META L1=+0.01 trd=+0.79 cnt=67
+[RUN] 350.2min | ticks=622150 | grp1/1: AAPL L1=+0.14 trd=-0.45 cnt=163 | MSFT L1=+0.07 trd=-0.04 cnt=230 | NVDA L1=-0.05 trd=-0.35 cnt=346 | AMZN L1=+0.06 trd=+0.22 cnt=114 | META L1=+0.04 trd=-0.06 cnt=138
+[RUN] 351.2min | ticks=623428 | grp1/1: AAPL L1=+0.03 trd=+0.45 cnt=275 | MSFT L1=+0.02 trd=+0.06 cnt=154 | NVDA L1=+0.12 trd=-0.10 cnt=459 | AMZN L1=-0.04 trd=+0.36 cnt=160 | META L1=-0.02 trd=+0.09 cnt=168
+[RUN] 352.2min | ticks=624572 | grp1/1: AAPL L1=-0.04 trd=-0.09 cnt=228 | MSFT L1=-0.07 trd=-0.27 cnt=165 | NVDA L1=+0.10 trd=+0.06 cnt=452 | AMZN L1=-0.06 trd=+0.21 cnt=118 | META L1=+0.13 trd=-0.59 cnt=156
+[RUN] 353.2min | ticks=626047 | grp1/1: AAPL L1=+0.01 trd=-0.16 cnt=288 | MSFT L1=+0.10 trd=-0.40 cnt=134 | NVDA L1=+0.05 trd=-0.30 cnt=741 | AMZN L1=+0.07 trd=+0.54 cnt=69 | META L1=+0.07 trd=-0.03 cnt=231
+[RUN] 354.2min | ticks=627367 | grp1/1: AAPL L1=-0.04 trd=-0.00 cnt=291 | MSFT L1=+0.02 trd=-0.04 cnt=184 | NVDA L1=+0.08 trd=-0.13 cnt=622 | AMZN L1=-0.07 trd=+0.34 cnt=132 | META L1=-0.19 trd=-0.79 cnt=79
+[RUN] 355.2min | ticks=628814 | grp1/1: AAPL L1=+0.14 trd=-0.04 cnt=316 | MSFT L1=+0.06 trd=-0.25 cnt=135 | NVDA L1=-0.02 trd=+0.29 cnt=501 | AMZN L1=+0.18 trd=-0.02 cnt=229 | META L1=+0.01 trd=+0.60 cnt=259
+[RUN] 356.2min | ticks=630665 | grp1/1: AAPL L1=+0.02 trd=+0.26 cnt=353 | MSFT L1=+0.09 trd=-0.11 cnt=174 | NVDA L1=+0.03 trd=-0.10 cnt=513 | AMZN L1=+0.05 trd=+0.40 cnt=112 | META L1=+0.06 trd=+0.67 cnt=693
+[RUN] 357.2min | ticks=632768 | grp1/1: AAPL L1=+0.05 trd=-0.44 cnt=309 | MSFT L1=+0.08 trd=-0.45 cnt=164 | NVDA L1=+0.06 trd=+0.29 cnt=806 | AMZN L1=-0.04 trd=-0.34 cnt=247 | META L1=+0.01 trd=+0.19 cnt=570
+[RUN] 358.2min | ticks=634118 | grp1/1: AAPL L1=+0.00 trd=+0.09 cnt=307 | MSFT L1=+0.11 trd=+0.21 cnt=99 | NVDA L1=+0.01 trd=+0.31 cnt=530 | AMZN L1=+0.06 trd=+0.11 cnt=171 | META L1=-0.19 trd=+0.62 cnt=229
+[RUN] 359.2min | ticks=635553 | grp1/1: AAPL L1=-0.06 trd=-0.04 cnt=212 | MSFT L1=-0.05 trd=-0.15 cnt=111 | NVDA L1=+0.08 trd=-0.12 cnt=618 | AMZN L1=-0.12 trd=+0.06 cnt=248 | META L1=+0.12 trd=+0.26 cnt=219
+[RUN] 360.2min | ticks=637361 | grp1/1: AAPL L1=+0.03 trd=+0.03 cnt=225 | MSFT L1=+0.08 trd=-0.15 cnt=150 | NVDA L1=-0.14 trd=-0.17 cnt=879 | AMZN L1=+0.03 trd=-0.15 cnt=120 | META L1=+0.03 trd=+0.47 cnt=425
+[RUN] 361.2min | ticks=639186 | grp1/1: AAPL L1=-0.12 trd=+0.56 cnt=411 | MSFT L1=+0.02 trd=+0.63 cnt=248 | NVDA L1=-0.11 trd=+0.24 cnt=492 | AMZN L1=+0.07 trd=+0.03 cnt=141 | META L1=+0.02 trd=-0.19 cnt=461
+[RUN] 362.2min | ticks=640711 | grp1/1: AAPL L1=+0.13 trd=-0.00 cnt=289 | MSFT L1=+0.20 trd=+0.18 cnt=135 | NVDA L1=-0.03 trd=+0.33 cnt=564 | AMZN L1=+0.04 trd=+0.49 cnt=112 | META L1=+0.02 trd=+0.31 cnt=421
+[RUN] 363.2min | ticks=642307 | grp1/1: AAPL L1=-0.07 trd=+0.43 cnt=295 | MSFT L1=+0.05 trd=-0.22 cnt=196 | NVDA L1=+0.07 trd=+0.27 cnt=575 | AMZN L1=-0.02 trd=-0.05 cnt=154 | META L1=+0.00 trd=-0.43 cnt=373
+[RUN] 364.2min | ticks=644130 | grp1/1: AAPL L1=+0.14 trd=+0.37 cnt=390 | MSFT L1=+0.05 trd=-0.69 cnt=210 | NVDA L1=-0.08 trd=+0.03 cnt=512 | AMZN L1=-0.05 trd=-0.30 cnt=168 | META L1=+0.11 trd=-0.15 cnt=538
+[RUN] 365.2min | ticks=646160 | grp1/1: AAPL L1=-0.05 trd=-0.08 cnt=296 | MSFT L1=+0.19 trd=+0.22 cnt=317 | NVDA L1=-0.02 trd=+0.15 cnt=750 | AMZN L1=+0.15 trd=+0.22 cnt=347 | META L1=+0.04 trd=+0.11 cnt=299
+[RUN] 366.2min | ticks=648703 | grp1/1: AAPL L1=+0.15 trd=-0.27 cnt=387 | MSFT L1=-0.10 trd=+0.37 cnt=293 | NVDA L1=+0.03 trd=-0.25 cnt=598 | AMZN L1=-0.03 trd=+0.06 cnt=205 | META L1=+0.09 trd=+0.43 cnt=1034
+[RUN] 367.3min | ticks=650653 | grp1/1: AAPL L1=+0.03 trd=-0.41 cnt=279 | MSFT L1=+0.09 trd=+0.27 cnt=136 | NVDA L1=+0.08 trd=-0.13 cnt=617 | AMZN L1=-0.03 trd=+0.18 cnt=225 | META L1=+0.03 trd=-0.09 cnt=644
+[RUN] 368.3min | ticks=652094 | grp1/1: AAPL L1=+0.14 trd=+0.55 cnt=261 | MSFT L1=+0.14 trd=+0.27 cnt=142 | NVDA L1=-0.08 trd=+0.13 cnt=468 | AMZN L1=+0.07 trd=+0.23 cnt=114 | META L1=+0.00 trd=-0.11 cnt=411
+[RUN] 369.3min | ticks=654030 | grp1/1: AAPL L1=-0.08 trd=-0.27 cnt=288 | MSFT L1=-0.03 trd=-0.27 cnt=240 | NVDA L1=+0.07 trd=-0.23 cnt=551 | AMZN L1=+0.02 trd=+0.35 cnt=222 | META L1=-0.08 trd=+0.23 cnt=601
+[RUN] 370.3min | ticks=655733 | grp1/1: AAPL L1=+0.01 trd=-0.12 cnt=357 | MSFT L1=+0.20 trd=+0.20 cnt=300 | NVDA L1=+0.01 trd=-0.39 cnt=499 | AMZN L1=-0.22 trd=+0.12 cnt=134 | META L1=+0.04 trd=-0.10 cnt=378
+[RUN] 371.3min | ticks=657694 | grp1/1: AAPL L1=-0.06 trd=+0.18 cnt=404 | MSFT L1=+0.04 trd=+0.16 cnt=205 | NVDA L1=+0.05 trd=-0.04 cnt=380 | AMZN L1=-0.04 trd=+0.34 cnt=312 | META L1=+0.06 trd=-0.21 cnt=598
+[RUN] 372.3min | ticks=659541 | grp1/1: AAPL L1=+0.02 trd=+0.42 cnt=440 | MSFT L1=+0.11 trd=+0.22 cnt=247 | NVDA L1=+0.01 trd=-0.33 cnt=376 | AMZN L1=-0.08 trd=+0.18 cnt=248 | META L1=-0.08 trd=-0.24 cnt=519
+[RUN] 373.3min | ticks=661292 | grp1/1: AAPL L1=+0.08 trd=+0.39 cnt=290 | MSFT L1=-0.01 trd=+0.16 cnt=221 | NVDA L1=-0.02 trd=+0.36 cnt=564 | AMZN L1=+0.00 trd=-0.39 cnt=138 | META L1=+0.02 trd=+0.08 cnt=510
+[RUN] 374.3min | ticks=663047 | grp1/1: AAPL L1=+0.19 trd=+0.12 cnt=452 | MSFT L1=+0.18 trd=+0.27 cnt=214 | NVDA L1=+0.11 trd=+0.07 cnt=580 | AMZN L1=+0.00 trd=+0.48 cnt=128 | META L1=-0.03 trd=+0.80 cnt=355
+[RUN] 375.3min | ticks=664893 | grp1/1: AAPL L1=+0.06 trd=-0.14 cnt=353 | MSFT L1=-0.07 trd=+0.16 cnt=199 | NVDA L1=-0.06 trd=-0.19 cnt=390 | AMZN L1=+0.11 trd=+0.53 cnt=400 | META L1=-0.04 trd=-0.16 cnt=452
+[RUN] 376.8min | ticks=667828 | grp1/1: AAPL L1=-0.04 trd=-0.58 cnt=327 | MSFT L1=+0.04 trd=+0.43 cnt=141 | NVDA L1=+0.02 trd=-0.11 cnt=1003 | AMZN L1=-0.06 trd=-0.23 cnt=141 | META L1=-0.08 trd=-0.28 cnt=533
+[RUN] 378.1min | ticks=669877 | grp1/1: AAPL L1=+0.08 trd=-0.28 cnt=260 | MSFT L1=-0.08 trd=-0.04 cnt=127 | NVDA L1=+0.02 trd=+0.30 cnt=720 | AMZN L1=-0.17 trd=-0.23 cnt=151 | META L1=-0.14 trd=-0.36 cnt=504
+[RUN] 379.2min | ticks=671346 | grp1/1: AAPL L1=+0.10 trd=-0.05 cnt=227 | MSFT L1=-0.00 trd=+0.47 cnt=150 | NVDA L1=+0.09 trd=+0.37 cnt=459 | AMZN L1=+0.08 trd=+0.30 cnt=166 | META L1=-0.07 trd=+0.14 cnt=332
+[RUN] 380.3min | ticks=673872 | grp1/1: AAPL L1=-0.09 trd=+0.69 cnt=918 | MSFT L1=+0.11 trd=-0.34 cnt=251 | NVDA L1=+0.07 trd=+0.09 cnt=392 | AMZN L1=-0.07 trd=-0.53 cnt=278 | META L1=+0.02 trd=+0.09 cnt=474
+[RUN] 381.3min | ticks=676249 | grp1/1: AAPL L1=-0.02 trd=+0.14 cnt=322 | MSFT L1=+0.18 trd=+0.24 cnt=273 | NVDA L1=+0.01 trd=+0.14 cnt=895 | AMZN L1=+0.06 trd=+0.54 cnt=139 | META L1=+0.04 trd=-0.13 cnt=712
+[RUN] 382.3min | ticks=677957 | grp1/1: AAPL L1=+0.01 trd=+0.29 cnt=263 | MSFT L1=+0.02 trd=-0.03 cnt=356 | NVDA L1=+0.07 trd=-0.19 cnt=358 | AMZN L1=+0.03 trd=-0.19 cnt=177 | META L1=+0.05 trd=+0.47 cnt=485
+[RUN] 383.4min | ticks=679680 | grp1/1: AAPL L1=+0.03 trd=-0.11 cnt=469 | MSFT L1=-0.02 trd=-0.12 cnt=146 | NVDA L1=-0.03 trd=-0.09 cnt=484 | AMZN L1=-0.12 trd=-0.40 cnt=189 | META L1=+0.03 trd=+0.49 cnt=387
+[RUN] 384.4min | ticks=681300 | grp1/1: AAPL L1=-0.05 trd=+0.13 cnt=395 | MSFT L1=-0.04 trd=+0.02 cnt=218 | NVDA L1=+0.08 trd=-0.09 cnt=358 | AMZN L1=-0.02 trd=+0.17 cnt=197 | META L1=+0.04 trd=-0.05 cnt=442
+[RUN] 385.4min | ticks=686479 | grp1/1: AAPL L1=-0.04 trd=-0.08 cnt=561 | MSFT L1=-0.07 trd=+0.21 cnt=788 | NVDA L1=-0.08 trd=-0.14 cnt=1175 | AMZN L1=+0.11 trd=+0.03 cnt=928 | META L1=+0.00 trd=+0.40 cnt=1624
+[RUN] 386.5min | ticks=689912 | grp1/1: AAPL L1=+0.02 trd=+0.26 cnt=439 | MSFT L1=+0.10 trd=+0.07 cnt=468 | NVDA L1=-0.01 trd=+0.26 cnt=795 | AMZN L1=+0.02 trd=-0.06 cnt=538 | META L1=-0.06 trd=+0.12 cnt=737
+[RUN] 387.6min | ticks=693748 | grp1/1: AAPL L1=+0.03 trd=+0.46 cnt=619 | MSFT L1=+0.04 trd=+0.39 cnt=628 | NVDA L1=-0.05 trd=+0.22 cnt=759 | AMZN L1=+0.04 trd=+0.09 cnt=823 | META L1=+0.03 trd=+0.26 cnt=667
+[RUN] 388.6min | ticks=697349 | grp1/1: AAPL L1=-0.01 trd=+0.18 cnt=432 | MSFT L1=-0.00 trd=-0.06 cnt=474 | NVDA L1=-0.07 trd=-0.08 cnt=849 | AMZN L1=+0.05 trd=-0.33 cnt=533 | META L1=-0.14 trd=+0.30 cnt=1201
+[RUN] 389.7min | ticks=703136 | grp1/1: AAPL L1=+0.05 trd=+0.30 cnt=677 | MSFT L1=-0.04 trd=+0.55 cnt=573 | NVDA L1=-0.08 trd=+0.09 cnt=2405 | AMZN L1=-0.12 trd=+0.13 cnt=707 | META L1=+0.06 trd=+0.27 cnt=1359
+[RUN] 390.7min | ticks=713034 | grp1/1: AAPL L1=-0.02 trd=-0.03 cnt=1719 | MSFT L1=-0.02 trd=+0.21 cnt=1369 | NVDA L1=+0.02 trd=-0.01 cnt=1993 | AMZN L1=+0.10 trd=-0.05 cnt=2345 | META L1=-0.02 trd=+0.30 cnt=2340
+[RUN] 391.8min | ticks=721072 | grp1/1: AAPL L1=-0.02 trd=-0.23 cnt=1163 | MSFT L1=+0.06 trd=-0.03 cnt=759 | NVDA L1=-0.12 trd=-0.03 cnt=1375 | AMZN L1=+0.13 trd=-0.35 cnt=1319 | META L1=+0.03 trd=+0.10 cnt=2188
+[RUN] 392.9min | ticks=729887 | grp1/1: AAPL L1=+0.04 trd=-0.17 cnt=1430 | MSFT L1=+0.03 trd=-0.14 cnt=1627 | NVDA L1=-0.03 trd=-0.08 cnt=1470 | AMZN L1=+0.03 trd=-0.11 cnt=1660 | META L1=+0.17 trd=-0.20 cnt=2480
+[RUN] 393.9min | ticks=742950 | grp1/1: AAPL L1=-0.05 trd=-0.19 cnt=2800 | MSFT L1=-0.08 trd=-0.24 cnt=2524 | NVDA L1=-0.02 trd=-0.32 cnt=2673 | AMZN L1=-0.02 trd=-0.14 cnt=1720 | META L1=+0.00 trd=-0.26 cnt=2207
+
+[OK] Collecte terminée.
+[OUT] OFI agrégé  : logs\tick_ofi\tick_ofi_20260709_092502.csv
+[OUT] Ticks bruts : logs\tick_ofi\tick_raw_20260709_092502.csv  (769064 ticks)
+
+Résumé (dernière snapshot) :
+  AAPL   last=316.01  ofiL1_1m=-0.055  ofiL1_5m=-0.023  trd_1m=+0.965  quotes_1m=479  err=0
+  MSFT   last=384.24  ofiL1_1m=-0.051  ofiL1_5m=-0.039  trd_1m=+0.961  quotes_1m=504  err=0
+  NVDA   last=202.78  ofiL1_1m=-0.029  ofiL1_5m=-0.038  trd_1m=+0.959  quotes_1m=534  err=0
+  AMZN   last=246.99  ofiL1_1m=+0.004  ofiL1_5m=+0.007  trd_1m=+0.941  quotes_1m=451  err=0
+  META   last=631.38  ofiL1_1m=+0.032  ofiL1_5m=+0.058  trd_1m=+0.932  quotes_1m=413  err=0
+[2026-07-09 16:00:15,87] Collecte terminee (exit code: 0) 

@@ -10,11 +10,13 @@ Usage:
 """
 import pandas as pd
 import yfinance as yf
-import sqlite3
 from datetime import datetime
 import time
 import sys
 import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
+from src.app.database.pg_connection import get_conn_ca, init_ca_schema
 
 # Date de début pour l'historique
 START_DATE = "2008-01-01"
@@ -23,58 +25,57 @@ START_DATE = "2008-01-01"
 class CanadaImporter:
     """Import complet des données canadiennes."""
 
-    def __init__(self, db_path: str = "trading_data_ca.db"):
-        self.db_path = db_path
+    def __init__(self, db_path=None):  # db_path ignoré — schéma 'ca' dans PostgreSQL
         self.symbols = []
         self._ensure_table()
 
     def _ensure_table(self):
-        """Crée la table historical_data si elle n'existe pas."""
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
+        """Crée le schéma 'ca' et la table historical_data si ils n'existent pas."""
+        init_ca_schema()
+        conn = get_conn_ca()
+        cur = conn.cursor()
 
-        cursor.execute("""
+        cur.execute("""
             CREATE TABLE IF NOT EXISTS historical_data (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                symbol TEXT NOT NULL,
-                date DATE NOT NULL,
-                open REAL NOT NULL,
-                high REAL NOT NULL,
-                low REAL NOT NULL,
-                close REAL NOT NULL,
-                volume INTEGER NOT NULL,
-                adjusted_close REAL,
-                dividends REAL DEFAULT 0,
-                stock_splits REAL DEFAULT 0,
-                source TEXT NOT NULL DEFAULT 'yfinance',
-                sma20_volume REAL DEFAULT 0,
-                hl_sma20vol REAL DEFAULT 0,
-                oc_sma20vol REAL DEFAULT 0,
-                macd REAL DEFAULT 0,
-                macd_signal REAL DEFAULT 0,
-                rsi REAL DEFAULT 0,
-                adx REAL DEFAULT 0,
-                bb_high REAL DEFAULT 0,
-                bb_low REAL DEFAULT 0,
-                pct_close REAL DEFAULT 0,
-                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                id             SERIAL PRIMARY KEY,
+                symbol         TEXT NOT NULL,
+                date           DATE NOT NULL,
+                open           DOUBLE PRECISION NOT NULL,
+                high           DOUBLE PRECISION NOT NULL,
+                low            DOUBLE PRECISION NOT NULL,
+                close          DOUBLE PRECISION NOT NULL,
+                volume         BIGINT NOT NULL,
+                adjusted_close DOUBLE PRECISION,
+                dividends      DOUBLE PRECISION DEFAULT 0,
+                stock_splits   DOUBLE PRECISION DEFAULT 0,
+                source         TEXT NOT NULL DEFAULT 'yfinance',
+                sma20_volume   DOUBLE PRECISION DEFAULT 0,
+                hl_sma20vol    DOUBLE PRECISION DEFAULT 0,
+                oc_sma20vol    DOUBLE PRECISION DEFAULT 0,
+                macd           DOUBLE PRECISION DEFAULT 0,
+                macd_signal    DOUBLE PRECISION DEFAULT 0,
+                rsi            DOUBLE PRECISION DEFAULT 0,
+                adx            DOUBLE PRECISION DEFAULT 0,
+                bb_high        DOUBLE PRECISION DEFAULT 0,
+                bb_low         DOUBLE PRECISION DEFAULT 0,
+                pct_close      DOUBLE PRECISION DEFAULT 0,
+                timestamp      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 UNIQUE(symbol, date, source)
             )
         """)
-
-        cursor.execute("""
+        cur.execute("""
             CREATE INDEX IF NOT EXISTS idx_historical_symbol_date
             ON historical_data(symbol, date DESC)
         """)
-
-        cursor.execute("""
+        cur.execute("""
             CREATE INDEX IF NOT EXISTS idx_historical_date
             ON historical_data(date DESC)
         """)
 
         conn.commit()
+        cur.close()
         conn.close()
-        print(f"[OK] Table historical_data initialisée dans {self.db_path}")
+        print("[OK] Table historical_data initialisee dans stockca (PostgreSQL)")
 
     def fetch_canadian_symbols(self) -> list:
         """
@@ -156,16 +157,18 @@ class CanadaImporter:
     def get_already_imported(self) -> set:
         """Récupère les symboles déjà présents en base avec données suffisantes."""
         try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            cursor.execute("""
-                SELECT symbol, COUNT(*) as cnt FROM historical_data
-                GROUP BY symbol HAVING cnt >= 100
+            conn = get_conn_ca()
+            cur = conn.cursor()
+            cur.execute("""
+                SELECT symbol FROM (
+                    SELECT symbol, COUNT(*) as cnt FROM historical_data GROUP BY symbol
+                ) sub WHERE cnt >= 100
             """)
-            symbols = {row[0] for row in cursor.fetchall()}
+            symbols = {row[0] for row in cur.fetchall()}
+            cur.close()
             conn.close()
             return symbols
-        except:
+        except Exception:
             return set()
 
     def import_symbol(self, symbol: str, start_date: str = START_DATE) -> int:
@@ -211,17 +214,18 @@ class CanadaImporter:
             if len(df) == 0:
                 return 0
 
-            # Insérer en base
-            conn = sqlite3.connect(self.db_path)
+            # Insérer en base (schéma 'ca')
+            conn = get_conn_ca()
+            cur = conn.cursor()
 
             inserted = 0
             for _, row in df.iterrows():
                 try:
-                    cursor = conn.cursor()
-                    cursor.execute("""
-                        INSERT OR IGNORE INTO historical_data
+                    cur.execute("""
+                        INSERT INTO historical_data
                         (symbol, date, open, high, low, close, volume, adjusted_close, source)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        ON CONFLICT (symbol, date, source) DO NOTHING
                     """, (
                         symbol,
                         row['date'],
@@ -233,12 +237,13 @@ class CanadaImporter:
                         float(row.get('adjusted_close', row['close'])),
                         'yfinance'
                     ))
-                    if cursor.rowcount > 0:
+                    if cur.rowcount > 0:
                         inserted += 1
-                except:
+                except Exception:
                     pass
 
             conn.commit()
+            cur.close()
             conn.close()
 
             return inserted
@@ -294,7 +299,7 @@ class CanadaImporter:
         print(f"  - Symboles importés: {success}")
         print(f"  - Symboles en erreur/vides: {errors}")
         print(f"  - Total barres: {total_bars:,}")
-        print(f"  - Base de données: {self.db_path}")
+        print("  - Base de donnees: PostgreSQL schema 'ca'")
 
 
 def main():

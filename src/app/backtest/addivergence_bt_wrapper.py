@@ -136,6 +136,7 @@ class AdDivergenceBTWrapper(bt.Strategy):
                 if bundle:
                     bundle["entry_order"] = None
                     data = self._get_data(symbol)
+                    # strategy.sell() soumet déjà l'ordre au broker — pas de broker.submit() supplémentaire
                     stop = OrderTranslator.stop(self, data, bundle["stop_order"], order)
                     tp = OrderTranslator.take_profit(self, data, bundle["take_profit_order"], order)
                     self.pending_stops[symbol] = {
@@ -143,10 +144,8 @@ class AdDivergenceBTWrapper(bt.Strategy):
                         "take_profit_order": tp
                     }
                     if stop is not None:
-                        self.broker.submit(stop)
                         self.log_diag(f"[BT] Stop order submitted for {symbol} (post-entry)")
                     if tp is not None:
-                        self.broker.submit(tp)
                         self.log_diag(f"[BT] Take profit order submitted for {symbol} (post-entry)")
             elif order.issell():
                 self.orders_by_symbol[symbol] = None
@@ -157,7 +156,9 @@ class AdDivergenceBTWrapper(bt.Strategy):
                     return
                 last_entry_price = self.last_entry_prices[symbol]
                 pnl = -1 * (order.executed.price - last_entry_price) * order.executed.size
-                if pnl >= 0:
+                # Identifier TP vs SL via exectype (pas le PnL : un trailing stop peut déclencher
+                # légèrement en profit si le trail a suivi la hausse, faussant la détection par signe)
+                if order.exectype == bt.Order.Limit:
                     order_type = 'TP'
                     if symbol in self.pending_stops and self.pending_stops[symbol] is not None and self.pending_stops[symbol].get("stop_order") is not None:
                         self.broker.cancel(self.pending_stops[symbol]["stop_order"])
@@ -190,11 +191,10 @@ class AdDivergenceBTWrapper(bt.Strategy):
 
     def next(self):
         current_date = self.datas[0].datetime.date(0)
-        self.log_diag(f"Analyse pour la date {current_date}...")
-        self.log_diag(f"[DIAG] Cash disponible: {self.broker.get_cash()} | Value: {self.broker.get_value()}")
-        for d in self.datas:
-            pos = self.getposition(d)
-            self.log_diag(f"[DIAG] {d._name} | Position size: {pos.size} | Price: {d.close[0]}")
+        # Ignorer les barres hors période (données chargées plus tôt pour le warmup des indicateurs)
+        if current_date < self.start_date.date() or current_date > self.end_date.date():
+            return
+        self.log_diag(f"Analyse pour la date {current_date}... Cash={self.broker.get_cash():.0f}")
         symbols = [d._name for d in self.datas]
         self.strategy.set_symbols_to_analyse(symbols)
         self.log_diag(f"2. Sélection + scoring")
@@ -222,10 +222,8 @@ class AdDivergenceBTWrapper(bt.Strategy):
                             self.broker.cancel(pending_order)
                             self.log_diag(f"[CANCEL] Annulation {order_key} orphelin pour {symbol} avant nouvelle entrée")
                     self.pending_stops[symbol] = None
+                # OrderTranslator.entry() appelle strategy.buy() qui soumet déjà au broker
                 entry = OrderTranslator.entry(self, data, bundle["entry_order"])
-                if entry is not None:
-                    self.broker.submit(entry)
-                    self.log_diag(f"[BT] Entry order submitted for {symbol}")
                 entry_price = entry.created.price if entry is not None else 'N/A'
                 self.log_diag(f"{current_date} Placing order for {symbol}: Entry at {entry_price}")
                 if entry is None:

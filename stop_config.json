@@ -29,7 +29,7 @@
     "type": "trailing",
     "_type_options": ["fixed", "trailing"],
     "pct": 8.0,
-    "_pct_comment": "% de recul depuis le prix d'entrée (fixed) ou depuis le plus haut (trailing)"
+    "_pct_comment": "% de recul depuis le prix d'entrée (fixed) ou depuis le plus haut (trailing). Aligné sur le label du modèle ML — réentraîner si modifié."
   },
 
   "_profit_doc": {
@@ -41,7 +41,7 @@
   "profit": {
     "type": "fixed",
     "_type_options": ["fixed", "dynamic"],
-    "fixed_pct": 15.0,
+    "fixed_pct": 8.0,
     "_fixed_pct_comment": "% de hausse depuis le prix d'entrée pour prise de bénéfice fixe",
     "dynamic_atr_mult": 2.0,
     "_dynamic_atr_mult_comment": "Multiplicateur ATR : target = entry + N × ATR(dynamic_atr_period)",
@@ -49,11 +49,23 @@
     "_dynamic_atr_period_comment": "Période ATR (14 = standard, 20 = plus lissé)"
   },
 
+  "_time_doc": {
+    "description": "Barrière de temps : ferme toute position qui n'a touché ni le stop ni le profit après N jours de bourse.",
+    "important":   "Doit rester alignée sur prediction_horizon du modèle ML (label triple-barrière). Si vous changez cette valeur, réentraînez le modèle avec le même horizon."
+  },
+
+  "time": {
+    "max_holding_days": 20,
+    "_max_holding_days_comment": "Jours de bourse depuis l'entrée (week-ends exclus). 0 = désactivé"
+  },
+
   "execution": {
     "use_darkice_for_profit": true,
     "_darkice_comment": "DarkIce pour la prise de bénéfice (moins visible au marché)",
+    "use_darkice_for_protection": true,
+    "_darkice_stop_comment": "Si true: au déclenchement du stop virtuel, envoie d'abord un ordre DarkIce iceberg puis fallback protection_order_type en cas de refus",
     "darkice_start": "09:35:00",
-    "darkice_end": "15:45:00",
+    "darkice_end": "15:55:00",
     "protection_order_type": "MKT",
     "_protection_order_comment": "MKT = exécution immédiate quand stop virtuel déclenché"
   },

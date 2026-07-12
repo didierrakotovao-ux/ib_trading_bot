@@ -13,13 +13,15 @@ Sources des symboles:
 """
 import pandas as pd
 import yfinance as yf
-import sqlite3
 import requests
 from datetime import datetime, timedelta
 from io import StringIO
 import time
 import sys
 import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
+from src.app.database.pg_connection import get_conn
 
 # Date de début pour l'historique
 START_DATE = "2008-01-01"
@@ -28,8 +30,7 @@ START_DATE = "2008-01-01"
 class NasdaqImporter:
     """Import complet des données NASDAQ."""
 
-    def __init__(self, db_path: str = "trading_data.db"):
-        self.db_path = db_path
+    def __init__(self, db_path=None):  # db_path ignoré — connexion via pg_config.py
         self.symbols = []
 
     def fetch_nasdaq_symbols(self) -> list:
@@ -128,17 +129,18 @@ class NasdaqImporter:
     def get_already_imported(self) -> set:
         """Récupère les symboles déjà présents en base avec données suffisantes."""
         try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            # Symboles avec au moins 1000 barres (environ 4 ans)
-            cursor.execute("""
-                SELECT symbol, COUNT(*) as cnt FROM historical_data
-                GROUP BY symbol HAVING cnt >= 1000
+            conn = get_conn()
+            cur = conn.cursor()
+            cur.execute("""
+                SELECT symbol FROM (
+                    SELECT symbol, COUNT(*) as cnt FROM historical_data GROUP BY symbol
+                ) sub WHERE cnt >= 1000
             """)
-            symbols = {row[0] for row in cursor.fetchall()}
+            symbols = {row[0] for row in cur.fetchall()}
+            cur.close()
             conn.close()
             return symbols
-        except:
+        except Exception:
             return set()
 
     def import_symbol(self, symbol: str, start_date: str = START_DATE) -> int:
@@ -189,16 +191,17 @@ class NasdaqImporter:
                 return 0
 
             # Insérer en base
-            conn = sqlite3.connect(self.db_path)
+            conn = get_conn()
+            cur = conn.cursor()
 
             inserted = 0
             for _, row in df.iterrows():
                 try:
-                    cursor = conn.cursor()
-                    cursor.execute("""
-                        INSERT OR IGNORE INTO historical_data
+                    cur.execute("""
+                        INSERT INTO historical_data
                         (symbol, date, open, high, low, close, volume, adjusted_close, source)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        ON CONFLICT (symbol, date, source) DO NOTHING
                     """, (
                         symbol,
                         row['date'],
@@ -210,12 +213,13 @@ class NasdaqImporter:
                         float(row.get('adjusted_close', row['close'])),
                         'yfinance'
                     ))
-                    if cursor.rowcount > 0:
+                    if cur.rowcount > 0:
                         inserted += 1
-                except:
+                except Exception:
                     pass
 
             conn.commit()
+            cur.close()
             conn.close()
 
             return inserted

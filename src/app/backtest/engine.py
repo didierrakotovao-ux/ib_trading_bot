@@ -5,7 +5,8 @@ import yfinance as yf
 from datetime import datetime, timedelta
 from addivergence_bt_wrapper import AdDivergenceBTWrapper
 from market_data_mock import MarketDataMock
-import sqlite3
+import sys, os; sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
+from src.app.database.pg_connection import read_sql
 
 
 class BacktestEngine:
@@ -22,8 +23,9 @@ class BacktestEngine:
         commission=0.001,
         stake=100,
         lookback_days=350,  # Jours de données historiques pour le scoring
-        scoring_type="smooth_ml",  # Type de scoring: "ml", "smooth_ml", "earnings_ml"
+        scoring_type="smooth_ml",
         smooth_model_path=None,  # Chemin du modèle smooth_ml (None = modèle US par défaut)
+        wyckoff_model_path=None,  # Chemin du modèle wyckoff_ml
         use_sue_filter=False,  # Filtre SUE (Novy-Marx)
         sue_threshold=0.0,  # Seuil SUE
         max_symbols=None,  # Limiter le nombre de symboles (None = tous)
@@ -40,6 +42,7 @@ class BacktestEngine:
         self.lookback_days = lookback_days
         self.scoring_type = scoring_type
         self.smooth_model_path = smooth_model_path
+        self.wyckoff_model_path = wyckoff_model_path
         self.use_sue_filter = use_sue_filter
         self.sue_threshold = sue_threshold
         self.max_symbols = max_symbols
@@ -66,26 +69,22 @@ class BacktestEngine:
     # ------------------------------------------------------------------
     def _load_data(self):
         self.dataframes = {}
-        conn = sqlite3.connect(self.db_path)
-
         # Charger les données depuis (start_date - lookback_days) pour avoir assez d'historique pour le scoring
         data_start_date = self.start_date - timedelta(days=self.lookback_days + 100)  # +100 pour marge (252 jours trading = ~365 calendaires)
 
         query = """
             SELECT symbol, date, open, high, low, close, volume, adjusted_close
             FROM historical_data
-            WHERE date BETWEEN ? AND ?
-            AND close >= ?
-            AND volume >= ?
+            WHERE date BETWEEN %s AND %s
+            AND close >= %s
+            AND volume >= %s
             ORDER BY symbol, date
         """
-        df = pd.read_sql_query(
+        df = read_sql(
             query,
-            conn,
-            params=(data_start_date.strftime('%Y-%m-%d'), self.end_date.strftime('%Y-%m-%d'),
-                    self.min_price, self.min_volume)
+            (data_start_date.strftime('%Y-%m-%d'), self.end_date.strftime('%Y-%m-%d'),
+             self.min_price, self.min_volume)
         )
-        conn.close()
         if df.empty:
             print("[INFO] Aucun symbole ne passe le screener.")
             return
@@ -101,11 +100,23 @@ class BacktestEngine:
             print(f"[DATA] Limité à {self.max_symbols} symboles pour le test")
 
         # Stocker tous les DataFrames pour le cache
+        # Backtrader attend une première barre sur tous les flux ajoutés avant
+        # d'appeler next() : un symbole dont la 1ère ligne disponible tombe
+        # après start_date (ex: penny stock qui ne passe le filtre prix/volume
+        # qu'un seul jour, tard dans la période) bloque next() pour TOUT le
+        # cerebro jusqu'à cette date -> on l'exclut.
+        start_ts = pd.Timestamp(self.start_date)
         symbols_added = 0
+        symbols_skipped = 0
         for symbol, group in df.groupby("symbol"):
             group = group.copy()
             group['date'] = pd.to_datetime(group['date'])
             group.set_index('date', inplace=True)
+
+            if group.index.min() > start_ts:
+                symbols_skipped += 1
+                continue
+
             self.dataframes[symbol] = group
 
             # Ajouter chaque symbole à Backtrader
@@ -116,7 +127,8 @@ class BacktestEngine:
             self.cerebro.adddata(data)
             symbols_added += 1
 
-        print(f"[DATA] {symbols_added} symboles ajoutés à Backtrader")
+        print(f"[DATA] {symbols_added} symboles ajoutés à Backtrader "
+              f"({symbols_skipped} exclus: données débutant après {self.start_date.date()})")
     # ------------------------------------------------------------------
     def _configure_broker(self):
         self.cerebro.broker.setcash(self.initial_cash)
@@ -147,6 +159,7 @@ class BacktestEngine:
             dataframes=self.dataframes,  # Passer les DataFrames complets pour le cache
             scoring_type=self.scoring_type,
             smooth_model_path=self.smooth_model_path,
+            wyckoff_model_path=self.wyckoff_model_path,
             use_sue_filter=self.use_sue_filter,
             sue_threshold=self.sue_threshold,
             db_path=self.db_path

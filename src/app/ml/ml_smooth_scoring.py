@@ -3,7 +3,6 @@ ML Smooth Scoring - Scoring avec le modèle smooth momentum (smoothness + saison
 """
 import pandas as pd
 import numpy as np
-import sqlite3
 import joblib
 from pathlib import Path
 from typing import Optional, List
@@ -12,6 +11,10 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 from src.app.ml.scoring import Scoring
+from src.app.ml.features import compute_base_features
+from src.app.ml.market_context import (
+    load_market_features, merge_market_features, MARKET_FEATURE_COLUMNS)
+from src.app.database.pg_connection import get_conn
 
 
 class SmoothMLScoring(Scoring):
@@ -23,15 +26,13 @@ class SmoothMLScoring(Scoring):
     df: pd.DataFrame
 
     def __init__(self, model_path: str = "models/smooth_momentum_model.pkl",
-                 db_path: str = "trading_data.db"):
+                 db_path=None):  # db_path ignoré — connexion via pg_config.py
         self.df = None
         self.model = None
         self.scaler = None
         self.model_loaded = False
-        # Résoudre le chemin par rapport à la racine du projet
         project_root = Path(__file__).parent.parent.parent.parent
         self.model_path = project_root / model_path
-        self.db_path = str(project_root / db_path)
 
         # Colonnes chargées depuis le modèle
         self.feature_columns: List[str] = []
@@ -39,6 +40,9 @@ class SmoothMLScoring(Scoring):
 
         # Cache des métadonnées de secteur
         self._sector_cache: dict = {}
+        # Cache du contexte marché (SPY/QQQ) — chargé au premier scoring,
+        # partagé entre tous les symboles de la session
+        self._market_cache = None
 
         self._load_model()
         self._load_sector_cache()
@@ -65,10 +69,11 @@ class SmoothMLScoring(Scoring):
     def _load_sector_cache(self):
         """Charge le cache des secteurs depuis la BD."""
         try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            cursor.execute("SELECT symbol, sector FROM symbol_metadata")
-            self._sector_cache = {row[0]: row[1] for row in cursor.fetchall()}
+            conn = get_conn()
+            cur = conn.cursor()
+            cur.execute("SELECT symbol, sector FROM symbol_metadata")
+            self._sector_cache = {row[0]: row[1] for row in cur.fetchall()}
+            cur.close()
             conn.close()
             print(f"[OK] Cache secteurs charge: {len(self._sector_cache)} symboles")
         except Exception as e:
@@ -107,74 +112,12 @@ class SmoothMLScoring(Scoring):
         df = df.copy()
         df.columns = df.columns.str.lower()
 
-        # === Features de base (identiques à MLScoring) ===
-
-        if 'sma20_volume' not in df.columns:
-            df['sma20_volume'] = df['volume'].rolling(window=20).mean()
-
-        if 'hl_sma20vol' not in df.columns:
-            df['hl_sma20vol'] = (df['high'] - df['low']) / (df['sma20_volume'] + 1e-6)
-
-        if 'oc_sma20vol' not in df.columns:
-            df['oc_sma20vol'] = (df['open'] - df['close']) / (df['sma20_volume'] + 1e-6)
-
-        if 'macd' not in df.columns:
-            try:
-                import pandas_ta as ta
-                macd_df = ta.macd(df['close'], fast=12, slow=26)
-                df['macd'] = macd_df['MACD_12_26_9']
-                df['macd_signal'] = macd_df['MACDs_12_26_9']
-            except:
-                ema12 = df['close'].ewm(span=12).mean()
-                ema26 = df['close'].ewm(span=26).mean()
-                df['macd'] = ema12 - ema26
-                df['macd_signal'] = df['macd'].ewm(span=9).mean()
-
-        if 'rsi' not in df.columns:
-            try:
-                import pandas_ta as ta
-                df['rsi'] = ta.rsi(df['close'], length=14)
-            except:
-                delta = df['close'].diff()
-                gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
-                loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
-                rs = gain / (loss + 1e-6)
-                df['rsi'] = 100 - (100 / (1 + rs))
-
-        if 'adx' not in df.columns:
-            try:
-                import pandas_ta as ta
-                adx_df = ta.adx(df['high'], df['low'], df['close'], length=14)
-                df['adx'] = adx_df['ADX_14']
-            except:
-                df['adx'] = 25
-
-        if 'bb_high' not in df.columns:
-            sma20 = df['close'].rolling(20).mean()
-            std20 = df['close'].rolling(20).std()
-            df['bb_high'] = sma20 + 2 * std20
-            df['bb_low'] = sma20 - 2 * std20
-
-        if 'pct_close' not in df.columns:
-            df['pct_close'] = df['close'].pct_change()
-
-        df['macd_hist'] = df['macd'] - df['macd_signal']
-
-        bb_range = df['bb_high'] - df['bb_low']
-        df['bb_position'] = np.where(bb_range > 0,
-            (df['close'] - df['bb_low']) / bb_range, 0.5)
-
-        df['rsi_momentum'] = df['rsi'] - 50
-        df['volume_ratio'] = df['volume'] / (df['sma20_volume'] + 1e-6)
-        df['trend_strength'] = df['adx'] * np.sign(df['macd'])
-
-        df['return_5d'] = df['close'].pct_change(5)
-        df['return_10d'] = df['close'].pct_change(10)
-        df['return_20d'] = df['close'].pct_change(20)
-        df['volatility_10d'] = df['close'].pct_change().rolling(10).std()
-
-        high_52w = df['high'].rolling(252, min_periods=50).max()
-        df['high_52w_pct'] = df['close'] / (high_52w + 1e-6)
+        # === Features de base — TOUJOURS recalculées depuis l'OHLCV ===
+        # Les colonnes d'indicateurs venant de la DB sont écrasées : elles
+        # peuvent être à zéro (bug compute_features, toutes à 0 depuis
+        # mi-janvier 2026). Module partagé avec l'entraînement — mêmes
+        # formules des deux côtés, pas de train/serve skew.
+        df = compute_base_features(df)
 
         # === Smoothness (R²) ===
         df['smoothness_20d'] = self._rolling_r2(df['close'], 20)
@@ -190,6 +133,14 @@ class SmoothMLScoring(Scoring):
 
         df['month_sin'] = np.sin(2 * np.pi * month.values / 12)
         df['month_cos'] = np.cos(2 * np.pi * month.values / 12)
+
+        # === Contexte de marché (régime) ===
+        # Requis seulement si le modèle chargé a été entraîné avec —
+        # rétro-compatible avec les anciens pkl
+        if any(c in self.feature_columns for c in MARKET_FEATURE_COLUMNS):
+            if self._market_cache is None:
+                self._market_cache = load_market_features()
+            df = merge_market_features(df, market=self._market_cache)
 
         # === Secteur (one-hot) ===
         sector = self._sector_cache.get(symbol, 'Unknown') if symbol else 'Unknown'
@@ -281,32 +232,26 @@ class SmoothMLScoring(Scoring):
 
 # Test standalone
 if __name__ == "__main__":
-    import sqlite3
-
-    db_path = "trading_data.db"
-    conn = sqlite3.connect(db_path)
-
+    conn = get_conn()
     symbols_to_test = ['AAPL', 'NVDA', 'GOOGL', 'QCOM', 'TXN', 'INTU',
                        'TFC', 'USB', 'PNC', 'ABBV', 'MRK', 'PFE',
                        'ORLY', 'AZO', 'YUM', 'RTX', 'GE', 'LMT']
 
-    scoring = SmoothMLScoring(
-        model_path="models/smooth_momentum_model.pkl",
-        db_path=db_path
-    )
+    scoring = SmoothMLScoring(model_path="models/smooth_momentum_model.pkl")
 
     print("\n" + "=" * 60)
     print("TEST SmoothMLScoring")
     print("=" * 60)
 
     for symbol in symbols_to_test:
-        query = f"""
+        cur = conn.cursor()
+        cur.execute("""
             SELECT date, open, high, low, close, volume
-            FROM historical_data
-            WHERE symbol = '{symbol}'
-            ORDER BY date
-        """
-        df = pd.read_sql_query(query, conn)
+            FROM historical_data WHERE symbol = %s ORDER BY date
+        """, (symbol,))
+        rows = cur.fetchall()
+        cur.close()
+        df = pd.DataFrame(rows, columns=['date','open','high','low','close','volume'])
 
         if not df.empty:
             details = scoring.get_prediction_details(df, symbol=symbol)

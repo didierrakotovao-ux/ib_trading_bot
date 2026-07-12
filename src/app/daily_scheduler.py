@@ -54,7 +54,7 @@ SCHEDULE = [
     # background=True : lancé en arrière-plan (Popen), le scheduler continue immédiatement
     # background=False : bloquant (run), le scheduler attend la fin avant de continuer
     ("09:20", "trading",       "Prise de position",                          False),
-    ("10:00", "stop_monitor",  "Surveillance des stops (boucle jusqu'à 16h)", True),
+    ("09:30", "stop_monitor",  "Surveillance des stops (boucle jusqu'à 16h)", True),
     # journal_sync, update_us, update_canada gérés par tâches Windows séparées
 ]
 
@@ -133,8 +133,16 @@ def run_task(task: str, port: int, dry_run: bool, logger: logging.Logger,
 
     try:
         if background:
-            subprocess.Popen(cmd, cwd=cwd)
-            logger.info(f"Tâche '{task}' lancée en arrière-plan")
+            # stop_monitor : redirige stdout+stderr vers un fichier log dédié
+            if task == 'stop_monitor':
+                stop_log_path = os.path.join(LOG_DIR, f"stop_manager_{date.today().strftime('%Y-%m-%d')}.log")
+                stop_log_file = open(stop_log_path, 'a', encoding='utf-8', buffering=1)
+                proc = subprocess.Popen(cmd, cwd=cwd, stdout=stop_log_file, stderr=stop_log_file)
+                logger.info(f"Tâche '{task}' lancée en arrière-plan (PID={proc.pid}) — logs: {stop_log_path}")
+                return proc   # retourne le Popen pour surveillance
+            else:
+                subprocess.Popen(cmd, cwd=cwd)
+                logger.info(f"Tâche '{task}' lancée en arrière-plan")
             return True
         else:
             result = subprocess.run(
@@ -198,6 +206,35 @@ def main():
 
     # Suivi des tâches déjà exécutées aujourd'hui
     tasks_done: set[str] = set()   # format: "YYYY-MM-DD_task"
+    stop_monitor_proc = None       # process background stop_manager (surveillance)
+
+    def _is_stop_monitor_alive() -> bool:
+        """
+        Vérifie que le stop_manager tourne effectivement via l'âge du fichier log.
+        On n'utilise PAS Popen.poll() : sur Windows le lanceur .venv/Scripts/python.exe
+        est un wrapper léger qui sort immédiatement (code=0) même si le vrai
+        processus Python tourne encore.
+        Règle : stop_monitor est vivant si son log a été écrit dans les 15 dernières
+        minutes (3 × intervalle de scan de 5 min).
+        """
+        if stop_monitor_proc is None:
+            return False
+        stop_log = os.path.join(LOG_DIR, f"stop_manager_{date.today().strftime('%Y-%m-%d')}.log")
+        if not os.path.exists(stop_log):
+            # Log pas encore créé — accord d'une grâce de 5 min au démarrage
+            return True
+        age_minutes = (time.time() - os.path.getmtime(stop_log)) / 60
+        if age_minutes > 15:
+            logger.warning(f"[SURVEILLANCE] Log stop_manager stale depuis {age_minutes:.0f} min — considere mort")
+            return False
+        return True
+
+    def _market_still_open() -> bool:
+        """Vrai si on est dans la fenêtre de trading (avant 16h00, jours ouvrés)."""
+        now = datetime.now()
+        if now.weekday() >= 5:
+            return False
+        return now.hour < 16
 
     try:
         while True:
@@ -226,14 +263,31 @@ def main():
 
                     if now >= scheduled_dt:
                         logger.info(f"--- {desc} ({hhmm}) ---")
-                        success = run_task(task, port, dry_run, logger, background=bg)
+                        result = run_task(task, port, dry_run, logger, background=bg)
                         tasks_done.add(task_key)
-                        if not success:
+                        if task == 'stop_monitor' and result and hasattr(result, 'poll'):
+                            stop_monitor_proc = result   # garder la référence pour surveillance
+                        elif not result:
                             logger.warning(f"Tâche '{task}' échouée, elle ne sera pas relancée automatiquement.")
 
-                # Vérifier si toutes les tâches du jour sont faites
+                # --- Surveillance du stop_monitor (relance si mort pendant les heures de marché) ---
+                if (f"{today}_stop_monitor" in tasks_done
+                        and not _is_stop_monitor_alive()
+                        and _market_still_open()):
+                    logger.warning(
+                        f"[SURVEILLANCE] stop_manager mort (code={stop_monitor_proc.returncode if stop_monitor_proc else '?'}) "
+                        f"— relance automatique [{now.strftime('%H:%M:%S')}]"
+                    )
+                    result = run_task('stop_monitor', port, dry_run, logger, background=True)
+                    if result and hasattr(result, 'poll'):
+                        stop_monitor_proc = result
+                        logger.info(f"[SURVEILLANCE] stop_manager relancé (PID={stop_monitor_proc.pid})")
+                    else:
+                        logger.error("[SURVEILLANCE] Échec relance stop_manager")
+
+                # Vérifier si toutes les tâches du jour sont faites ET marché fermé
                 all_done = all(f"{today}_{t}" in tasks_done for _, t, _, _ in SCHEDULE)
-                if all_done:
+                if all_done and not _market_still_open():
                     from datetime import timedelta
                     tomorrow_9am = (now + timedelta(days=1)).replace(
                         hour=9, minute=0, second=0, microsecond=0
@@ -241,8 +295,12 @@ def main():
                     wait_sec = (tomorrow_9am - now).total_seconds()
                     logger.info(f"Toutes les tâches du jour terminées. "
                                 f"Prochain cycle demain à 09h00 (dans {int(wait_sec // 3600)}h{int((wait_sec % 3600) // 60):02d}m)")
-                    time.sleep(wait_sec)
-                    tasks_done.clear()  # Réinitialiser pour le nouveau jour
+                    # Dormir en tranches d'1h (survit aux interruptions système)
+                    while datetime.now() < tomorrow_9am:
+                        remaining = (tomorrow_9am - datetime.now()).total_seconds()
+                        time.sleep(min(remaining, 3600))
+                    tasks_done.clear()
+                    stop_monitor_proc = None
                     continue
 
                 time.sleep(30)  # Vérifie toutes les 30 secondes
@@ -250,7 +308,7 @@ def main():
             except Exception as e:
                 logger.error(f"Erreur inattendue dans la boucle principale : {e}", exc_info=True)
                 logger.info("Reprise dans 60 secondes...")
-                time.sleep(60)  # Pause courte avant de reprendre
+                time.sleep(60)
 
     except KeyboardInterrupt:
         logger.info("Scheduler arrêté par l'utilisateur (Ctrl+C)")

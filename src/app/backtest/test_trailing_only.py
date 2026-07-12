@@ -31,10 +31,20 @@ def main():
     parser.add_argument('--period', choices=list(PERIODS.keys()), help='Période prédéfinie')
     parser.add_argument('--start', type=str, help='Date début YYYY-MM-DD')
     parser.add_argument('--end', type=str, help='Date fin YYYY-MM-DD')
-    parser.add_argument('--trailing', type=float, default=5.0, help='Trailing stop % (défaut: 5)')
+    parser.add_argument('--use_fondamental_data', action='store_true', help='Utiliser les données fondamentales')
+    parser.add_argument('--trailing', type=float, default=None,
+                        help='Trailing stop %% (défaut: 8 pour smooth_ml, 5 pour wyckoff_ml)')
     parser.add_argument('--cooldown', type=int, default=30,
                         help='Jours sans réentrée après stop-out (défaut: 30, 0=désactivé)')
+    parser.add_argument('--scoring', choices=['smooth_ml', 'wyckoff_ml'], default='smooth_ml',
+                        help='Type de scoring (défaut: smooth_ml)')
+    parser.add_argument('--smooth-model', type=str, default=None,
+                        help='Chemin du modèle smooth (optionnel)')
+    parser.add_argument('--wyckoff-model', type=str, default=None,
+                        help='Chemin du modèle wyckoff (optionnel)')
     args = parser.parse_args()
+
+
 
     if args.period:
         start_date, end_date = PERIODS[args.period]
@@ -45,13 +55,17 @@ def main():
         start_date = datetime(2025, 4, 22)
         end_date   = datetime(2025, 10, 7)
 
+    trailing_value = args.trailing if args.trailing is not None else (
+        8.0 if args.scoring == 'smooth_ml' else 5.0
+    )
     cooldown_desc = f"{args.cooldown}j" if args.cooldown > 0 else "désactivé"
 
     print("=" * 60)
     print("BACKTEST - TRAILING STOP ONLY (pas de TP)")
     print("=" * 60)
     print(f"Période       : {start_date.date()} -> {end_date.date()}")
-    print(f"Trailing Stop : {args.trailing}%")
+    print(f"Scoring       : {args.scoring}")
+    print(f"Trailing Stop : {trailing_value}%")
     print(f"Cooldown      : {cooldown_desc}")
     print("=" * 60)
 
@@ -59,7 +73,10 @@ def main():
         strategy_cls=TrailingOnlyBTWrapper,
         start_date=start_date,
         end_date=end_date,
-        initial_cash=100000
+        initial_cash=100000,
+        scoring_type=args.scoring,
+        smooth_model_path=args.smooth_model,
+        wyckoff_model_path=args.wyckoff_model,
     )
 
     # Patch pour injecter trailing_percent et cooldown_days
@@ -73,11 +90,14 @@ def main():
             end_date=engine.end_date,
             dataframes=engine.dataframes,
             scoring_type=engine.scoring_type,
+            smooth_model_path=engine.smooth_model_path,
+            wyckoff_model_path=engine.wyckoff_model_path,
             use_sue_filter=engine.use_sue_filter,
             sue_threshold=engine.sue_threshold,
             db_path=engine.db_path,
-            trailing_percent=args.trailing,
+            trailing_percent=trailing_value,
             cooldown_days=args.cooldown,
+            use_fondamental_data=args.use_fondamental_data,
         )
         results_bt = engine.cerebro.run()
         strat = results_bt[0]
