@@ -29,6 +29,8 @@ from src.app.database.pg_connection import get_conn
 class HistoricalDataUpdater:
     """Met à jour les données historiques de façon incrémentale."""
 
+    ALWAYS_UPDATE_SYMBOLS = ['^VIX']
+
     def __init__(self, db_path=None):  # db_path ignoré — connexion via pg_config.py
         pass
 
@@ -37,13 +39,20 @@ class HistoricalDataUpdater:
     # ------------------------------------------------------------------
 
     def get_symbols_to_update(self) -> list:
-        """Récupère tous les symboles de la base de données."""
+        """Récupère tous les symboles de la base de données + symboles forcés."""
         conn = get_conn()
         cur = conn.cursor()
         cur.execute("SELECT DISTINCT symbol FROM historical_data ORDER BY symbol")
         symbols = [row[0] for row in cur.fetchall()]
         cur.close()
         conn.close()
+
+        # Garantit l'inclusion d'indices macro requis pour le backtest/risk overlay.
+        for forced_symbol in self.ALWAYS_UPDATE_SYMBOLS:
+            if forced_symbol not in symbols:
+                symbols.append(forced_symbol)
+
+        symbols.sort()
         return symbols
 
     def get_last_date(self, symbol: str) -> str:
