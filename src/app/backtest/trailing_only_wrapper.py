@@ -4,6 +4,7 @@ La position reste ouverte tant que le trailing stop n'est pas touché.
 """
 import backtrader as bt
 from datetime import date, datetime, timedelta
+from bisect import bisect_right
 
 import sys
 import os
@@ -13,6 +14,7 @@ from src.app.strategies.wyckoff_ml import WyckoffMLStrategy
 from src.app.strategies.addivergence import AdDivergenceStrategy
 from src.app.value.fundamental_filters import FundamentalFilters
 from src.app.database.trade_journal import TradeJournal, TradeMode
+from src.app.database.pg_connection import read_sql
 from market_data_mock import MarketDataMock
 
 
@@ -30,6 +32,16 @@ class TrailingOnlyBTWrapper(bt.Strategy):
         scoring_type="smooth_ml",
         smooth_model_path=None,  # Chemin du modèle smooth_ml (None = modèle US par défaut)
         wyckoff_model_path=None,  # Chemin du modèle wyckoff_ml
+        # Seuils 18/27 : zone stable de la grille de sensibilité 2026-07-12
+        # (surface plate — bandes larges légèrement meilleures que 20/25)
+        regime_vix_symbol='^VIX',
+        regime_risk_on=18.0,
+        regime_risk_off=27.0,
+        regime_momentum_trailing=8.0,
+        # 8.0 : aligné sur les labels du modèle wyckoff (triple-barrière
+        # trailing 8%, stop_config.json) — 5% exécuterait une autre stratégie
+        # que celle apprise
+        regime_wyckoff_trailing=8.0,
         use_sue_filter=False,  # Filtre SUE (Novy-Marx)
         sue_threshold=0.0,  # Seuil SUE (SUE > sue_threshold)
         db_path=None  # Chemin DB (None = trading_data.db)
@@ -53,7 +65,37 @@ class TrailingOnlyBTWrapper(bt.Strategy):
             db_path = os.path.basename(self.p.db_path)
 
         # Stratégie métier
-        if self.p.scoring_type == "wyckoff_ml":
+        self.is_regime_switch = self.p.scoring_type == "regime_switch"
+        self.active_regime = None  # "momentum" | "wyckoff"
+        self._vix_dates = []
+        self._vix_values = {}
+
+        if self.is_regime_switch:
+            self.strategy_momentum = MomentumStrategy(
+                market_data=self.market_data,
+                capital=self.p.capital,
+                max_stocks=self.p.max_stocks,
+                use_trailing_stop=True,
+                trailing_percent=self.p.regime_momentum_trailing,
+                scoring_type="smooth_ml",
+                smooth_model_path=self.p.smooth_model_path,
+                use_sue_filter=self.p.use_sue_filter,
+                sue_threshold=self.p.sue_threshold,
+                db_path=db_path,
+            )
+            self.strategy_wyckoff = WyckoffMLStrategy(
+                market_data=self.market_data,
+                capital=self.p.capital,
+                max_stocks=self.p.max_stocks,
+                use_trailing_stop=True,
+                trailing_percent=self.p.regime_wyckoff_trailing,
+                scoring_type="wyckoff_ml",
+                wyckoff_model_path=self.p.wyckoff_model_path,
+                db_path=db_path,
+            )
+            self.strategy = None
+            self._load_vix_series()
+        elif self.p.scoring_type == "wyckoff_ml":
             self.strategy = WyckoffMLStrategy(
                 market_data=self.market_data,
                 capital=self.p.capital,
@@ -84,13 +126,25 @@ class TrailingOnlyBTWrapper(bt.Strategy):
         if self.p.dataframes:
             try:
                 from score_precompute import precompute_for_strategy
-                self.strategy.precomputed = precompute_for_strategy(
-                    scoring_type=self.p.scoring_type,
-                    dataframes=self.p.dataframes,
-                    model_path=(self.p.wyckoff_model_path
-                                if self.p.scoring_type == "wyckoff_ml"
-                                else self.p.smooth_model_path),
-                )
+                if self.is_regime_switch:
+                    self.strategy_momentum.precomputed = precompute_for_strategy(
+                        scoring_type="smooth_ml",
+                        dataframes=self.p.dataframes,
+                        model_path=self.p.smooth_model_path,
+                    )
+                    self.strategy_wyckoff.precomputed = precompute_for_strategy(
+                        scoring_type="wyckoff_ml",
+                        dataframes=self.p.dataframes,
+                        model_path=self.p.wyckoff_model_path,
+                    )
+                else:
+                    self.strategy.precomputed = precompute_for_strategy(
+                        scoring_type=self.p.scoring_type,
+                        dataframes=self.p.dataframes,
+                        model_path=(self.p.wyckoff_model_path
+                                    if self.p.scoring_type == "wyckoff_ml"
+                                    else self.p.smooth_model_path),
+                    )
             except Exception as e:
                 import traceback
                 traceback.print_exc()
@@ -111,7 +165,12 @@ class TrailingOnlyBTWrapper(bt.Strategy):
 
         # Journal de trading en BD
         self.trade_entries = {}
-        model_tag = "Wyckoff" if self.p.scoring_type == "wyckoff_ml" else "Smooth"
+        if self.p.scoring_type == "wyckoff_ml":
+            model_tag = "Wyckoff"
+        elif self.is_regime_switch:
+            model_tag = "RegimeSwitch"
+        else:
+            model_tag = "Smooth"
         if self.use_fondamental_data:
             self.strategy_name = f"TrailingOnly_{model_tag}_WithFundamental"
         else:
@@ -132,6 +191,74 @@ class TrailingOnlyBTWrapper(bt.Strategy):
         self.diag_filename = os.path.join(resultats_dir, f"diagnostique_trailing_only_{diag_date}.txt")
         with open(self.diag_filename, "w") as f:
             f.write(f"--- Début du diagnostic TrailingOnly ({diag_date}) ---\n")
+
+    def _load_vix_series(self):
+        """Charge la série VIX pour piloter le switch de régime."""
+        try:
+            start = (self.start_date - timedelta(days=40)).strftime('%Y-%m-%d')
+            end = self.end_date.strftime('%Y-%m-%d')
+            df = read_sql(
+                """
+                SELECT date, close
+                FROM historical_data
+                WHERE symbol = %s
+                  AND date BETWEEN %s AND %s
+                ORDER BY date
+                """,
+                (self.p.regime_vix_symbol, start, end)
+            )
+            if df is None or df.empty:
+                print(f"[REGIME][WARN] Série {self.p.regime_vix_symbol} introuvable."
+                      " Fallback momentum.")
+                return
+
+            for _, row in df.iterrows():
+                d = row['date'].date() if hasattr(row['date'], 'date') else row['date']
+                self._vix_dates.append(d)
+                self._vix_values[d] = float(row['close'])
+
+            print(f"[REGIME] Série {self.p.regime_vix_symbol} chargée: {len(self._vix_dates)} points")
+        except Exception as e:
+            print(f"[REGIME][WARN] Impossible de charger le VIX ({e})")
+
+    def _get_latest_vix(self, current_date):
+        if not self._vix_dates:
+            return None
+        idx = bisect_right(self._vix_dates, current_date) - 1
+        if idx < 0:
+            return None
+        d = self._vix_dates[idx]
+        return self._vix_values.get(d)
+
+    def _resolve_active_strategy(self, current_date):
+        if not self.is_regime_switch:
+            return self.strategy, self.p.scoring_type
+
+        vix = self._get_latest_vix(current_date)
+        if vix is None:
+            if self.active_regime is None:
+                self.active_regime = "momentum"
+            return (
+                self.strategy_momentum if self.active_regime == "momentum" else self.strategy_wyckoff,
+                self.active_regime,
+            )
+
+        previous = self.active_regime
+        if self.active_regime is None:
+            self.active_regime = "wyckoff" if vix >= self.p.regime_risk_off else "momentum"
+        elif self.active_regime == "momentum" and vix >= self.p.regime_risk_off:
+            self.active_regime = "wyckoff"
+        elif self.active_regime == "wyckoff" and vix <= self.p.regime_risk_on:
+            self.active_regime = "momentum"
+
+        if previous != self.active_regime:
+            self.log_diag(
+                f"[REGIME] {current_date} switch {previous} -> {self.active_regime} "
+                f"(VIX={vix:.2f}, on<={self.p.regime_risk_on}, off>={self.p.regime_risk_off})"
+            )
+
+        active_strategy = self.strategy_momentum if self.active_regime == "momentum" else self.strategy_wyckoff
+        return active_strategy, self.active_regime
 
     def _log_trade_journal(self, symbol, entry_date, qty, entry_price, exit_date, exit_price, cause, pnl_brut, bars_held=0, score=None):
         """Enregistre un trade dans le journal BD."""
@@ -194,7 +321,8 @@ class TrailingOnlyBTWrapper(bt.Strategy):
                     'quantite': abs(order.executed.size),
                     'bar_entree': len(self),
                     # Score ML à l'entrée (None si la stratégie ne l'expose pas)
-                    'score': getattr(self.strategy, 'symbolsScores', {}).get(symbol),
+                    'score': self.pending_order_bundles.get(symbol, {}).get('score'),
+                    'entry_regime': self.pending_order_bundles.get(symbol, {}).get('regime'),
                 }
 
                 # Placer le trailing stop uniquement
@@ -290,14 +418,14 @@ class TrailingOnlyBTWrapper(bt.Strategy):
         if current_positions >= self.p.max_stocks:
             return
 
-        symbols = [d._name for d in self.datas]
+        symbols = [d._name for d in self.datas if not str(d._name).startswith('^')]
 
         if self.use_fondamental_data:
             ym = (current_date.year, current_date.month)
 
             # Recalculer une fois par mois (les fondamentaux changent trimestriellement)
             if self._fund_cache_ym != ym:
-                all_syms = [d._name for d in self.datas]
+                all_syms = [d._name for d in self.datas if not str(d._name).startswith('^')]
                 prices   = {d._name: d.close[0] for d in self.datas}
 
                 # Pré-charger tous les fondamentaux en parallèle (cache 24h ensuite)
@@ -323,8 +451,10 @@ class TrailingOnlyBTWrapper(bt.Strategy):
 
             symbols = self._fund_symbols_cache
             
-        self.strategy.set_symbols_to_analyse(symbols)
-        symbols_to_trade = self.strategy.get_symbols(current_date)
+        active_strategy, active_mode = self._resolve_active_strategy(current_date)
+        active_strategy.set_symbols_to_analyse(symbols)
+        symbols_to_trade = active_strategy.get_symbols(current_date)
+        self.log_diag(f"[REGIME] Mode actif: {active_mode}")
         self.log_diag(f"{current_date} Symboles sélectionnés: {symbols_to_trade}")
 
         # FILTRER les symboles déjà en position AVANT de générer les ordres
@@ -359,16 +489,16 @@ class TrailingOnlyBTWrapper(bt.Strategy):
             return
         
         # Mettre à jour la liste des symboles à trader (APRÈS filtrage)
-        self.strategy.symbolsToTrade = symbols_available
+        active_strategy.symbolsToTrade = symbols_available
         self.log_diag(f"[FILTER] Symboles disponibles après filtrage: {symbols_available}")
 
         # Mettre à jour le capital avec la valeur actuelle du portefeuille
         current_capital = self.broker.getvalue()
-        self.strategy.capital = current_capital
+        active_strategy.capital = current_capital
         self.log_diag(f"[CAPITAL] Valeur portefeuille actuelle: {current_capital:,.2f}$")
 
         # Générer les ordres UNIQUEMENT pour les symboles disponibles
-        order_bundles = self.strategy.get_order_params()
+        order_bundles = active_strategy.get_order_params()
 
         print(f"[DEBUG] Nombre de bundles à traiter: {len(order_bundles)}")
         print(f"[DEBUG] Data feeds disponibles: {[d._name for d in self.datas[:10]]}...")
@@ -426,7 +556,11 @@ class TrailingOnlyBTWrapper(bt.Strategy):
                     print(f"[BT] Entry order placé pour {symbol}, qty={qty}, ref={entry_order.ref}")
                     self.log_diag(f"[BT] Entry order placé pour {symbol}, qty={qty}")
                     self.orders_by_symbol[symbol] = {"entry": entry_order}
-                    self.pending_order_bundles[symbol] = bundle
+                    self.pending_order_bundles[symbol] = {
+                        "bundle": bundle,
+                        "regime": active_mode,
+                        "score": getattr(active_strategy, 'symbolsScores', {}).get(symbol),
+                    }
                     reserved_cash -= qty * entry_price_ref * cash_buffer_mult
                     planned_entries += 1
                 else:
