@@ -12,7 +12,7 @@ if not exist %LOG_DIR% mkdir %LOG_DIR%
 echo [%date% %time%] Demarrage collecte tick OFI >> %LOG_FILE%
 
 .venv\Scripts\python.exe src/app/collect_tick_ofi.py ^
-    --host 192.168.0.103 ^
+    --host 127.0.0.1 ^
     --port 7496 ^
     --exchange ISLAND ^
     --symbols AAPL,MSFT,NVDA,AMZN,META ^

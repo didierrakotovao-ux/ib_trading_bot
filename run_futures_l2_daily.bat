@@ -12,7 +12,7 @@ if not exist %LOG_DIR% mkdir %LOG_DIR%
 echo [%date% %time%] Demarrage collecte Futures L2 >> %LOG_FILE%
 
 .venv\Scripts\python.exe src/app/collect_futures_l2.py ^
-    --host 192.168.0.103 ^
+    --host 127.0.0.1 ^
     --port 7496 ^
     --client 97 ^
     --symbols MES,MNQ,YM ^
