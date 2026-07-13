@@ -103,11 +103,13 @@ class StopConfig:
         lines = [
             f"  Protection : {self.protection_type.upper()} -{self.protection_pct}%"
             f"  (ordre {self.protection_order_type})",
-            f"  Profit     : {self.profit_type.upper()} "
-            + (f"+{self.profit_fixed_pct}%" if self.profit_type == "fixed"
-               else f"{self.profit_atr_mult}×ATR({self.profit_atr_period})")
-            + (f"  [DarkIce {self.darkice_start}-{self.darkice_end}]"
-               if self.use_darkice_for_profit else "  [LMT simple]"),
+            f"  Profit     : "
+            + ("DÉSACTIVÉ (trailing-only)" if self.profit_type == "none"
+               else self.profit_type.upper() + " "
+               + (f"+{self.profit_fixed_pct}%" if self.profit_type == "fixed"
+                  else f"{self.profit_atr_mult}×ATR({self.profit_atr_period})")
+               + (f"  [DarkIce {self.darkice_start}-{self.darkice_end}]"
+                  if self.use_darkice_for_profit else "  [LMT simple]")),
             f"  Temps      : "
             + (f"sortie après {self.max_holding_days} jours de bourse"
                if self.max_holding_days > 0 else "désactivée"),
@@ -248,8 +250,17 @@ class StopManager:
         """Niveau initial de stop (identique pour fixed et trailing au départ)."""
         return round(entry_price * (1 - self.config.protection_pct / 100), 4)
 
+    # Sentinelle "jamais atteint" quand la prise de bénéfice est désactivée
+    # (profit.type = "none") — la colonne profit_level est NOT NULL en DB
+    PROFIT_DISABLED_LEVEL = 9_999_999_999.0
+
     def _calc_profit_level(self, entry_price: float, atr: float = 0.0) -> float:
         """Niveau de prise de bénéfice."""
+        if self.config.profit_type == "none":
+            # Trailing-only : sortie uniquement par stop suiveur / temps
+            # (aligné sur les backtests TrailingOnly — les runners au-delà
+            # de +8% portent la performance)
+            return self.PROFIT_DISABLED_LEVEL
         if self.config.profit_type == "fixed":
             return round(entry_price * (1 + self.config.profit_fixed_pct / 100), 4)
         else:
@@ -451,14 +462,18 @@ class StopManager:
                 print(f"[STOPS] {symbol}: trade fermé récemment — position IB en règlement, entrée ignorée")
                 conn.close()
                 return None
+            # Attribution au régime courant (la vraie date d'entrée est
+            # inconnue ici — position découverte dans TWS sans trace journal)
+            from src.app.strategies.regime_selector import current_strategy_name
+            strategy_name = current_strategy_name()
             cur = conn.cursor()
             cur.execute("""
                 INSERT INTO trades
                     (trade_mode, strategy_name, symbol, date_entree,
                      prix_entree, quantite, quantite_restante)
-                VALUES (%s, 'Momentum', %s, NOW(), %s, %s, %s)
+                VALUES (%s, %s, %s, NOW(), %s, %s, %s)
                 RETURNING id
-            """, (self.trade_mode.value, symbol, avg_cost, qty, qty))
+            """, (self.trade_mode.value, strategy_name, symbol, avg_cost, qty, qty))
             trade_id = cur.fetchone()[0]
             conn.commit()
             cur.close()
@@ -993,7 +1008,8 @@ class StopManager:
                 continue   # pas besoin de vérifier profit
 
             # --- Vérification prise de bénéfice ---
-            if current_price >= profit_level:
+            # (jamais déclenchée si profit.type = "none" : niveau sentinelle)
+            if s["profit_type"] != "none" and current_price >= profit_level:
                 print(f"[STOPS] {symbol}: PROFIT DECLENCHE [{datetime.now().strftime('%H:%M:%S')}] "
                       f"prix={current_price:.2f} >= target={profit_level:.2f} "
                       f"(qty IB={actual_qty})")
@@ -1166,15 +1182,19 @@ class StopManager:
             print("Aucun stop actif")
         for r in rows:
             pnl_stop = (r["stop_level"] - r["entry_price"]) / r["entry_price"] * 100
-            pnl_profit = (r["profit_level"] - r["entry_price"]) / r["entry_price"] * 100
+            if r["profit_type"] == "none":
+                profit_line = "\n       profit[désactivé] trailing-only"
+            else:
+                pnl_profit = (r["profit_level"] - r["entry_price"]) / r["entry_price"] * 100
+                profit_line = (f"\n       profit[{r['profit_type']:8}] "
+                               f"{r['profit_level']:.2f} ({pnl_profit:+.1f}%)")
             print(
                 f"{r['symbol']:6} | entrée={r['entry_price']:.2f} | qty={r['qty_remaining']}"
                 f"\n       stop  [{r['protection_type']:8}] {r['stop_level']:.2f}"
                 f" ({pnl_stop:+.1f}%)"
                 + (f"  HWM={r['high_water_mark']:.2f}" if r["protection_type"] == "trailing" else "")
-                + f"\n       profit[{r['profit_type']:8}] {r['profit_level']:.2f}"
-                f" ({pnl_profit:+.1f}%)"
-                f"\n       vérifié: {r['last_checked'] or 'jamais'}"
+                + profit_line
+                + f"\n       vérifié: {r['last_checked'] or 'jamais'}"
             )
         print(f"{'='*75}\n")
 

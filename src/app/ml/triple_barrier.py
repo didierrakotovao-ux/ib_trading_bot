@@ -30,11 +30,16 @@ def load_barriers_from_stop_config(config_path: Path = None) -> dict:
     try:
         with open(path, "r", encoding="utf-8") as f:
             cfg = json.load(f)
+        time_cfg = cfg.get("time", {})
+        # label_horizon prime : la barrière d'EXÉCUTION (max_holding_days)
+        # peut être plus longue sans faire dériver les labels des modèles
+        horizon = int(time_cfg.get("label_horizon")
+                      or time_cfg.get("max_holding_days")
+                      or defaults["horizon"])
         return {
             "profit_barrier": float(cfg["profit"]["fixed_pct"]) / 100,
             "stop_barrier": float(cfg["protection"]["pct"]) / 100,
-            "horizon": int(cfg.get("time", {}).get("max_holding_days", defaults["horizon"]))
-                       or defaults["horizon"],
+            "horizon": horizon,
         }
     except Exception as e:
         print(f"[CONFIG][WARN] stop_config.json non lu ({e}) — barrieres par defaut")

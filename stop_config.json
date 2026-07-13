@@ -35,12 +35,13 @@
   "_profit_doc": {
     "type_fixed":   "Limite fixe : ordre LIMIT à entry × (1 + fixed_pct/100). Cible connue à l'avance.",
     "type_dynamic": "Limite ATR  : ordre LIMIT à entry + (dynamic_atr_mult × ATR). S'adapte à la volatilité du titre.",
-    "conseil":      "dynamic recommandé sur titres volatils (ATR élevé), fixed sur titres stables"
+    "type_none":    "Pas de prise de bénéfice : sortie uniquement par trailing stop (et barrière de temps si activée). Aligné sur les backtests TrailingOnly validés (les runners +39%/+70% portent la performance).",
+    "note_ml":      "fixed_pct reste utilisé comme barrière de LABEL par l'entraînement ML (proxy de classement des entrées, validé bout-en-bout par les backtests) même quand type=none."
   },
 
   "profit": {
-    "type": "fixed",
-    "_type_options": ["fixed", "dynamic"],
+    "type": "none",
+    "_type_options": ["fixed", "dynamic", "none"],
     "fixed_pct": 8.0,
     "_fixed_pct_comment": "% de hausse depuis le prix d'entrée pour prise de bénéfice fixe",
     "dynamic_atr_mult": 2.0,
@@ -50,13 +51,16 @@
   },
 
   "_time_doc": {
-    "description": "Barrière de temps : ferme toute position qui n'a touché ni le stop ni le profit après N jours de bourse.",
-    "important":   "Doit rester alignée sur prediction_horizon du modèle ML (label triple-barrière). Si vous changez cette valeur, réentraînez le modèle avec le même horizon."
+    "description": "Barrière de temps : ferme toute position qui n'a pas touché le stop après N jours de bourse (recyclage des slots).",
+    "etude": "2026-07-12 : en trailing-only, l'EV varie de <0.15%/trade entre 20j et 120j — paramètre de second ordre. 40j = quasi-max d'EV + rotation du capital 2x plus rapide que 60-120j.",
+    "label_horizon": "Horizon des LABELS ML (triple-barrière), découplé de la barrière d'exécution : les modèles sont entraînés/validés avec 20j — ne changer qu'avec un réentraînement."
   },
 
   "time": {
-    "max_holding_days": 20,
-    "_max_holding_days_comment": "Jours de bourse depuis l'entrée (week-ends exclus). 0 = désactivé"
+    "max_holding_days": 40,
+    "_max_holding_days_comment": "Barrière d'EXÉCUTION en jours de bourse (week-ends exclus). 0 = désactivé",
+    "label_horizon": 20,
+    "_label_horizon_comment": "Horizon des labels ML — utilisé par l'entraînement, PAS par le stop_manager"
   },
 
   "execution": {

@@ -149,9 +149,11 @@ class LiveJournal:
                 existing = cursor.fetchone()
 
                 if not existing:
+                    from src.app.strategies.regime_selector import current_strategy_name
                     trade_id = self.trade_journal.log_trade(
                         trade_mode=self.trade_mode,
-                        strategy_name="Momentum",
+                        # Attribution au régime en vigueur à la date du fill
+                        strategy_name=current_strategy_name(as_of=fill_time),
                         symbol=symbol,
                         date_entree=fill_time,
                         prix_entree=buy['price'],

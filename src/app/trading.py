@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
 from strategies.momentum import MomentumStrategy
+from strategies.wyckoff_ml import WyckoffMLStrategy
+from strategies.regime_selector import RegimeSelector, current_strategy_name
 from screener.providers.market_data_provider import MarketDataProvider
 from strategies.addivergence import AdDivergenceStrategy
 from position_manager import PositionManager
@@ -22,7 +24,8 @@ class Trading:
         6-écrit le journal de performance
     """
     def __init__(self, port=7497, client_id=1, total_capital=100000, max_positions=5,
-                 use_trailing_stop=False, trailing_percent=5.0):
+                 use_trailing_stop=False, trailing_percent=5.0,
+                 use_regime_switch=True, vix_risk_on=18.0, vix_risk_off=27.0):
         self.port = port
         self.total_capital = total_capital
         self.max_positions = max_positions
@@ -30,14 +33,35 @@ class Trading:
         self.use_trailing_stop = use_trailing_stop
         self.trailing_percent = trailing_percent
         self.market_data_provider = MarketDataProvider(port=port, client_id=client_id)
-        self.strategies = [MomentumStrategy(
-            self.market_data_provider,
-            capital=total_capital,
-            max_stocks=max_positions,
-            use_trailing_stop=use_trailing_stop,
-            trailing_percent=trailing_percent,
-            scoring_type="smooth_ml"
-        )]
+
+        # Sélecteur de régime VIX (validé en backtest : +139.6% / DD 17.4%
+        # sur 2022-2026 vs +96.9% / DD 27.4% pour momentum seul).
+        # Le régime est déterminé une fois par run (trading.py tourne une
+        # fois par jour via le scheduler) — hystérésis rejouée depuis la DB.
+        self.use_regime_switch = use_regime_switch
+        self.active_regime = "momentum"
+        if use_regime_switch:
+            selector = RegimeSelector(risk_on=vix_risk_on, risk_off=vix_risk_off)
+            self.active_regime, _, _ = selector.current_regime()
+
+        if self.active_regime == "wyckoff":
+            self.strategies = [WyckoffMLStrategy(
+                self.market_data_provider,
+                capital=total_capital,
+                max_stocks=max_positions,
+                use_trailing_stop=use_trailing_stop,
+                trailing_percent=trailing_percent,
+                scoring_type="wyckoff_ml"
+            )]
+        else:
+            self.strategies = [MomentumStrategy(
+                self.market_data_provider,
+                capital=total_capital,
+                max_stocks=max_positions,
+                use_trailing_stop=use_trailing_stop,
+                trailing_percent=trailing_percent,
+                scoring_type="smooth_ml"
+            )]
         self.orders = []
         self.position_manager = PositionManager()
         self.order_callbacks = []  # Liste de callbacks à appeler sur exécution d'ordre
@@ -49,6 +73,8 @@ class Trading:
         self.trade_mode = TradeMode.PAPER if port == 7497 else TradeMode.LIVE
         self.trade_ids = {}  # Mapping symbol -> trade_id pour mettre à jour à la sortie
 
+        print(f"[TRADING] Régime actif: {self.active_regime.upper()}"
+              + ("" if use_regime_switch else " (switch désactivé)"))
         print(f"[TRADING] Capital total: {total_capital:,.0f}$, Max positions: {max_positions}, Capital/position: {self.capital_per_position:,.0f}$")
         print(f"[TRADING] Trailing stop: {'Activé (' + str(trailing_percent) + '%)' if use_trailing_stop else 'Désactivé (gestion manuelle)'}")
         print(f"[JOURNAL] Mode de trading: {self.trade_mode.value}")
@@ -68,11 +94,15 @@ class Trading:
         """
         self.order_callbacks.append(callback)
 
-    def on_order_executed(self, symbol, action, status, fill_price, fill_qty, fill_time, strategy_name="Momentum"):
+    def on_order_executed(self, symbol, action, status, fill_price, fill_qty, fill_time, strategy_name=None):
         """
         Callback appelé par MarketDataProvider lors de l'exécution d'un ordre.
         Gère les BUY (entrées) et SELL (sorties) pour la journalisation.
         """
+        # Attribution au régime actif (le journal doit distinguer les trades
+        # momentum des trades wyckoff pour les analyses par stratégie)
+        if strategy_name is None:
+            strategy_name = "Wyckoff" if self.active_regime == "wyckoff" else "Momentum"
         print(f"[TRADING] Order executed: {symbol} {action} {fill_qty} @ {fill_price}")
 
         # Retirer des ordres en attente
@@ -457,10 +487,11 @@ class Trading:
                 existing = cursor.fetchone()
 
                 if not existing:
-                    # Ajouter l'entrée au journal
+                    # Ajouter l'entrée au journal — attribuée au régime
+                    # en vigueur à la date du fill
                     trade_id = self.trade_journal.log_trade(
                         trade_mode=self.trade_mode,
-                        strategy_name="Momentum",
+                        strategy_name=current_strategy_name(as_of=fill_time),
                         symbol=symbol,
                         date_entree=fill_time,
                         prix_entree=buy['price'],
@@ -572,6 +603,14 @@ if __name__ == "__main__":
     parser.add_argument('--live', action='store_true',
                         help='Live trading (port 7496, capital 10 000$). '
                              'Par défaut : paper trading (port 7497, capital 100 000$).')
+    parser.add_argument('--no-regime-switch', action='store_true',
+                        help='Désactive le sélecteur de régime VIX '
+                             '(momentum uniquement, ancien comportement)')
+    parser.add_argument('--vix-risk-on', type=float, default=18.0,
+                        help='Seuil VIX de retour en momentum (défaut: 18, '
+                             'zone stable de la grille de sensibilité)')
+    parser.add_argument('--vix-risk-off', type=float, default=27.0,
+                        help='Seuil VIX de bascule en wyckoff (défaut: 27)')
     args = parser.parse_args()
 
     # Configuration
@@ -591,7 +630,10 @@ if __name__ == "__main__":
         port=PORT,
         client_id=CLIENT_ID,
         total_capital=TOTAL_CAPITAL,
-        max_positions=MAX_POSITIONS
+        max_positions=MAX_POSITIONS,
+        use_regime_switch=not args.no_regime_switch,
+        vix_risk_on=args.vix_risk_on,
+        vix_risk_off=args.vix_risk_off
     )
 
     try:
