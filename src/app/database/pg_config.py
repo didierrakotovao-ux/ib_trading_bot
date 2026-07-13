@@ -1,8 +1,8 @@
 PG_CONFIG = {
     "host":     "192.168.0.108",
     "port":     5432,
-    "user":     "drako",
-    "password": "AndresyKely24!",
+    "user":     "",
+    "password": "",
     "database": "stockus",
     "sslmode":  "disable",
 }
@@ -10,8 +10,8 @@ PG_CONFIG = {
 PG_CONFIG_CA = {
     "host":     "192.168.0.108",
     "port":     5432,
-    "user":     "drako",
-    "password": "AndresyKely24!",
+    "user":     "",
+    "password": "",
     "database": "stockca",
     "sslmode":  "disable",
 }
