@@ -271,6 +271,22 @@ class StopManager:
                 return round(entry_price * (1 + self.config.profit_fixed_pct / 100), 4)
             return round(entry_price + self.config.profit_atr_mult * atr, 4)
 
+    def _get_fresh_ib_qty(self, symbol: str) -> int:
+        """
+        Interroge IB pour la quantité longue ACTUELLE d'un symbole.
+        Appelé juste avant chaque SELL pour éviter les shorts si la position
+        a bougé depuis le snapshot ib_qty_map du début du scan.
+        """
+        try:
+            positions = self.market_data.req_ib_positions()
+            for p in positions:
+                if p["symbol"] == symbol:
+                    return int(p["qty"])
+            return 0
+        except Exception as e:
+            print(f"[STOPS] {symbol}: impossible de vérifier la position fraîche ({e})")
+            return -1  # -1 = incertain, bloquer le SELL par sécurité
+
     def _get_atr(self, symbol: str) -> float:
         """Calcule l'ATR(N) depuis la DB historique."""
         try:
@@ -999,6 +1015,15 @@ class StopManager:
                     print(f"[STOPS] {symbol}: trigger déjà pris par une autre instance")
                     continue
                 try:
+                    # Vérification fraîche juste avant le SELL — évite les shorts
+                    # si la position a bougé depuis le snapshot du début du scan
+                    fresh_qty = self._get_fresh_ib_qty(symbol)
+                    if fresh_qty <= 0:
+                        print(f"[STOPS] {symbol}: position IB={fresh_qty} au moment du trigger "
+                              f"(position fermée ou short) — SELL annulé")
+                        self._rollback_trigger(stop_id)
+                        continue
+                    actual_qty = fresh_qty
                     self._place_protection_order(symbol, actual_qty, current_price)
                     self._pending_sells.add(symbol)
                     self._finalize_trigger(stop_id)
@@ -1017,6 +1042,13 @@ class StopManager:
                     print(f"[STOPS] {symbol}: trigger profit déjà pris par une autre instance")
                     continue
                 try:
+                    fresh_qty = self._get_fresh_ib_qty(symbol)
+                    if fresh_qty <= 0:
+                        print(f"[STOPS] {symbol}: position IB={fresh_qty} au moment du profit "
+                              f"(position fermée ou short) — SELL annulé")
+                        self._rollback_trigger(stop_id)
+                        continue
+                    actual_qty = fresh_qty
                     self._place_profit_order(symbol, actual_qty, profit_level)
                     self._pending_sells.add(symbol)
                     self._finalize_trigger(stop_id)
