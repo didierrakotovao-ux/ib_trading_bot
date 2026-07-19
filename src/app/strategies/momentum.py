@@ -51,10 +51,15 @@ class MomentumStrategy(Strategy):
         self.scoring_type = scoring_type
         self.market_data = market_data
         self.lookback_days = 400  # ~252 jours de trading + marge pour les features
-        # Seuil calibré par balayage EV sur le test out-of-time 2025-04→2026-06
-        # (modèle avec contexte marché, 2026-07-11) : EV +1.47%/trade à 60.
-        # L'ancien 65 correspondait à l'échelle de score du modèle précédent.
-        self.score_threshold = 60
+        # Seuil sur l'ÉCHELLE CALIBRÉE (probabilités isotoniques, modèle
+        # 2018-2026 à 100 arbres). Balayage out-of-time 2025-04→2026-06 :
+        #   >=50 : précision 49.7% | EV +2.77% | ~3 signaux/j (> capacité)
+        #   >=55 : précision 54.5% | EV +3.49% | ~10 signaux/mois = capacité
+        # Avec 5 slots et ~2 semaines de détention, 55 gagne 5 pts de
+        # précision et +0.7% d'EV sans coût de capacité. Le test d'ère
+        # 2010-2017 (utilisateur) confirme la structure : 56% à >=50.
+        # NB: les anciens seuils 60-65 vivaient sur l'échelle non calibrée.
+        self.score_threshold = 55
         self.capital = capital
         self.max_stocks = max_stocks
         self.use_trailing_stop = use_trailing_stop

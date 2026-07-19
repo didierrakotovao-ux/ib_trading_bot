@@ -26,3 +26,15 @@ tmpclaude-ae65-cwd
 # Fichier de config base de données (contient mot de passe)
 src/app/database/pg_config.py
 cache/
+
+# Logs de collecte (churn quotidien)
+logs/
+
+# Sorties de debug volumineuses
+output.txt
+output2.txt
+
+# Sauvegardes et expériences de modèles (la prod .pkl reste versionnée)
+models/*.pkl.prev
+models/exp_*.pkl
+models/*.backup-*.pkl

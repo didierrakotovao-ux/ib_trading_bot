@@ -59,6 +59,12 @@ def main():
     # exécute une autre stratégie que celle que le modèle a apprise.
     parser.add_argument('--switch-wy-trailing', type=float, default=8.0,
                         help='Trailing %% utilisé par Wyckoff en mode regime_switch')
+    # DÉSACTIVÉE par défaut (0). Le live utilise 40 (stop_manager) —
+    # passer --max-holding-bars 40 pour un backtest en parité avec le live.
+    # Implémentation deux phases anti-course (cf. bug -201% du 2026-07-12).
+    parser.add_argument('--max-holding-bars', type=int, default=0,
+                        help='Barrière de temps en barres (0 = désactivée ; '
+                             '40 = parité stop_manager)')
     args = parser.parse_args()
 
 
@@ -118,6 +124,7 @@ def main():
             regime_momentum_trailing=args.switch_mom_trailing,
             regime_wyckoff_trailing=args.switch_wy_trailing,
             cooldown_days=args.cooldown,
+            max_holding_bars=args.max_holding_bars,
             use_fondamental_data=args.use_fondamental_data,
         )
         results_bt = engine.cerebro.run()

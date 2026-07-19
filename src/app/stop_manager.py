@@ -43,7 +43,7 @@ class StopConfig:
     protection_pct: float = 5.0
 
     # Profit
-    profit_type: str = "fixed"          # "fixed" | "dynamic"
+    profit_type: str = "none"          # "fixed" | "dynamic"
     profit_fixed_pct: float = 8.0
     profit_atr_mult: float = 2.0
     profit_atr_period: int = 14

@@ -49,6 +49,8 @@ class WyckoffMLScoring(Scoring):
                 data = joblib.load(self.model_path)
                 self.model = data['model']
                 self.scaler = data['scaler']
+                # Calibration isotonique (None sur les anciens pkl)
+                self.calibrator = data.get('calibrator')
                 self.feature_columns = data['feature_columns']
                 self.model_loaded = True
                 print(f"[OK] Modele Wyckoff ML charge: {self.model_path}")
@@ -121,6 +123,9 @@ class WyckoffMLScoring(Scoring):
             X = last.values
             X_scaled = self.scaler.transform(X)
             probability = self.model.predict_proba(X_scaled)[0, 1]
+            # Calibration isotonique si le pkl en contient une
+            if getattr(self, 'calibrator', None) is not None:
+                probability = float(self.calibrator.predict([probability])[0])
 
             score = int(probability * 100)
             return max(0, min(score, 100))
