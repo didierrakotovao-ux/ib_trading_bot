@@ -680,6 +680,10 @@ if __name__ == "__main__":
     finally:
         print("[TRADING] Fermeture...")
         trading.close()
-        # Forcer un exit propre — le thread IB API peut crasher en C lors du GC Python
+        # Forcer un exit propre — le thread IB API peut crasher en C lors du GC Python.
+        # os._exit() saute le flush normal des buffers : le faire explicitement avant,
+        # sinon tout print() non encore vidé (stdout redirigé = bufferisé par bloc) est perdu.
         import os
+        sys.stdout.flush()
+        sys.stderr.flush()
         os._exit(0)

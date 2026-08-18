@@ -43,7 +43,7 @@ class StopConfig:
     protection_pct: float = 5.0
 
     # Profit
-    profit_type: str = "fixed"          # "fixed" | "dynamic"
+    profit_type: str = "none"          # "fixed" | "dynamic"
     profit_fixed_pct: float = 8.0
     profit_atr_mult: float = 2.0
     profit_atr_period: int = 14
@@ -250,6 +250,46 @@ class StopManager:
         """Niveau initial de stop (identique pour fixed et trailing au départ)."""
         return round(entry_price * (1 - self.config.protection_pct / 100), 4)
 
+    # Écart max toléré entre prix_entree (DB) et avg_cost (IB) pour une même
+    # position avant de considérer la ligne `trades` comme obsolète/orpheline.
+    STALE_ENTRY_TOLERANCE_PCT = 3.0
+
+    def _is_stale_trade_row(self, row, avg_cost: float) -> bool:
+        """
+        Une ligne `trades` ouverte (quantite_restante > 0) trouvée pour un symbole
+        n'est un prix d'entrée fiable que si elle correspond réellement à la position
+        IB actuelle. IB (avg_cost) est la seule source de vérité sur le coût réel
+        d'une position actuellement détenue — une ligne DB dont le prix diverge trop
+        signale une ancienne position clôturée hors du bot (manuellement, ou pendant
+        une coupure de surveillance) dont quantite_restante n'a jamais été remise à 0.
+        """
+        prix_db = row["prix_entree"]
+        if not prix_db or prix_db <= 0 or avg_cost <= 0:
+            return False
+        ecart_pct = abs(prix_db - avg_cost) / avg_cost * 100
+        return ecart_pct > self.STALE_ENTRY_TOLERANCE_PCT
+
+    def _close_orphan_trade(self, conn, trade_id: int, symbol: str = ""):
+        """
+        Clôture une ligne `trades` orpheline détectée via _is_stale_trade_row,
+        pour qu'elle arrête de polluer la détection de nouvelles positions.
+        """
+        try:
+            cur = conn.cursor()
+            cur.execute("""
+                UPDATE trades
+                SET quantite_restante = 0,
+                    date_sortie = COALESCE(date_sortie, NOW()),
+                    cause_sortie = COALESCE(cause_sortie, 'ORPHAN_RECONCILED')
+                WHERE id = %s
+            """, (trade_id,))
+            conn.commit()
+            cur.close()
+            print(f"[STOPS] {symbol}: ligne trades #{trade_id} obsolète clôturée (ORPHAN_RECONCILED)")
+        except Exception as e:
+            conn.rollback()
+            print(f"[STOPS] {symbol}: erreur clôture trade orphelin #{trade_id}: {e}")
+
     # Sentinelle "jamais atteint" quand la prise de bénéfice est désactivée
     # (profit.type = "none") — la colonne profit_level est NOT NULL en DB
     PROFIT_DISABLED_LEVEL = 9_999_999_999.0
@@ -436,12 +476,16 @@ class StopManager:
         Retourne True si ce symbole a été fermé (quantite_restante=0) dans les N dernières minutes.
         Protège contre la latence IB : une position vendue reste visible dans TWS
         quelques secondes/minutes, ce qui provoquerait une nouvelle entrée journal et un doublon SELL.
+        Exclut les clôtures ORPHAN_* (réconciliation de données, pas un vrai ordre IB) :
+        sinon _close_orphan_trade bloquerait pendant `minutes` la recréation de l'entrée
+        journal qu'elle vient elle-même de rendre nécessaire.
         """
         cur = dict_cursor(conn)
         cur.execute("""
             SELECT id FROM trades
             WHERE symbol = %s AND trade_mode = %s
               AND quantite_restante = 0
+              AND (cause_sortie IS NULL OR cause_sortie NOT IN ('ORPHAN_RECONCILED', 'ORPHAN_IB_CLOSED'))
               AND date_sortie >= NOW() - (%s * INTERVAL '1 minute')
         """, (symbol, self.trade_mode.value, minutes))
         row = cur.fetchone()
@@ -508,11 +552,15 @@ class StopManager:
         la DB fournit le prix d'entrée. Fallback sur la DB si TWS ne répond pas.
         """
         ib_positions = self.market_data.req_ib_positions()
-        ib_open = {p["symbol"]: int(abs(p["qty"])) for p in ib_positions if p["qty"] != 0}
-        ib_avg_cost = {p["symbol"]: p["avg_cost"] for p in ib_positions if p["qty"] != 0}
+        # Ignorer les positions SHORT (qty < 0) — ne jamais configurer un stop sur un short
+        # (même garde-fou que dans scan() pour les nouvelles positions détectées en cours de boucle)
+        ib_open = {p["symbol"]: int(p["qty"]) for p in ib_positions if p["qty"] > 0}
+        ib_avg_cost = {p["symbol"]: p["avg_cost"] for p in ib_positions if p["qty"] > 0}
 
-        if not ib_open:
-            # Fallback DB si TWS ne renvoie rien
+        if not ib_positions:
+            # Fallback DB seulement si IB n'a rien renvoyé du tout (échec de connexion) —
+            # une réponse IB valide sans position longue (ex. tout est short ou flat) ne
+            # doit surtout pas retomber sur les vieilles lignes trades non soldées.
             print("[STOPS] Positions TWS non disponibles — fallback sur la DB")
             conn = self._connect()
             cur = dict_cursor(conn)
@@ -564,10 +612,14 @@ class StopManager:
                 print(f"[STOPS] {symbol}: stop déclenché récemment — setup ignoré au redémarrage")
                 continue
 
+            avg_cost = ib_avg_cost.get(symbol, 0.0)
+            if row and self._is_stale_trade_row(row, avg_cost):
+                self._close_orphan_trade(conn, row["id"], symbol)
+                row = None
+
             if row:
                 to_setup.append((symbol, row["prix_entree"], ib_qty, row["id"]))
             else:
-                avg_cost = ib_avg_cost.get(symbol, 0.0)
                 if avg_cost > 0:
                     trade_id = self._create_journal_entry(symbol, avg_cost, ib_qty)
                     if trade_id:
@@ -753,6 +805,28 @@ class StopManager:
 
         return order_id
 
+    def _journal_exit(self, trade_id: Optional[int], symbol: str, entry_price: float,
+                       qty_sold: int, exit_price: float, cause: str):
+        """
+        Referme la ligne trades correspondante après une sortie stop_manager.
+        Sans cet appel, quantite_restante reste bloqué à sa valeur d'entrée
+        (trades.id reste "ouvert" indéfiniment) et une barrière de temps peut
+        se redéclencher sur la même ligne, vendant une position déjà fermée.
+        """
+        if not trade_id:
+            return
+        journal = TradeJournal()
+        try:
+            journal.log_partial_exit(
+                trade_id=trade_id, symbol=symbol, date_sortie=datetime.now(),
+                prix_sortie=exit_price, quantite_vendue=qty_sold,
+                prix_entree=entry_price, cause_sortie=cause,
+            )
+        except Exception as e:
+            print(f"[STOPS] {symbol}: échec journalisation sortie (trade_id={trade_id}): {e}")
+        finally:
+            journal.close()
+
     def _mark_triggered(self, stop_id: int, trigger_type: str):
         conn = self._connect()
         cur = conn.cursor()
@@ -817,6 +891,51 @@ class StopManager:
         cur.close()
         conn.close()
 
+    # Délai au-delà duquel un stop resté "claimed" (active=2) est considéré
+    # abandonné (process mort entre le claim et l'envoi de l'ordre IB).
+    STALE_CLAIM_MINUTES = 10
+
+    def _recover_stale_claims(self):
+        """
+        Un stop passe à active=2 juste avant l'envoi de l'ordre SELL, puis doit
+        être finalisé (active=0, _finalize_trigger) ou annulé (_rollback_trigger,
+        retour à active=1) en quelques secondes. S'il reste bloqué à active=2 plus
+        de STALE_CLAIM_MINUTES, un crash a interrompu le process entre le claim et
+        l'issue de l'ordre : on le remet en active=1 pour qu'il soit réévalué au
+        prochain scan. En cas de doublon (même symbole/trade réclamé plusieurs
+        fois), seule la ligne la plus récente est réactivée, les autres sont
+        désactivées pour éviter deux stops actifs simultanés sur la même position.
+        """
+        conn = self._connect()
+        cur = conn.cursor()
+        try:
+            cur.execute("""
+                WITH stale AS (
+                    SELECT id, ROW_NUMBER() OVER (
+                        PARTITION BY symbol, trade_mode ORDER BY id DESC
+                    ) AS rn
+                    FROM position_stops
+                    WHERE active = 2 AND trade_mode = %s
+                      AND triggered_at < NOW() - (%s * INTERVAL '1 minute')
+                )
+                UPDATE position_stops ps
+                SET active = CASE WHEN stale.rn = 1 THEN 1 ELSE 0 END,
+                    triggered_type = CASE WHEN stale.rn = 1 THEN NULL ELSE ps.triggered_type END,
+                    triggered_at = CASE WHEN stale.rn = 1 THEN NULL ELSE ps.triggered_at END
+                FROM stale
+                WHERE ps.id = stale.id
+            """, (self.trade_mode.value, self.STALE_CLAIM_MINUTES))
+            n = cur.rowcount
+            conn.commit()
+            if n:
+                print(f"[STOPS] {n} stop(s) bloqué(s) en 'claimed' récupéré(s) (rollback)")
+        except Exception as e:
+            conn.rollback()
+            print(f"[STOPS] Erreur récupération des claims bloqués: {e}")
+        finally:
+            cur.close()
+            conn.close()
+
     # ------------------------------------------------------------------
     # Scan principal
     # ------------------------------------------------------------------
@@ -827,6 +946,8 @@ class StopManager:
         Commence par récupérer les positions réelles IB — désactive les stops
         orphelins (symboles fermés côté IB mais encore dans la DB).
         """
+        self._recover_stale_claims()
+
         # 1. Positions réelles dans IB
         ib_positions = self.market_data.req_ib_positions()
         ib_symbols = {p["symbol"] for p in ib_positions if p["qty"] != 0}
@@ -858,6 +979,18 @@ class StopManager:
                             "UPDATE position_stops SET active = 0 WHERE id = %s",
                             (s["id"],)
                         )
+                        if s["trade_id"]:
+                            # Sans cette clôture, la ligne trades reste "ouverte"
+                            # (quantite_restante > 0) indéfiniment et pourra plus tard
+                            # être reprise à tort comme prix d'entrée d'une future
+                            # position IB sur le même symbole (cf. _is_stale_trade_row).
+                            ocur.execute("""
+                                UPDATE trades
+                                SET quantite_restante = 0,
+                                    date_sortie = COALESCE(date_sortie, NOW()),
+                                    cause_sortie = COALESCE(cause_sortie, 'ORPHAN_IB_CLOSED')
+                                WHERE id = %s AND quantite_restante > 0
+                            """, (s["trade_id"],))
                         self._pending_sells.discard(s["symbol"])
                         print(f"[STOPS] {s['symbol']}: position fermee dans IB -> stop desactive en DB")
                     conn.commit()
@@ -894,6 +1027,9 @@ class StopManager:
                         """, (symbol, self.trade_mode.value))
                         row = ncur.fetchone()
                         ncur.close()
+                        if row and self._is_stale_trade_row(row, avg_cost):
+                            self._close_orphan_trade(conn, row["id"], symbol)
+                            row = None
                         if row:
                             self.setup_position(symbol, row["prix_entree"], ib_qty, trade_id=row["id"])
                         elif self._recently_triggered(symbol, conn):
@@ -1027,6 +1163,8 @@ class StopManager:
                     self._place_protection_order(symbol, actual_qty, current_price)
                     self._pending_sells.add(symbol)
                     self._finalize_trigger(stop_id)
+                    self._journal_exit(s["trade_id"], symbol, s["entry_price"],
+                                        actual_qty, current_price, "TRAILING_STOP")
                 except Exception as e:
                     print(f"[STOPS] {symbol}: échec envoi ordre stop ({e}) — rollback trigger")
                     self._rollback_trigger(stop_id)
@@ -1052,6 +1190,8 @@ class StopManager:
                     self._place_profit_order(symbol, actual_qty, profit_level)
                     self._pending_sells.add(symbol)
                     self._finalize_trigger(stop_id)
+                    self._journal_exit(s["trade_id"], symbol, s["entry_price"],
+                                        actual_qty, profit_level, "PROFIT_TARGET")
                 except Exception as e:
                     print(f"[STOPS] {symbol}: échec envoi ordre profit ({e}) — rollback trigger")
                     self._rollback_trigger(stop_id)
@@ -1074,9 +1214,21 @@ class StopManager:
                             print(f"[STOPS] {symbol}: trigger temps déjà pris par une autre instance")
                             continue
                         try:
+                            # Vérification fraîche juste avant le SELL — même garde-fou que
+                            # STOP/PROFIT : évite de vendre une position déjà fermée ou short
+                            # (référence trades obsolète, ex. barrière de temps sur un vieux trade).
+                            fresh_qty = self._get_fresh_ib_qty(symbol)
+                            if fresh_qty <= 0:
+                                print(f"[STOPS] {symbol}: position IB={fresh_qty} au moment du trigger "
+                                      f"(position fermée ou short) — SELL annulé")
+                                self._rollback_trigger(stop_id)
+                                continue
+                            actual_qty = fresh_qty
                             self._place_protection_order(symbol, actual_qty, current_price, label="TEMPS")
                             self._pending_sells.add(symbol)
                             self._finalize_trigger(stop_id)
+                            self._journal_exit(s["trade_id"], symbol, s["entry_price"],
+                                                actual_qty, current_price, "TIME_BARRIER")
                         except Exception as e:
                             print(f"[STOPS] {symbol}: échec envoi ordre sortie temps ({e}) — rollback trigger")
                             self._rollback_trigger(stop_id)

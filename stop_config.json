@@ -57,7 +57,7 @@
   },
 
   "time": {
-    "max_holding_days": 40,
+    "max_holding_days": 0,
     "_max_holding_days_comment": "Barrière d'EXÉCUTION en jours de bourse (week-ends exclus). 0 = désactivé",
     "label_horizon": 20,
     "_label_horizon_comment": "Horizon des labels ML — utilisé par l'entraînement, PAS par le stop_manager"
