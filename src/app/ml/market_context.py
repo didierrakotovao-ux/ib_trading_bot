@@ -25,7 +25,12 @@ MARKET_FEATURE_COLUMNS = [
 ]
 
 
-def load_market_features(min_date: str = "2016-01-01") -> pd.DataFrame:
+def load_market_features(min_date: str = "2008-01-01") -> pd.DataFrame:
+    # min_date 2008 : SPY/QQQ sont en base depuis 2008. Un min_date trop
+    # tardif rend les features marché NaN avant cette date et le dropna
+    # élimine SILENCIEUSEMENT les échantillons (l'expérience « 2010-2017 »
+    # du 2026-07-18 n'a en réalité porté que sur 2016-2017 à cause du
+    # défaut précédent à 2016-01-01).
     """
     Charge SPY/QQQ depuis la DB et calcule les features de contexte marché.
 

@@ -66,6 +66,7 @@ class Trading:
         self.position_manager = PositionManager()
         self.order_callbacks = []  # Liste de callbacks à appeler sur exécution d'ordre
         self.pending_orders = set()  # Symboles avec ordres en attente (pas encore exécutés)
+        self.entry_scores = {}  # symbol -> score d'entrée (paper/live)
 
         # Journal de trading en BD
         self.trade_journal = TradeJournal()
@@ -111,12 +112,15 @@ class Trading:
             print(f"[Trading] {symbol} retiré des ordres en attente")
 
         if action == "BUY" and status.lower() == "filled":
+            entry_score = self.entry_scores.pop(symbol, None)
             # Ajout de la position dans le PositionManager
             self.position_manager.open_position(
                 symbol=symbol,
                 qty=fill_qty,
                 entry_price=fill_price,
-                entry_time=fill_time
+                entry_time=fill_time,
+                entry_score=entry_score,
+                entry_bar=1
             )
             # Journaliser l'entrée en BD
             trade_id = self.trade_journal.log_trade(
@@ -125,10 +129,11 @@ class Trading:
                 symbol=symbol,
                 date_entree=fill_time or datetime.now(),
                 prix_entree=fill_price,
-                quantite=fill_qty
+                quantite=fill_qty,
+                score_entree=entry_score
             )
             self.trade_ids[symbol] = trade_id
-            print(f"[JOURNAL] Entrée enregistrée: {symbol} @ {fill_price} (ID: {trade_id})")
+            print(f"[JOURNAL] Entrée enregistrée: {symbol} @ {fill_price} (score={entry_score} | ID: {trade_id})")
 
         elif action == "SELL" and status.lower() == "filled":
             # Sortie partielle ou totale
@@ -196,6 +201,9 @@ class Trading:
                 print(f"[Trading] Ordre déjà en attente pour {symbol}, ordre ignoré.")
                 return None
 
+            if symbol and 'score' in getattr(order, '__dict__', {}):
+                self.entry_scores[symbol] = order.score
+
             # Estimer le coût de la position (utiliser le dernier prix connu ou une estimation)
             lmt_price = getattr(order, 'lmtPrice', None)
 
@@ -250,7 +258,7 @@ class Trading:
         # Récupérer prix_entree et quantite_restante depuis la BD
         self.trade_journal.connect()
         cursor = self.trade_journal.conn.cursor()
-        cursor.execute("SELECT prix_entree, quantite_restante FROM trades WHERE id = ?", (trade_id,))
+        cursor.execute("SELECT prix_entree, quantite_restante FROM trades WHERE id = %s", (trade_id,))
         row = cursor.fetchone()
         if not row:
             print(f"[WARNING] close_position: trade_id={trade_id} introuvable")
@@ -261,6 +269,15 @@ class Trading:
         qty_vendue = int(qty_sold) if qty_sold else qty_restante
         qty_vendue = min(qty_vendue, qty_restante)  # Ne pas vendre plus que ce qu'on a
 
+        position = self.position_manager.get_position(symbol)
+        entry_score = position.entry_score if position else self.entry_scores.get(symbol)
+        entry_time = position.entry_time if position else None
+        exit_time = exit_time or datetime.now()
+        bars_held = 1
+        if entry_time is not None:
+            delta_seconds = max(0, (exit_time - entry_time).total_seconds())
+            bars_held = max(1, int(delta_seconds / 300))
+
         # Mettre à jour le PositionManager
         position, _ = self.position_manager.partial_close_position(
             symbol, qty_vendue, exit_price, exit_time
@@ -270,11 +287,13 @@ class Trading:
         self.trade_journal.log_partial_exit(
             trade_id=trade_id,
             symbol=symbol,
-            date_sortie=exit_time or datetime.now(),
+            date_sortie=exit_time,
             prix_sortie=exit_price,
             quantite_vendue=qty_vendue,
             prix_entree=prix_entree,
-            cause_sortie=cause_sortie
+            cause_sortie=cause_sortie,
+            bars_held=bars_held,
+            score_entree=entry_score
         )
 
         # Si la position est entièrement fermée, retirer du mapping
@@ -306,12 +325,12 @@ class Trading:
                     symbolToTrade.append(symbol)
                 for orders in strategy.get_order_params():
                     symbol = orders['symbol']
+                    score = orders.get('score', strategy.symbolsScores.get(symbol))
+                    if score is not None:
+                        orders['score'] = score
                     contrat = self.market_data_provider.create_contract(symbol)
                     entry_order = orders['entry_order']
-
-                    # Algo Adaptive IB : optimise le prix d'exécution sans plafond fixe.
-                    # Priority "Urgent" → se comporte comme un ordre marché mais cherche
-                    # à améliorer le prix; gère les gaps d'ouverture contrairement à VWAP+LMT.
+                    entry_order.score = score
                     entry_order.orderType = "MKT"
                     entry_order.algoStrategy = "Adaptive"
                     entry_order.algoParams = [TagValue("adaptivePriority", "Urgent")]
@@ -489,13 +508,15 @@ class Trading:
                 if not existing:
                     # Ajouter l'entrée au journal — attribuée au régime
                     # en vigueur à la date du fill
+                    entry_score = self.entry_scores.get(symbol) or self.strategies[0].symbolsScores.get(symbol)
                     trade_id = self.trade_journal.log_trade(
                         trade_mode=self.trade_mode,
                         strategy_name=current_strategy_name(as_of=fill_time),
                         symbol=symbol,
                         date_entree=fill_time,
                         prix_entree=buy['price'],
-                        quantite=buy['shares']
+                        quantite=buy['shares'],
+                        score_entree=entry_score
                     )
                     self.trade_ids[symbol] = trade_id
                     print(f"[SYNC] Entrée ajoutée: {symbol} @ {buy['price']} (ID: {trade_id})")
@@ -533,6 +554,12 @@ class Trading:
                     qty_vendue = min(int(sell['shares']), qty_restante)
 
                     # Utiliser log_partial_exit : gère PnL sur qty réelle + fermeture si restant=0
+                    position = self.position_manager.get_position(symbol)
+                    entry_score = position.entry_score if position else self.entry_scores.get(symbol)
+                    bars_held = 1
+                    if position and position.entry_time is not None:
+                        delta_seconds = max(0, (fill_time - position.entry_time).total_seconds())
+                        bars_held = max(1, int(delta_seconds / 300))
                     self.trade_journal.log_partial_exit(
                         trade_id=trade_id,
                         symbol=symbol,
@@ -540,7 +567,9 @@ class Trading:
                         prix_sortie=sell['price'],
                         quantite_vendue=qty_vendue,
                         prix_entree=entry_price,
-                        cause_sortie='TRAILING_STOP'
+                        cause_sortie='TRAILING_STOP',
+                        bars_held=bars_held,
+                        score_entree=entry_score
                     )
 
                     # Mettre à jour le PositionManager

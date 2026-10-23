@@ -226,7 +226,9 @@ class TradeJournal:
         prix_sortie: float,
         quantite_vendue: int,
         prix_entree: float,
-        cause_sortie: str = "MANUAL"
+        cause_sortie: str = "MANUAL",
+        bars_held: Optional[int] = None,
+        score_entree: Optional[float] = None
     ) -> int:
         """
         Enregistre une sortie partielle ou totale d'une position.
@@ -256,8 +258,12 @@ class TradeJournal:
         exit_id = cur.fetchone()[0]
 
         cur.execute("""
-            UPDATE trades SET quantite_restante = quantite_restante - %s WHERE id = %s
-        """, (quantite_vendue, trade_id))
+            UPDATE trades SET
+                quantite_restante = quantite_restante - %s,
+                bars_held = COALESCE(%s, bars_held),
+                score_entree = COALESCE(%s, score_entree)
+            WHERE id = %s
+        """, (quantite_vendue, bars_held, score_entree, trade_id))
 
         cur.execute("SELECT quantite_restante FROM trades WHERE id = %s", (trade_id,))
         row = cur.fetchone()
@@ -275,11 +281,15 @@ class TradeJournal:
             cur.execute("""
                 UPDATE trades SET
                     date_sortie = %s, prix_sortie = %s, cause_sortie = %s,
-                    pnl_brut = %s, commission = %s, pnl_net = %s, quantite_restante = 0
+                    pnl_brut = %s, commission = %s, pnl_net = %s,
+                    bars_held = COALESCE(%s, bars_held),
+                    score_entree = COALESCE(%s, score_entree),
+                    quantite_restante = 0
                 WHERE id = %s
             """, (
                 last_exit_date, prix_sortie, cause_sortie,
                 round(total_pnl_brut, 2), round(total_commission, 2), round(total_pnl_net, 2),
+                bars_held, score_entree,
                 trade_id
             ))
             print(f"[JOURNAL] Position fermée (trade_id={trade_id}): PnL net total = {total_pnl_net:.2f}$")

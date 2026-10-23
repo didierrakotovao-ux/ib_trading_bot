@@ -124,7 +124,14 @@ def read_sql(query: str, params=None) -> pd.DataFrame:
     """
     with get_engine().raw_connection() as conn:
         cur = conn.cursor()
-        cur.execute(query, params or [])
+        try:
+            cur.execute(query, params or [])
+        except Exception:
+            # Ne jamais rendre au pool une connexion en transaction avortée
+            # (sinon la requête suivante échoue avec "current transaction
+            # is aborted")
+            conn.rollback()
+            raise
         cols = [desc[0] for desc in cur.description]
         rows = cur.fetchall()
         return pd.DataFrame(rows, columns=cols)
@@ -137,7 +144,12 @@ def read_sql_ca(query: str, params=None) -> pd.DataFrame:
     """
     with get_engine_ca().raw_connection() as conn:
         cur = conn.cursor()
-        cur.execute(query, params or [])
+        try:
+            cur.execute(query, params or [])
+        except Exception:
+            # Idem read_sql : rollback avant de rendre la connexion au pool
+            conn.rollback()
+            raise
         cols = [desc[0] for desc in cur.description]
         rows = cur.fetchall()
         return pd.DataFrame(rows, columns=cols)

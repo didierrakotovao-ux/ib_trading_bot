@@ -1,12 +1,15 @@
 from datetime import datetime
 
 class Position:
-    def __init__(self, symbol, qty, entry_price, entry_time=None, position_type="long"):
+    def __init__(self, symbol, qty, entry_price, entry_time=None, position_type="long",
+                 entry_score=None, entry_bar=None):
         self.symbol = symbol
         self.qty = qty            # quantité initiale à l'entrée
         self.qty_remaining = qty  # quantité encore détenue
         self.entry_price = entry_price
         self.entry_time = entry_time or datetime.now()
+        self.entry_score = entry_score
+        self.entry_bar = entry_bar
         self.exit_price = None
         self.exit_time = None
         self.position_type = position_type
@@ -44,12 +47,14 @@ class PositionManager:
         """Retourne True si une position ouverte existe pour ce symbole."""
         return any(p.symbol == symbol and p.status == "open" for p in self.positions)
 
-    def open_position(self, symbol, qty, entry_price, entry_time=None, position_type="long"):
+    def open_position(self, symbol, qty, entry_price, entry_time=None, position_type="long",
+                      entry_score=None, entry_bar=None):
         # Vérifie s'il existe déjà une position ouverte sur ce symbole
         if any(p.symbol == symbol and p.status == "open" for p in self.positions):
             # Ne crée pas de doublon
             return None
-        pos = Position(symbol, qty, entry_price, entry_time, position_type)
+        pos = Position(symbol, qty, entry_price, entry_time, position_type,
+                      entry_score=entry_score, entry_bar=entry_bar)
         self.positions.append(pos)
         return pos
 

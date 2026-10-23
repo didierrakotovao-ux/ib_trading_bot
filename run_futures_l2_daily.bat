@@ -9,13 +9,13 @@ set LOG_FILE=%LOG_DIR%\collect_log_%TODAY%.txt
 
 if not exist %LOG_DIR% mkdir %LOG_DIR%
 
-echo [%date% %time%] Demarrage collecte Futures L2 >> %LOG_FILE%
+echo [%date% %time%] Demarrage collecte Actions L2 >> %LOG_FILE%
 
 .venv\Scripts\python.exe src/app/collect_futures_l2.py ^
     --host 127.0.0.1 ^
     --port 7496 ^
     --client 97 ^
-    --symbols MES,MNQ,YM ^
+    --symbols NVDA,AMZN,META ^
     --no-ticks ^
     --duration-min 480 ^
     --output-dir collectOF ^

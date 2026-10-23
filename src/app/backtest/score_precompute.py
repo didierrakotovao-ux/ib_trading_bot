@@ -73,6 +73,10 @@ def _batch_scores(df: pd.DataFrame, scoring) -> dict:
         return {}
     X = scoring.scaler.transform(sub[feats].astype(float).values)
     proba = scoring.model.predict_proba(X)[:, 1]
+    # Calibration isotonique — même transformation que le scoring live
+    calibrator = getattr(scoring, 'calibrator', None)
+    if calibrator is not None:
+        proba = calibrator.predict(proba)
     scores = np.clip((proba * 100).astype(int), 0, 100)
     keys = zip(sub['symbol'], sub['date'].dt.date)
     return {k: int(s) for k, s in zip(keys, scores)}

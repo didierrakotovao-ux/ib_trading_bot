@@ -1,6 +1,6 @@
 """
-Collecte L2 (carnet d'ordres) + trades pour futures MES, MNQ, YM via IB API.
-Format de sortie: parquet compatible NinjaTrader.
+Collecte L2 (carnet d'ordres) + trades pour futures (MES, MNQ, YM) ou actions
+(NVDA, AMZN, META, ...) via IB API. Format de sortie: parquet compatible NinjaTrader.
 
 Structure de sortie:
     collectOF/sessions_mes/YYYY-MM-DD/trade_HHMMSS.parquet  -> ts, price, size
@@ -10,6 +10,7 @@ Usage:
     python src/app/collect_futures_l2.py --host 192.168.0.103 --port 7496
     python src/app/collect_futures_l2.py --host 192.168.0.103 --port 7496 --no-ticks
     python src/app/collect_futures_l2.py --host 192.168.0.103 --port 7496 --contract-month 202609
+    python src/app/collect_futures_l2.py --symbols NVDA,AMZN,META
 """
 
 from __future__ import annotations
@@ -37,11 +38,14 @@ except ImportError:
 
 ET = ZoneInfo("America/New_York")
 
-# Symbole IB -> (exchange, multiplicateur tick, nom session NinjaTrader)
-FUTURES: Dict[str, Tuple[str, float, str]] = {
-    "MES": ("CME",  5.0, "sessions_mes"),
-    "MNQ": ("CME",  2.0, "sessions_mnq"),
-    "YM":  ("CBOT", 5.0, "sessions_dow"),
+# Symbole IB -> (exchange, secType, nom session NinjaTrader)
+INSTRUMENTS: Dict[str, Tuple[str, str, str]] = {
+    "MES":  ("CME",    "FUT", "sessions_mes"),
+    "MNQ":  ("CME",    "FUT", "sessions_mnq"),
+    "YM":   ("CBOT",   "FUT", "sessions_dow"),
+    "NVDA": ("ISLAND", "STK", "sessions_nvda"),
+    "AMZN": ("ISLAND", "STK", "sessions_amzn"),
+    "META": ("ISLAND", "STK", "sessions_meta"),
 }
 
 WINDOWS: Dict[str, int] = {"1m": 60, "5m": 300, "15m": 900}
@@ -248,15 +252,16 @@ class FuturesL2Collector(EWrapper, EClient):
 
     # ── Souscription ──────────────────────────────────────────────────────────
 
-    def subscribe(self, symbol: str, exchange: str, contract_month: str,
+    def subscribe(self, symbol: str, exchange: str, sec_type: str, contract_month: str,
                   l2_req_id: int, tick_req_id: Optional[int],
                   l1_req_id: int) -> None:
         contract = Contract()
         contract.symbol = symbol
-        contract.secType = "FUT"
+        contract.secType = sec_type
         contract.exchange = exchange
         contract.currency = "USD"
-        contract.lastTradeDateOrContractMonth = contract_month
+        if sec_type == "FUT":
+            contract.lastTradeDateOrContractMonth = contract_month
 
         with self._lock:
             self.l2_req_to_symbol[l2_req_id]   = symbol
@@ -329,7 +334,7 @@ def _write_chunk(output_dir: Path, symbol: str,
                  trade_rows: list, quote_rows: list,
                  chunk_label: str, date_str: str) -> Tuple[int, int]:
     """Ecrit les buffers trade et quote en parquet, retourne (nb_trades, nb_quotes)."""
-    _, _, session = FUTURES.get(symbol, ("CME", 1.0, f"sessions_{symbol.lower()}"))
+    _, _, session = INSTRUMENTS.get(symbol, ("SMART", "STK", f"sessions_{symbol.lower()}"))
     day_dir = output_dir / session / date_str
     day_dir.mkdir(parents=True, exist_ok=True)
 
@@ -354,7 +359,7 @@ def _write_chunk(output_dir: Path, symbol: str,
 def main() -> int:
     front = _front_month_simple()
 
-    parser = argparse.ArgumentParser(description="Collecte L2 futures MES/MNQ/YM -> parquet NinjaTrader")
+    parser = argparse.ArgumentParser(description="Collecte L2 futures ou actions -> parquet NinjaTrader")
     parser.add_argument("--host",           type=str,   default="127.0.0.1")
     parser.add_argument("--port",           type=int,   default=7496)
     parser.add_argument("--client",         type=int,   default=97)
@@ -376,7 +381,7 @@ def main() -> int:
     output_dir = Path(args.output_dir)
 
     print(f"\n{'='*60}")
-    print("FUTURES L2 COLLECTOR  (format parquet NinjaTrader)")
+    print("L2 COLLECTOR  (format parquet NinjaTrader)")
     print(f"{'='*60}")
     print(f"Host/Port      : {args.host}:{args.port}")
     print(f"Client ID      : {args.client}")
@@ -387,7 +392,7 @@ def main() -> int:
     print(f"Duration       : {args.duration_min} min")
     print(f"Output dir     : {output_dir}/")
     for sym in symbols:
-        _, _, session = FUTURES.get(sym, ("CME", 1.0, f"sessions_{sym.lower()}"))
+        _, _, session = INSTRUMENTS.get(sym, ("SMART", "STK", f"sessions_{sym.lower()}"))
         print(f"  {sym} -> {output_dir}/{session}/YYYY-MM-DD/{{trade,quote}}_HHMMSS.parquet")
     print(f"Ticks          : {'DESACTIVES (--no-ticks)' if args.no_ticks else 'actives'}")
     print(f"{'='*60}\n")
@@ -401,10 +406,12 @@ def main() -> int:
 
     try:
         for i, symbol in enumerate(symbols):
-            exchange, _, _ = FUTURES.get(symbol, ("CME", 1.0, f"sessions_{symbol.lower()}"))
+            exchange, sec_type, _ = INSTRUMENTS.get(
+                symbol, ("SMART", "STK", f"sessions_{symbol.lower()}"))
             collector.subscribe(
                 symbol=symbol,
                 exchange=exchange,
+                sec_type=sec_type,
                 contract_month=args.contract_month,
                 l2_req_id=1000 + i,
                 tick_req_id=None if args.no_ticks else 2000 + i,
@@ -501,7 +508,7 @@ def main() -> int:
         print(f"[OUT] Chunks ecrits : {chunks_written}")
         print("\nResume final :")
         for sym in symbols:
-            _, _, session = FUTURES.get(sym, ("CME", 1.0, f"sessions_{sym.lower()}"))
+            _, _, session = INSTRUMENTS.get(sym, ("SMART", "STK", f"sessions_{sym.lower()}"))
             snap = collector.snapshot(sym)
             print(
                 f"  {sym:4s}  session={session}"

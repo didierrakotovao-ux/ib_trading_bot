@@ -191,7 +191,8 @@ class WyckoffMLStrategy(Strategy):
 
             order_dict = {
                 'symbol': symbol,
-                'entry_order': entryorder
+                'entry_order': entryorder,
+                'score': self.symbolsScores.get(symbol)
             }
 
             if self.use_trailing_stop:

@@ -28,6 +28,13 @@ class TrailingOnlyBTWrapper(bt.Strategy):
         max_stocks=5,
         trailing_percent=5.0,  # Trailing stop à 5%
         cooldown_days=30,       # Jours d'interdiction de réentrée après stop-out (0 = désactivé)
+        # Barrière de temps en barres (0 = DÉSACTIVÉE par défaut).
+        # ATTENTION : l'implémentation est en deux phases (annulation du
+        # trailing PUIS vente à la barre suivante) pour éviter la course
+        # stop+market du 2026-07-12 (double vente -> shorts involontaires,
+        # run à -201%). Le live (stop_manager) n'a pas cette course : stops
+        # virtuels, jamais posés dans le carnet.
+        max_holding_bars=0,
         dataframes=None,  # DataFrames pré-chargés depuis SQLite
         scoring_type="smooth_ml",
         smooth_model_path=None,  # Chemin du modèle smooth_ml (None = modèle US par défaut)
@@ -156,6 +163,10 @@ class TrailingOnlyBTWrapper(bt.Strategy):
         self.last_entry_prices = {}
         self.pending_stops = {}
         self.stop_exit_dates = {}   # symbol → date de dernier stop-out
+        # Barrière de temps en deux phases (anti-course stop+market) :
+        # phase 1 = annulation du trailing demandée ; phase 2 = vente placée
+        self.time_exit_requested = set()
+        self.time_exit_sold = set()
 
         # Filtres fondamentaux (si activés)
         if self.use_fondamental_data:
@@ -349,7 +360,11 @@ class TrailingOnlyBTWrapper(bt.Strategy):
 
                 last_entry_price = self.last_entry_prices[symbol]
                 pnl = (order.executed.price - last_entry_price) * abs(order.executed.size)
-                order_type = 'TRAILING_STOP'
+                order_type = 'TIME_BARRIER' if symbol in self.time_exit_sold \
+                    else 'TRAILING_STOP'
+                # Réinitialiser l'état de la barrière de temps pour ce symbole
+                self.time_exit_requested.discard(symbol)
+                self.time_exit_sold.discard(symbol)
 
                 # Nettoyer le pending stop
                 if symbol in self.pending_stops:
@@ -412,6 +427,39 @@ class TrailingOnlyBTWrapper(bt.Strategy):
             print(f"[NEXT] Date={current_date}, Bar={bar_num}/{total_bars}")
         self.log_diag(f"Analyse pour la date {current_date}...")
         self.log_diag(f"[DIAG] Cash: {self.broker.get_cash():.2f} | Value: {self.broker.get_value():.2f}")
+
+        # --- Barrière de temps, DEUX PHASES (parité stop_manager.max_holding_days) ---
+        # Course à éviter (bug du 2026-07-12, -201%) : annuler le trailing et
+        # vendre MARKET dans le même cycle laisse une barre où les DEUX ordres
+        # peuvent s'exécuter (le stop, plus ancien, est traité d'abord par le
+        # broker) -> double vente -> position short involontaire.
+        # Phase 1 : demander l'annulation du trailing. Phase 2 (barres
+        # suivantes) : vendre seulement quand le stop est confirmé mort et la
+        # position encore ouverte.
+        if self.p.max_holding_bars and self.p.max_holding_bars > 0:
+            for symbol, entry_info in list(self.trade_entries.items()):
+                held = len(self) - entry_info.get('bar_entree', len(self))
+                if held < self.p.max_holding_bars or symbol in self.time_exit_sold:
+                    continue
+                data = self._get_data(symbol)
+                pos = self.getposition(data) if data is not None else None
+                if data is None or not pos or pos.size <= 0:
+                    continue
+                stop_order = self.pending_stops.get(symbol)
+                stop_alive = stop_order is not None and stop_order.alive()
+                if symbol not in self.time_exit_requested:
+                    # Phase 1 : annulation du trailing uniquement
+                    if stop_alive:
+                        self.cancel(stop_order)
+                    self.time_exit_requested.add(symbol)
+                    self.log_diag(f"[TIME] {symbol}: barrière de temps atteinte "
+                                  f"({held} barres) — annulation du trailing")
+                elif not stop_alive:
+                    # Phase 2 : stop mort, vente unique
+                    self.sell(data=data, size=pos.size)
+                    self.time_exit_sold.add(symbol)
+                    self.log_diag(f"[TIME] {symbol}: vente barrière de temps "
+                                  f"placée ({held} barres)")
 
         # Optimisation: ne pas chercher de nouvelles positions si on a déjà max_stocks
         current_positions = sum(1 for d in self.datas if self.getposition(d).size != 0)

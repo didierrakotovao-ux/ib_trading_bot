@@ -172,7 +172,8 @@ class LiveJournal:
 
                 # Chercher une entrée ouverte (quantite_restante > 0)
                 cursor.execute('''
-                    SELECT id, prix_entree, quantite_restante FROM trades
+                    SELECT id, prix_entree, quantite_restante, date_entree, score_entree
+                    FROM trades
                     WHERE symbol = %s AND trade_mode = %s AND (date_sortie IS NULL OR quantite_restante > 0)
                     ORDER BY date_entree DESC LIMIT 1
                 ''', (symbol, self.trade_mode.value))
@@ -180,8 +181,12 @@ class LiveJournal:
                 entry = cursor.fetchone()
 
                 if entry:
-                    trade_id, entry_price, qty_restante = entry
+                    trade_id, entry_price, qty_restante, entry_time, entry_score = entry
                     qty_vendue = min(int(sell['shares']), qty_restante)
+                    bars_held = 1
+                    if entry_time is not None:
+                        delta_seconds = max(0, (fill_time - entry_time).total_seconds())
+                        bars_held = max(1, int(delta_seconds / 300))
                     self.trade_journal.log_partial_exit(
                         trade_id=trade_id,
                         symbol=symbol,
@@ -189,7 +194,9 @@ class LiveJournal:
                         prix_sortie=sell['price'],
                         quantite_vendue=qty_vendue,
                         prix_entree=entry_price,
-                        cause_sortie='TRAILING_STOP'
+                        cause_sortie='TRAILING_STOP',
+                        bars_held=bars_held,
+                        score_entree=entry_score
                     )
                 else:
                     print(f"  [!] SELL orphelin: {symbol} @ {sell['price']:.2f} (pas d'entrée ouverte)")

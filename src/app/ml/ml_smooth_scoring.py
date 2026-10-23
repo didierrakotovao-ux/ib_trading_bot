@@ -15,6 +15,7 @@ from src.app.ml.features import compute_base_features
 from src.app.ml.market_context import (
     load_market_features, merge_market_features, MARKET_FEATURE_COLUMNS)
 from src.app.database.pg_connection import get_conn
+from src.app.strategies.momentum_filters import MomentumFilters
 
 
 class SmoothMLScoring(Scoring):
@@ -26,13 +27,15 @@ class SmoothMLScoring(Scoring):
     df: pd.DataFrame
 
     def __init__(self, model_path: str = "models/smooth_momentum_model.pkl",
-                 db_path=None):  # db_path ignoré — connexion via pg_config.py
+                 db_path=None,
+                 apply_momentum_filters: bool = True):  # db_path ignoré — connexion via pg_config.py
         self.df = None
         self.model = None
         self.scaler = None
         self.model_loaded = False
         project_root = Path(__file__).parent.parent.parent.parent
         self.model_path = project_root / model_path
+        self.apply_momentum_filters = apply_momentum_filters
 
         # Colonnes chargées depuis le modèle
         self.feature_columns: List[str] = []
@@ -47,6 +50,25 @@ class SmoothMLScoring(Scoring):
         self._load_model()
         self._load_sector_cache()
 
+    def _passes_momentum_filters(self, df: pd.DataFrame) -> bool:
+        """Applique le gate momentum 12-1 + FIP avant le scoring."""
+        if not self.apply_momentum_filters:
+            return True
+
+        if len(df) < 252:
+            return False
+
+        data = df.sort_values('date') if 'date' in df.columns else df
+        momentum_12_1 = MomentumFilters.calc_momentum_12_1(data)
+        if np.isnan(momentum_12_1) or momentum_12_1 <= 0:
+            return False
+
+        fip = MomentumFilters.calc_fip(data)
+        if np.isnan(fip) or fip >= 0:
+            return False
+
+        return True
+
     def _load_model(self):
         """Charge le modèle ML smooth momentum."""
         try:
@@ -54,6 +76,8 @@ class SmoothMLScoring(Scoring):
                 data = joblib.load(self.model_path)
                 self.model = data['model']
                 self.scaler = data['scaler']
+                # Calibration isotonique (None sur les anciens pkl)
+                self.calibrator = data.get('calibrator')
                 self.feature_columns = data['feature_columns']
                 self.sector_columns = data.get('sector_columns', [])
                 self.model_loaded = True
@@ -168,6 +192,11 @@ class SmoothMLScoring(Scoring):
             return 0
 
         try:
+            if self.apply_momentum_filters and not self._passes_momentum_filters(df):
+                if symbol:
+                    print(f"[INFO] Filtre momentum 12-1/FIP non satisfait pour {symbol}")
+                return 0
+
             df = self._create_features(df, symbol=symbol)
             self.df = df
 
@@ -184,6 +213,10 @@ class SmoothMLScoring(Scoring):
             X = df_clean[self.feature_columns].iloc[-1:].values
             X_scaled = self.scaler.transform(X)
             probability = self.model.predict_proba(X_scaled)[0, 1]
+            # Calibration isotonique : redonne au score le sens de vraie
+            # probabilité de gain (les pkl anciens n'en ont pas -> inchangé)
+            if self.calibrator is not None:
+                probability = float(self.calibrator.predict([probability])[0])
 
             score = int(probability * 100)
             return max(0, min(score, 100))
@@ -211,6 +244,12 @@ class SmoothMLScoring(Scoring):
             'probability': probability,
             'signal': signal,
         }
+
+        if self.df is not None and len(self.df) >= 252:
+            momentum_12_1 = MomentumFilters.calc_momentum_12_1(self.df)
+            fip = MomentumFilters.calc_fip(self.df)
+            details['momentum_12_1'] = None if np.isnan(momentum_12_1) else float(momentum_12_1)
+            details['fip'] = None if np.isnan(fip) else float(fip)
 
         if self.df is not None and not self.df.empty:
             last = self.df.iloc[-1]
